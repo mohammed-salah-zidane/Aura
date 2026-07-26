@@ -1,0 +1,1 @@
+"NSLocationWhenInUseUsageDescription" = "Aura reads your location to show the weather where you are. Skipping this still works: the weather service resolves an approximate place from the request itself.";
