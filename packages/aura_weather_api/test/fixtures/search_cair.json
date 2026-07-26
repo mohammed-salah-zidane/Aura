@@ -1,0 +1,29 @@
+[
+    {
+        "id": 683802,
+        "name": "Cairo",
+        "region": "Al Qahirah",
+        "country": "Egypt",
+        "lat": 30.05,
+        "lon": 31.25,
+        "url": "cairo-al-qahirah-egypt"
+    },
+    {
+        "id": 129125,
+        "name": "Cairns",
+        "region": "Queensland",
+        "country": "Australia",
+        "lat": -16.92,
+        "lon": 145.77,
+        "url": "cairns-queensland-australia"
+    },
+    {
+        "id": 2784369,
+        "name": "Cairneyhill",
+        "region": "Fife",
+        "country": "United Kingdom",
+        "lat": 56.06,
+        "lon": -3.54,
+        "url": "cairneyhill-fife-united-kingdom"
+    }
+]

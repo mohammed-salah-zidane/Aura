@@ -1,0 +1,11 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          # WeatherAPI is snake_case throughout, so the rename is set once here
+          # rather than repeated on every DTO. The handful of keys it cannot
+          # derive (pm2_5, us-epa-index, gb-defra-index) carry a JsonKey.
+          field_rename: snake
+          explicit_to_json: true
+          create_to_json: true
