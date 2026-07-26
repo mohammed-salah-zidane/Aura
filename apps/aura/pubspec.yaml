@@ -29,6 +29,8 @@ dependencies:
     path: ../../packages/features/aura_feature_search
   aura_feature_settings:
     path: ../../packages/features/aura_feature_settings
+  aura_l10n:
+    path: ../../packages/aura_l10n
   aura_network:
     path: ../../packages/aura_network
   aura_storage:

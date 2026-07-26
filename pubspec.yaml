@@ -10,6 +10,7 @@ workspace:
   - apps/aura
   - packages/aura_core
   - packages/aura_design
+  - packages/aura_l10n
   - packages/aura_network
   - packages/aura_weather_api
   - packages/aura_storage
@@ -45,6 +46,14 @@ melos:
         concurrency: 1
       packageFilters:
         dependsOn: build_runner
+
+    gen:l10n:
+      description: Generate the localization delegate from the ARB files.
+      run: flutter gen-l10n
+      exec:
+        concurrency: 1
+      packageFilters:
+        fileExists: l10n.yaml
 
     gen:watch:
       description: Watch and regenerate codegen output.
@@ -96,6 +105,7 @@ melos:
       # no *.g.dart and analysis would fail on the missing part files.
       run: |
         melos run gen && \
+        melos run gen:l10n && \
         melos run format && \
         melos run analyze && \
         melos run test

@@ -1,0 +1,38 @@
+{
+  "@@locale": "en",
+
+  "splashTagline": "Weather in a new light",
+  "@splashTagline": {
+    "description": "The brand line under the wordmark on the splash screen. Set in small caps by the view, so it is stored in sentence case here."
+  },
+
+  "splashAttribution": "Powered by WeatherAPI.com",
+  "@splashAttribution": {
+    "description": "Credit for the weather service, at the foot of the splash screen. The free tier requires the service to be named visibly, so this line ships in every build."
+  },
+
+  "splashLoading": "Loading Aura",
+  "@splashLoading": {
+    "description": "Spoken by a screen reader in place of the three animated dots, which carry no text of their own."
+  },
+
+  "permissionTitle": "Enable Location",
+  "@permissionTitle": {
+    "description": "Heading on the screen that asks for location permission."
+  },
+
+  "permissionBody": "Aura uses your location to show accurate, real-time conditions for exactly where you are.",
+  "@permissionBody": {
+    "description": "Explains why the app is asking for location, under the heading on the permission screen."
+  },
+
+  "permissionAllow": "Allow Location Access",
+  "@permissionAllow": {
+    "description": "Primary button on the permission screen. Opens the system location prompt."
+  },
+
+  "permissionEnterManually": "Enter City Manually",
+  "@permissionEnterManually": {
+    "description": "Secondary button on the permission screen. Skips location and opens search instead."
+  }
+}

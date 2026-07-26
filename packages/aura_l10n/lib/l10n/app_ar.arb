@@ -1,0 +1,17 @@
+{
+  "@@locale": "ar",
+
+  "splashTagline": "الطقس في ضوء جديد",
+
+  "splashAttribution": "بيانات الطقس من WeatherAPI.com",
+
+  "splashLoading": "جارٍ تحميل Aura",
+
+  "permissionTitle": "تشغيل خدمة الموقع",
+
+  "permissionBody": "يستخدم تطبيق Aura موقعك ليعرض لك حالة الطقس الدقيقة والمحدَّثة لحظيًا في مكانك بالتحديد.",
+
+  "permissionAllow": "السماح بالوصول إلى الموقع",
+
+  "permissionEnterManually": "إدخال المدينة يدويًا"
+}

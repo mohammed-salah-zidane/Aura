@@ -15,6 +15,8 @@ dependencies:
     path: ../../aura_design
   aura_domain:
     path: ../../aura_domain
+  aura_l10n:
+    path: ../../aura_l10n
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.3.2

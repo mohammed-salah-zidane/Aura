@@ -1,0 +1,19 @@
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-dir: lib/l10n/generated
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+
+# A non-nullable getter means `context.l10n` cannot be null at a call site, so
+# no screen carries a null check for its own copy.
+nullable-getter: false
+
+# Without this the generated list is alphabetical, which puts Arabic first and
+# makes it the fallback for every locale Aura does not ship. A device set to
+# French would open in Arabic.
+preferred-supported-locales:
+  - en
+
+# Every message must carry a description. A key with no context is a key the
+# next person guesses at, and guessed context is how a locale drifts.
+required-resource-attributes: true

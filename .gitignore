@@ -16,6 +16,7 @@ pubspec_overrides.yaml
 .flutter-plugins-dependencies
 
 # Generated sources
+**/lib/l10n/generated/
 *.g.dart
 *.freezed.dart
 *.gen.dart
