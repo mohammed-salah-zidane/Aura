@@ -1,0 +1,18 @@
+name: aura_domain
+description: "Entities, repository ports and use cases. Pure Dart, no framework."
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  aura_core:
+    path: ../aura_core
+  collection: ^1.19.0
+  meta: ^1.18.0
+
+dev_dependencies:
+  test: ^1.25.0
+  very_good_analysis: ^10.3.0

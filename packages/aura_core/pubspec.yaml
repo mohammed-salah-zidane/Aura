@@ -1,0 +1,16 @@
+name: aura_core
+description: "Shared kernel: Result, failures, value objects and clock."
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  collection: ^1.19.0
+  meta: ^1.18.0
+
+dev_dependencies:
+  test: ^1.25.0
+  very_good_analysis: ^10.3.0

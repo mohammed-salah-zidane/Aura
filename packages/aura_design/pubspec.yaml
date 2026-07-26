@@ -1,0 +1,21 @@
+name: aura_design
+description: "Aura design system. Tokens generated from aura.pen."
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  google_fonts: ^8.2.0
+  lucide_icons_flutter: ^3.1.15
+
+dev_dependencies:
+  alchemist: ^0.14.0
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.3.0

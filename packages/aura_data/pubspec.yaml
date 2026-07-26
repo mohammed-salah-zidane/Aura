@@ -1,0 +1,22 @@
+name: aura_data
+description: "Repository implementations and DTO to entity mappers."
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  aura_core:
+    path: ../aura_core
+  aura_domain:
+    path: ../aura_domain
+  aura_weather_api:
+    path: ../aura_weather_api
+  meta: ^1.18.0
+
+dev_dependencies:
+  mocktail: ^1.0.5
+  test: ^1.25.0
+  very_good_analysis: ^10.3.0
