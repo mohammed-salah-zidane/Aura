@@ -1,6 +1,8 @@
+import 'package:aura/src/di/providers.dart';
 import 'package:aura_design/aura_design.dart';
-import 'package:aura_feature_onboarding/aura_feature_onboarding.dart';
+import 'package:aura_feature_home/aura_feature_home.dart';
 import 'package:aura_l10n/aura_l10n.dart';
+import 'package:aura_providers/aura_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,13 +23,37 @@ Future<void> main() async {
   // overridden by the window on both platforms.
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  runApp(const ProviderScope(child: AuraApp()));
+  runApp(
+    ProviderScope(overrides: deviceOverrides(), child: const AuraApp()),
+  );
 }
 
 /// Root of the application.
-class AuraApp extends StatelessWidget {
+class AuraApp extends ConsumerStatefulWidget {
   /// Creates the application root.
   const AuraApp({super.key});
+
+  @override
+  ConsumerState<AuraApp> createState() => _AuraAppState();
+}
+
+class _AuraAppState extends ConsumerState<AuraApp> {
+  String? _language;
+
+  /// Keeps `intl` and the API's `lang` in step with the locale `Localizations`
+  /// actually resolved.
+  ///
+  /// The provider is written after the frame rather than inside it: writing to
+  /// one while the tree is building is what Riverpod exists to stop.
+  void _adopt(Locale locale) {
+    AuraLocales.adopt(locale);
+    final tag = locale.languageCode;
+    if (tag == _language) return;
+    _language = tag;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(languageProvider.notifier).tag = tag;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,17 +63,25 @@ class AuraApp extends StatelessWidget {
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       // Runs inside Localizations, so it sees the locale that was actually
-      // resolved and keeps intl's own formatters in step with it.
+      // resolved.
       //
       // The Material is transparency only. Aura's screens paint their own sky
       // and pass a complete style to every Text, but a Text with no Material
       // above it inherits the framework's debug style, which draws a yellow
       // double underline under every string in the app.
       builder: (context, child) {
-        AuraLocales.adopt(Localizations.localeOf(context));
+        _adopt(Localizations.localeOf(context));
         return Material(type: MaterialType.transparency, child: child);
       },
-      home: const SplashScreen(),
+      home: HomeScreen(
+        onOpenSettings: () {},
+        onOpenSearch: () {},
+        onOpenSavedCities: () {},
+        onOpenForecast: () {},
+        onOpenAirQuality: () {},
+        onOpenAlert: () {},
+        onOpenSunAndMoon: () {},
+      ),
     );
   }
 }

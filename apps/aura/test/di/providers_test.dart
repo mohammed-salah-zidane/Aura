@@ -1,11 +1,15 @@
 import 'package:aura/src/di/providers.dart';
+import 'package:aura/src/platform/device_location.dart';
+import 'package:aura/src/platform/device_notifications.dart';
 import 'package:aura_core/aura_core.dart';
 import 'package:aura_data/aura_data.dart';
 import 'package:aura_domain/aura_domain.dart';
+import 'package:aura_providers/aura_providers.dart';
 import 'package:aura_storage/aura_storage.dart';
 import 'package:aura_weather_api/aura_weather_api.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
@@ -14,13 +18,18 @@ void main() {
   late AuraDatabase database;
   late ProviderContainer container;
 
+  ProviderContainer wiredContainer() => ProviderContainer(
+    overrides: <Override>[
+      ...deviceOverrides(),
+      databaseProvider.overrideWithValue(database),
+    ],
+  );
+
   setUp(() {
     SharedPreferencesAsyncPlatform.instance =
         InMemorySharedPreferencesAsync.empty();
     database = AuraDatabase(NativeDatabase.memory());
-    container = ProviderContainer(
-      overrides: [databaseProvider.overrideWithValue(database)],
-    );
+    container = wiredContainer();
   });
 
   tearDown(() {
@@ -40,12 +49,23 @@ void main() {
       expect(container.read(weatherCacheProvider), isA<WeatherCache>());
     });
 
-    test('savedCitiesProvider resolves to the Drift store', () {
-      expect(container.read(savedCitiesProvider), isA<SavedCitiesStore>());
+    test('savedCitiesPortProvider resolves to the Drift store', () {
+      expect(container.read(savedCitiesPortProvider), isA<SavedCitiesStore>());
     });
 
-    test('settingsProvider resolves to the preferences store', () {
-      expect(container.read(settingsProvider), isA<PreferencesStore>());
+    test('settingsPortProvider resolves to the preferences store', () {
+      expect(container.read(settingsPortProvider), isA<PreferencesStore>());
+    });
+
+    test('locationPortProvider resolves to the Geolocator adapter', () {
+      expect(container.read(locationPortProvider), isA<DeviceLocation>());
+    });
+
+    test('notificationPortProvider resolves to the platform adapter', () {
+      expect(
+        container.read(notificationPortProvider),
+        isA<DeviceNotifications>(),
+      );
     });
 
     test('weatherApiProvider resolves to the SDK', () {
@@ -57,13 +77,34 @@ void main() {
     });
   });
 
+  group('a port with no implementation', () {
+    // Every seam is declared unimplemented so a container that forgot to wire
+    // one says which, rather than handing back something that half works.
+    test('reading it names the provider that was never overridden', () {
+      final bare = ProviderContainer();
+      addTearDown(bare.dispose);
+
+      expect(
+        () => bare.read(weatherRepositoryProvider),
+        throwsA(
+          isA<Object>().having(
+            (error) => error.toString(),
+            'message',
+            contains('weatherRepositoryProvider'),
+          ),
+        ),
+      );
+    });
+  });
+
   group('what the graph shares', () {
     // The cache and the saved cities are two views of one database. Two
     // connections to one sqlite file is how a database gets corrupted.
     test('the cache and the saved cities share one database', () {
       var opened = 0;
       final probe = ProviderContainer(
-        overrides: [
+        overrides: <Override>[
+          ...deviceOverrides(),
           databaseProvider.overrideWith((ref) {
             opened++;
             return database;
@@ -74,7 +115,7 @@ void main() {
 
       probe
         ..read(weatherCacheProvider)
-        ..read(savedCitiesProvider);
+        ..read(savedCitiesPortProvider);
 
       expect(opened, 1);
     });
@@ -93,7 +134,7 @@ void main() {
     test('overriding the repository leaves the rest of the graph alone', () {
       const swapped = _EmptyRepository();
       final overridden = ProviderContainer(
-        overrides: [
+        overrides: <Override>[
           databaseProvider.overrideWithValue(database),
           weatherRepositoryProvider.overrideWithValue(swapped),
         ],

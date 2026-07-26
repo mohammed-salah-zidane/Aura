@@ -1,24 +1,27 @@
 import 'package:aura/src/aura_env.dart';
-import 'package:aura_core/aura_core.dart';
+import 'package:aura/src/platform/device_location.dart';
+import 'package:aura/src/platform/device_notifications.dart';
 import 'package:aura_data/aura_data.dart';
 import 'package:aura_domain/aura_domain.dart';
+import 'package:aura_providers/aura_providers.dart';
 import 'package:aura_storage/aura_storage.dart';
 import 'package:aura_weather_api/aura_weather_api.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Override is published from `misc.dart` rather than the main library.
+import 'package:flutter_riverpod/misc.dart' show Override;
 
-/// Every dependency the app is built from, assembled in one place.
+/// Everything the app is built from, assembled in one place.
 ///
-/// Riverpod is the container as well as the state management, so there is no
-/// second registry to keep in step. A feature asks for a port and gets whatever
-/// this file decided implements it, which is what lets a test override one
-/// collaborator and leave the rest alone.
+/// `aura_providers` declares one provider per domain port and leaves each
+/// unimplemented. This file answers them, and it is the only file in the
+/// repository that sees the data, storage and platform layers at once. A
+/// feature asks for a port and gets whatever is decided here, which is what
+/// lets a test override one collaborator and leave the rest alone.
 ///
-/// Written by hand: `riverpod_generator` needs `analyzer ^12` and the workspace
-/// is capped below that by the SDK's own pins.
+/// Written by hand: `riverpod_generator` needs `analyzer ^12` and the
+/// workspace is capped below that by the SDK's own pins.
 ///
-/// The source of "now". Nothing anywhere else calls `DateTime.now()`.
-final clockProvider = Provider<Clock>((ref) => const SystemClock());
-
 /// The local database. Opened once and closed when the app lets go of it.
 final databaseProvider = Provider<AuraDatabase>((ref) {
   final database = AuraDatabase.onDevice();
@@ -39,21 +42,32 @@ final weatherCacheProvider = Provider<WeatherCachePort>(
   (ref) => WeatherCache(ref.watch(databaseProvider)),
 );
 
-/// Where weather comes from, as far as every screen is concerned.
-final weatherRepositoryProvider = Provider<WeatherRepository>(
-  (ref) => WeatherRepositoryImpl(
-    api: ref.watch(weatherApiProvider),
-    cache: ref.watch(weatherCacheProvider),
-    clock: ref.watch(clockProvider),
+/// The platform's notification plugin, wrapped in the adapter.
+final deviceNotificationsProvider = Provider<DeviceNotifications>(
+  (ref) => DeviceNotifications(
+    FlutterLocalNotificationsPlugin(),
+    ref.watch(clockProvider),
   ),
 );
 
-/// The user's kept cities.
-final savedCitiesProvider = Provider<SavedCitiesPort>(
-  (ref) => SavedCitiesStore(ref.watch(databaseProvider)),
-);
-
-/// The user's own choices.
-final settingsProvider = Provider<SettingsPort>(
-  (ref) => PreferencesStore.onDevice(),
-);
+/// What every port declared in `aura_providers` resolves to on a device.
+///
+/// Handed to the root `ProviderScope`. A test builds its own list and leaves
+/// out whatever it is not exercising.
+List<Override> deviceOverrides() => <Override>[
+  weatherRepositoryProvider.overrideWith(
+    (ref) => WeatherRepositoryImpl(
+      api: ref.watch(weatherApiProvider),
+      cache: ref.watch(weatherCacheProvider),
+      clock: ref.watch(clockProvider),
+    ),
+  ),
+  settingsPortProvider.overrideWith((ref) => PreferencesStore.onDevice()),
+  savedCitiesPortProvider.overrideWith(
+    (ref) => SavedCitiesStore(ref.watch(databaseProvider)),
+  ),
+  locationPortProvider.overrideWith((ref) => const DeviceLocation()),
+  notificationPortProvider.overrideWith(
+    (ref) => ref.watch(deviceNotificationsProvider),
+  ),
+];
