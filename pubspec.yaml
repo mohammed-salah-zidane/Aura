@@ -21,7 +21,6 @@ workspace:
   - packages/features/aura_feature_settings
   - packages/features/aura_feature_details
   - packages/features/aura_feature_onboarding
-  - tool/pen_extract
 
 dev_dependencies:
   # Held at 7.8.x: 7.8.2+ needs cli_util ^0.5.0, but drift_dev (capped at 2.34.0
@@ -54,10 +53,6 @@ melos:
         concurrency: 1
       packageFilters:
         dependsOn: build_runner
-
-    tokens:
-      description: Regenerate design tokens from aura.pen.
-      run: dart run tool/pen_extract/bin/pen_extract.dart
 
     analyze:
       description: Static analysis across the workspace. Infos are fatal.
