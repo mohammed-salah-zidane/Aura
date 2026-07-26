@@ -5,8 +5,11 @@
 .pub/
 build/
 coverage/
-*.lock.bak
 pubspec_overrides.yaml
+
+# This is an application, so the resolved lockfile is committed for
+# reproducible builds. Overrides a global *.lock rule if one is set.
+!pubspec.lock
 
 # Generated sources
 *.g.dart
