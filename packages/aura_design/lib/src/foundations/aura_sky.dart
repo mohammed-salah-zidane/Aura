@@ -4,6 +4,7 @@ import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_gradients.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
 import 'package:aura_design/src/tokens/aura_motion.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 /// Which sky a screen paints.
@@ -118,15 +119,31 @@ class _AuraSkyState extends State<AuraSky> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _progress,
-      builder: (context, child) => CustomPaint(
-        painter: _SkyPainter(from: _from, to: _to, progress: _progress.value),
-        child: child,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      // Every sky in the design is dark and the app runs edge to edge, so the
+      // clock and the battery sit directly on the gradient. Declaring it here
+      // rather than once in main is what makes it stick: a single
+      // setSystemUIOverlayStyle before runApp is overridden by the window on
+      // both platforms, and the bars come back dark on a dark sky.
+      value: _lightSystemBars,
+      child: AnimatedBuilder(
+        animation: _progress,
+        builder: (context, child) => CustomPaint(
+          painter: _SkyPainter(from: _from, to: _to, progress: _progress.value),
+          child: child,
+        ),
+        child: widget.child,
       ),
-      child: widget.child,
     );
   }
+
+  static const SystemUiOverlayStyle _lightSystemBars = SystemUiOverlayStyle(
+    statusBarColor: AuraColors.transparent,
+    statusBarBrightness: Brightness.dark,
+    statusBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: AuraColors.transparent,
+    systemNavigationBarIconBrightness: Brightness.light,
+  );
 }
 
 /// Paints both of a sky's fills, and the starfield when one side has it.

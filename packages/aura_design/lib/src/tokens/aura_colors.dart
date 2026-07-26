@@ -29,6 +29,10 @@ abstract final class AuraColors {
   /// Hairlines, dividers and chart gridlines. White at 8%.
   static const Color grid = Color(0x14FFFFFF);
 
+  /// Fully clear. The app runs edge to edge, so the system bars have no fill of
+  /// their own and the sky shows through them.
+  static const Color transparent = Color(0x00000000);
+
   /// Instrument surface.
   static const Color ink = Color(0xFF0F141A);
 
