@@ -86,6 +86,12 @@ abstract final class AuraColors {
 
   // ---------------------------------------------------------------- scale
 
+  /// Marker on an index scale bar.
+  static const Color scaleIndicator = Color(0xFFFFFFFF);
+
+  /// Stroke around that marker. Dark enough to read over every band.
+  static const Color scaleIndicatorStroke = Color(0xFF0E2A44);
+
   /// Severity ramp shared by the UV index and the air-quality index.
   ///
   /// Index maps to severity, not to a fixed category count: the WHO UV bands
@@ -145,6 +151,10 @@ abstract final class AuraColors {
 
   /// Tint for the moon glyph.
   static const Color conditionMoon = Color(0xFFFFE9B0);
+
+  /// Tint for the moon phase glyph on the sun and moon card, which is drawn
+  /// cooler than the moon that stands for a clear night.
+  static const Color conditionMoonPhase = Color(0xFFD8DEEA);
 
   /// Tint for the moon-behind-cloud glyph.
   static const Color conditionCloudMoon = Color(0xFFE8EEF5);

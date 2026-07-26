@@ -114,7 +114,12 @@ class AuraScaleBar extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AuraRadii.bar),
-          gradient: LinearGradient(colors: colors, stops: stops),
+          gradient: LinearGradient(
+            begin: AlignmentDirectional.centerStart,
+            end: AlignmentDirectional.centerEnd,
+            colors: colors,
+            stops: stops,
+          ),
         ),
         child: const SizedBox.expand(),
       ),

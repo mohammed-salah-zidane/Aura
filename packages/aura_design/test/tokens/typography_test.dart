@@ -23,7 +23,7 @@ const Map<String, TextStyle> _styles = <String, TextStyle>{
   'titleScreen': AuraText.titleScreen,
   'metricValue': AuraText.metricValue,
   'condition': AuraText.condition,
-  'temperature': AuraText.temperature,
+  'valueCompact': AuraText.valueCompact,
   'body': AuraText.body,
   'label': AuraText.label,
   'kicker': AuraText.kicker,

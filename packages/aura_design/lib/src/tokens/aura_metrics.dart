@@ -65,6 +65,9 @@ abstract final class AuraRadii {
   /// 16. Buttons and the alert banner.
   static const double button = 16;
 
+  /// 12. The note chip on a full-screen state.
+  static const double note = 12;
+
   /// 18. List rows.
   static const double row = 18;
 
@@ -114,14 +117,53 @@ abstract final class AuraSizes {
   /// Condition icon in a compact row.
   static const double iconConditionSmall = 22;
 
+  /// Icon on the alert banner.
+  static const double iconBanner = 20;
+
   /// Metric and UI icon.
   static const double iconUi = 18;
+
+  /// Chevron on a card heading, and the glyph inside a settings row's tile.
+  static const double iconSmall = 16;
+
+  /// Glyph beside a note or a location kicker.
+  static const double iconCaption = 12;
 
   /// Small metric icon inside a label row.
   static const double iconLabel = 15;
 
   /// Live pill indicator dot.
   static const double liveDot = 7;
+
+  /// The circular settings button in the brand bar.
+  static const double brandButton = 34;
+
+  /// Glyph in the bottom bar.
+  static const double iconBottomBar = 22;
+
+  /// The filled glyph marking the current-location page in the bottom bar.
+  static const double pagerCurrent = 13;
+
+  /// A page dot in the bottom bar.
+  static const double pagerDot = 7;
+
+  /// The note chip's glyph on a full-screen state.
+  static const double iconNote = 14;
+
+  /// Marker on an index scale bar, and the width of its stroke.
+  static const double scaleIndicator = 12;
+
+  /// Stroke around that marker, so it reads against any band under it.
+  static const double scaleIndicatorStroke = 2;
+
+  /// Index scale bar on a card.
+  static const double indexScaleHeight = 8;
+
+  /// Index scale bar on a detail screen, where it carries end labels.
+  static const double indexScaleHeightLarge = 10;
+
+  /// Divider between the columns of the sun and moon card.
+  static const double astroDividerHeight = 46;
 
   /// Splash loading dot.
   static const double splashDot = 6;

@@ -143,14 +143,16 @@ class AuraRangeBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(AuraRadii.bar),
         ),
         child: Align(
-          alignment: Alignment.centerLeft,
+          alignment: AlignmentDirectional.centerStart,
           child: FractionallySizedBox(
-            alignment: Alignment(clampedStart * 2 - 1, 0),
+            alignment: AlignmentDirectional(clampedStart * 2 - 1, 0),
             widthFactor: clampedExtent,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AuraRadii.bar),
                 gradient: LinearGradient(
+                  begin: AlignmentDirectional.centerStart,
+                  end: AlignmentDirectional.centerEnd,
                   colors: AuraGradients.temperatureRange.colors,
                   stops: AuraGradients.temperatureRange.stops,
                 ),
@@ -210,7 +212,7 @@ class AuraHourCell extends StatelessWidget {
           Icon(icon, size: AuraSizes.iconCondition, color: iconTint),
           Text(
             temperature,
-            style: AuraText.temperature.copyWith(
+            style: AuraText.valueCompact.copyWith(
               color: AuraColors.textPrimary,
             ),
           ),

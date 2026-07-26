@@ -113,6 +113,15 @@ abstract final class AuraText {
     fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
+  /// Air quality category on a card. `Good`
+  static const TextStyle categoryValue = TextStyle(
+    fontFamily: AuraFonts.display,
+    fontFamilyFallback: _displayFallback,
+    package: AuraFonts.package,
+    fontSize: 30,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
+  );
+
   /// Screen title. `3-Day Forecast`
   static const TextStyle titleScreen = TextStyle(
     fontFamily: AuraFonts.display,
@@ -178,8 +187,8 @@ abstract final class AuraText {
     fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
-  /// High and low, and hour-cell temperatures. `H:37°`
-  static const TextStyle temperature = TextStyle(
+  /// A compact reading. A high or a low, an hour temperature, an astro time.
+  static const TextStyle valueCompact = TextStyle(
     fontFamily: AuraFonts.app,
     fontFamilyFallback: _textFallback,
     package: AuraFonts.package,
@@ -454,13 +463,16 @@ abstract final class AuraText {
   );
 
   /// Small tracked label under an astro value. `SUNRISE`
+  ///
+  /// The design system sheet sets this at 10/600 with 0.8 of tracking; every
+  /// screen that draws one sets 11/500 with 0.5. The screens are what ship.
   static const TextStyle astroLabel = TextStyle(
     fontFamily: AuraFonts.system,
     fontFamilyFallback: _textFallback,
     package: AuraFonts.package,
-    fontSize: 10,
-    fontVariations: <FontVariation>[FontVariation('wght', 600)],
-    letterSpacing: 0.8,
+    fontSize: 11,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
+    letterSpacing: 0.5,
   );
 
   /// End label on a scale bar. `HAZARDOUS`

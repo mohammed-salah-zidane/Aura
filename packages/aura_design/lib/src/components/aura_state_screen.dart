@@ -19,6 +19,7 @@ class AuraStateScreen extends StatelessWidget {
     required this.title,
     required this.body,
     required this.actions,
+    this.note,
     this.iconColor = AuraColors.accent,
     super.key,
   });
@@ -34,6 +35,12 @@ class AuraStateScreen extends StatelessWidget {
 
   /// What the user can do about it, primary action first.
   final List<Widget> actions;
+
+  /// An optional chip under the body, naming what the app already has.
+  ///
+  /// Only the offline frame carries one, where it says how old the cached
+  /// reading is. Absent everywhere else.
+  final Widget? note;
 
   /// Tint for [icon]. Gold when the state invites an action, muted when it
   /// reports a problem.
@@ -68,6 +75,7 @@ class AuraStateScreen extends StatelessWidget {
                 iconColor: iconColor,
                 title: title,
                 body: body,
+                note: note,
               ),
             ),
             Column(
@@ -89,12 +97,14 @@ class _Explanation extends StatelessWidget {
     required this.iconColor,
     required this.title,
     required this.body,
+    required this.note,
   });
 
   final IconData icon;
   final Color iconColor;
   final String title;
   final String body;
+  final Widget? note;
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +135,53 @@ class _Explanation extends StatelessWidget {
             style: AuraText.body.copyWith(color: AuraColors.textSecondary),
           ),
         ),
+        ?note,
       ],
+    );
+  }
+}
+
+/// The chip a full-screen state uses to name what the app already holds.
+class AuraStateNote extends StatelessWidget {
+  /// Creates a note chip.
+  const AuraStateNote({required this.icon, required this.label, super.key});
+
+  /// Glyph before the text.
+  final IconData icon;
+
+  /// What the app already holds.
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return AuraGlass(
+      radius: AuraRadii.note,
+      shadow: const <BoxShadow>[],
+      padding: const EdgeInsets.symmetric(
+        vertical: AuraSpacing.smPlus,
+        horizontal: AuraSpacing.mdPlus,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: AuraSpacing.xsPlus,
+        children: <Widget>[
+          Icon(
+            icon,
+            size: AuraSizes.iconNote,
+            color: AuraColors.textTertiary,
+          ),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AuraText.captionTracked.copyWith(
+                color: AuraColors.textTertiary,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

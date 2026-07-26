@@ -46,7 +46,7 @@ class AuraAlertBanner extends StatelessWidget {
             children: <Widget>[
               const Icon(
                 AuraIcons.alert,
-                size: 20,
+                size: AuraSizes.iconBanner,
                 color: AuraColors.alertIcon,
               ),
               Expanded(
@@ -168,7 +168,7 @@ class AuraSettingsRow extends StatelessWidget {
                     if (onTap != null)
                       const Icon(
                         AuraIcons.chevronRight,
-                        size: 16,
+                        size: AuraSizes.iconSmall,
                         color: AuraColors.textTertiary,
                       ),
                   ],
@@ -197,7 +197,11 @@ class _IconTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(AuraRadii.iconTile),
       ),
       child: Center(
-        child: Icon(icon, size: 16, color: AuraColors.textSecondary),
+        child: Icon(
+          icon,
+          size: AuraSizes.iconSmall,
+          color: AuraColors.textSecondary,
+        ),
       ),
     );
   }
