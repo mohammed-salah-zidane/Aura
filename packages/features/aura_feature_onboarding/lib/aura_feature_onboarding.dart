@@ -2,5 +2,6 @@
 library;
 
 export 'src/permission/permission_screen.dart';
+export 'src/permission/permission_view_model.dart';
 export 'src/splash/splash_screen.dart';
 export 'src/splash/splash_view_model.dart';

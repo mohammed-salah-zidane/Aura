@@ -48,12 +48,12 @@ abstract final class AuraRoutes {
 ///
 /// [version] is the build the About row reports, read from the package at the
 /// root rather than hard-coded in the feature.
-GoRouter auraRouter({required String version, String? initialLocation}) {
+GoRouter auraRouter({required String version}) {
   void back(BuildContext context) =>
       context.canPop() ? context.pop() : context.go(AuraRoutes.home);
 
   return GoRouter(
-    initialLocation: initialLocation ?? AuraRoutes.splash,
+    initialLocation: AuraRoutes.splash,
     routes: <RouteBase>[
       GoRoute(
         path: AuraRoutes.splash,
@@ -69,7 +69,7 @@ GoRouter auraRouter({required String version, String? initialLocation}) {
       GoRoute(
         path: AuraRoutes.permission,
         builder: (context, state) => PermissionScreen(
-          onAllow: () => context.go(AuraRoutes.home),
+          onDone: () => context.go(AuraRoutes.home),
           onEnterManually: () => context.go(AuraRoutes.search),
         ),
       ),
@@ -116,6 +116,7 @@ GoRouter auraRouter({required String version, String? initialLocation}) {
         builder: (context, state) => SavedCitiesScreen(
           onOpenSearch: () => context.push(AuraRoutes.search),
           onSelect: () => back(context),
+          onBack: () => back(context),
         ),
       ),
       GoRoute(

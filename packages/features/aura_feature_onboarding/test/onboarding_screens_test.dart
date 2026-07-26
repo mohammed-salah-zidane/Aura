@@ -136,11 +136,19 @@ void main() {
   });
 
   group('PermissionScreen', () {
-    Widget subject({VoidCallback? onAllow, VoidCallback? onEnterManually}) =>
-        PermissionScreen(
-          onAllow: onAllow ?? () {},
-          onEnterManually: onEnterManually ?? () {},
-        );
+    Widget subject({
+      VoidCallback? onDone,
+      VoidCallback? onEnterManually,
+      FakeLocation? location,
+    }) => ProviderScope(
+      overrides: <Override>[
+        locationPortProvider.overrideWithValue(location ?? FakeLocation()),
+      ],
+      child: PermissionScreen(
+        onDone: onDone ?? () {},
+        onEnterManually: onEnterManually ?? () {},
+      ),
+    );
 
     testWidgets('shows the heading, the reason and both actions', (
       tester,
@@ -171,11 +179,36 @@ void main() {
       expect(find.byIcon(AuraIcons.navigation), findsOneWidget);
     });
 
-    testWidgets('the primary action fires once per tap', (tester) async {
+    testWidgets('the primary action asks the system, once per tap', (
+      tester,
+    ) async {
       var allowed = 0;
-      await pumpScreen(tester, subject(onAllow: () => allowed++));
+      final location = FakeLocation();
+      await pumpScreen(
+        tester,
+        subject(onDone: () => allowed++, location: location),
+      );
       await tester.tap(find.text((await _copy(_en)).permissionAllow));
-      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(location.requests, 1, reason: 'the prompt was never put up');
+      expect(allowed, 1);
+    });
+
+    testWidgets('the primary action moves on when the prompt is refused', (
+      tester,
+    ) async {
+      var allowed = 0;
+      final location = FakeLocation(granted: LocationPermission.denied);
+      await pumpScreen(
+        tester,
+        subject(onDone: () => allowed++, location: location),
+      );
+      await tester.tap(find.text((await _copy(_en)).permissionAllow));
+      await tester.pumpAndSettle();
+
+      // Refusing is not a dead end: the service resolves an approximate
+      // position from the request itself.
       expect(allowed, 1);
     });
 

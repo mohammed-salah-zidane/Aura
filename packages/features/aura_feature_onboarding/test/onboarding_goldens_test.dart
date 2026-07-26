@@ -40,9 +40,13 @@ void main() {
   });
 
   group('permission', () {
-    Widget subject() => PermissionScreen(
-      onAllow: () {},
-      onEnterManually: () {},
+    Widget subject() => ProviderScope(
+      overrides: <Override>[
+        locationPortProvider.overrideWithValue(
+          const _Location(LocationPermission.notDetermined),
+        ),
+      ],
+      child: PermissionScreen(onDone: () {}, onEnterManually: () {}),
     );
 
     testWidgets('English', (tester) async {
