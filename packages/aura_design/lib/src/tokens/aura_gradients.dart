@@ -15,6 +15,189 @@ class AuraGradient {
   final List<double> stops;
 }
 
+/// The radial wash a sky paints over its linear gradient.
+///
+/// Every frame in `aura.pen` carries exactly two fills: a vertical linear
+/// gradient, and this bloom above it. Reading only the first one drops the
+/// light source out of every screen in the app.
+///
+/// The pen's `size` is the ellipse **diameter** as a fraction of the frame, so
+/// the semi-axes are half of each factor. `center` is a fraction of the frame
+/// and defaults to the middle on either axis.
+class AuraBloom {
+  /// Creates a bloom token.
+  const AuraBloom({
+    required this.colors,
+    required this.stops,
+    required this.opacity,
+    required this.widthFactor,
+    required this.heightFactor,
+    this.centerX = 0.5,
+    this.centerY = 0.5,
+  });
+
+  /// Stop colours, from the centre outward.
+  final List<Color> colors;
+
+  /// Stop positions from 0 to 1, matching [colors] by index.
+  final List<double> stops;
+
+  /// Opacity of the whole fill layer, applied on top of each stop's own alpha.
+  final double opacity;
+
+  /// Ellipse width as a fraction of the frame width.
+  final double widthFactor;
+
+  /// Ellipse height as a fraction of the frame height.
+  final double heightFactor;
+
+  /// Horizontal centre as a fraction of the frame width.
+  final double centerX;
+
+  /// Vertical centre as a fraction of the frame height.
+  final double centerY;
+}
+
+/// The bloom of each sky, read from the second fill of its frame.
+///
+/// Every bloom in the design has exactly two stops, transparent at the outer
+/// one, which is what lets the sky transition interpolate them pairwise.
+abstract final class AuraBlooms {
+  /// Clear day. A warm haze low on the horizon.
+  static const AuraBloom clearDay = AuraBloom(
+    colors: <Color>[Color(0xC7FFF4D5), Color(0x00FFF4D5)],
+    stops: <double>[0, 1],
+    opacity: 0.9,
+    widthFactor: 1.3,
+    heightFactor: 0.58,
+    centerY: 0.19,
+  );
+
+  /// Partly cloudy.
+  static const AuraBloom partlyCloudy = AuraBloom(
+    colors: <Color>[Color(0x99FFFFFF), Color(0x00FFFFFF)],
+    stops: <double>[0, 1],
+    opacity: 0.6,
+    widthFactor: 1.3,
+    heightFactor: 0.55,
+    centerY: 0.2,
+  );
+
+  /// Overcast. The flattest light in the set.
+  static const AuraBloom overcast = AuraBloom(
+    colors: <Color>[Color(0x66C9D3DB), Color(0x00C9D3DB)],
+    stops: <double>[0, 1],
+    opacity: 0.32,
+    widthFactor: 1.3,
+    heightFactor: 0.5,
+    centerY: 0.18,
+  );
+
+  /// Rain.
+  static const AuraBloom rain = AuraBloom(
+    colors: <Color>[Color(0x667FA6C2), Color(0x007FA6C2)],
+    stops: <double>[0, 1],
+    opacity: 0.3,
+    widthFactor: 1.3,
+    heightFactor: 0.55,
+    centerY: 0.2,
+  );
+
+  /// Thunderstorm.
+  static const AuraBloom thunderstorm = AuraBloom(
+    colors: <Color>[Color(0x806E5A9E), Color(0x006E5A9E)],
+    stops: <double>[0, 1],
+    opacity: 0.5,
+    widthFactor: 1.3,
+    heightFactor: 0.5,
+    centerY: 0.16,
+  );
+
+  /// Snow.
+  static const AuraBloom snow = AuraBloom(
+    colors: <Color>[Color(0x77EAF2F8), Color(0x00EAF2F8)],
+    stops: <double>[0, 1],
+    opacity: 0.5,
+    widthFactor: 1.3,
+    heightFactor: 0.55,
+    centerY: 0.2,
+  );
+
+  /// Clear night. Sits off to the right, unlike every other sky.
+  static const AuraBloom clearNight = AuraBloom(
+    colors: <Color>[Color(0x66AEB8E0), Color(0x00AEB8E0)],
+    stops: <double>[0, 1],
+    opacity: 0.7,
+    widthFactor: 1.1,
+    heightFactor: 0.45,
+    centerX: 0.68,
+    centerY: 0.15,
+  );
+
+  /// Fog. The lowest and widest bloom, which is what reads as haze.
+  static const AuraBloom fog = AuraBloom(
+    colors: <Color>[Color(0x88C3CBD0), Color(0x00C3CBD0)],
+    stops: <double>[0, 1],
+    opacity: 0.5,
+    widthFactor: 1.3,
+    heightFactor: 0.6,
+    centerY: 0.3,
+  );
+
+  /// Brand sky.
+  static const AuraBloom systemBrand = AuraBloom(
+    colors: <Color>[Color(0x40FFFFFF), Color(0x00FFFFFF)],
+    stops: <double>[0, 1],
+    opacity: 0.5,
+    widthFactor: 1.2,
+    heightFactor: 0.5,
+    centerY: 0.12,
+  );
+
+  /// Dark instrument dashboard.
+  static const AuraBloom instrument = AuraBloom(
+    colors: <Color>[Color(0x402A4A7A), Color(0x002A4A7A)],
+    stops: <double>[0, 1],
+    opacity: 0.5,
+    widthFactor: 1,
+    heightFactor: 0.5,
+    centerX: 0.2,
+    centerY: 0,
+  );
+
+  /// Splash. The only bloom that goes transparent before the ellipse edge, and
+  /// the only one centred near the middle of the screen, behind the mark.
+  static const AuraBloom splash = AuraBloom(
+    colors: <Color>[Color(0x4DFFD68A), Color(0x00FFD68A)],
+    stops: <double>[0, 0.75],
+    opacity: 0.95,
+    widthFactor: 1.2,
+    heightFactor: 0.7,
+    centerY: 0.42,
+  );
+
+  /// Weather alert detail.
+  static const AuraBloom weatherAlert = AuraBloom(
+    colors: <Color>[Color(0x3DFF8A5B), Color(0x00FF8A5B)],
+    stops: <double>[0, 1],
+    opacity: 0.5,
+    widthFactor: 1.2,
+    heightFactor: 0.45,
+    centerY: 0.1,
+  );
+
+  /// Sun and moon detail. Offset right, like the clear-night sky.
+  static const AuraBloom sunAndMoon = AuraBloom(
+    colors: <Color>[Color(0x40AEB8E0), Color(0x00AEB8E0)],
+    stops: <double>[0, 1],
+    opacity: 0.6,
+    widthFactor: 1,
+    heightFactor: 0.4,
+    centerX: 0.7,
+    centerY: 0.12,
+  );
+}
+
 /// The condition skies. In Aura the background *is* the weather, so every
 /// condition swaps the whole-screen gradient.
 ///

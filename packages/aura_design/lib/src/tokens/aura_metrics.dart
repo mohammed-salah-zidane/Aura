@@ -77,6 +77,10 @@ abstract final class AuraSizes {
   /// Design canvas width. Layouts scale from this reference.
   static const double referenceWidth = 393;
 
+  /// Design canvas height. Only absolutely-placed decoration needs it; laid-out
+  /// content takes its height from the real screen.
+  static const double referenceHeight = 852;
+
   /// Metric card, 172 by 116.
   static const Size metricCard = Size(172, 116);
 
