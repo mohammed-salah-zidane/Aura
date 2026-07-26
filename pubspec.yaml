@@ -92,7 +92,10 @@ melos:
 
     ci:
       description: Everything CI runs. Must pass before any commit.
+      # gen runs first: generated sources are gitignored, so a fresh clone has
+      # no *.g.dart and analysis would fail on the missing part files.
       run: |
+        melos run gen && \
         melos run format && \
         melos run analyze && \
         melos run test
