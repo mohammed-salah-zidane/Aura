@@ -11,7 +11,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// holds settings.
 final class PreferencesStore implements SettingsPort {
   /// Creates the store over [_preferences].
+  ///
+  /// Tests pass an in-memory handle; the app uses [PreferencesStore.onDevice].
   const PreferencesStore(this._preferences);
+
+  /// Opens the platform preferences the app ships with.
+  PreferencesStore.onDevice() : _preferences = SharedPreferencesAsync();
 
   static const String _temperatureKey = 'units.temperature';
   static const String _speedKey = 'units.speed';
