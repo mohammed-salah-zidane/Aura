@@ -5,10 +5,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Families bundled by this package.
+///
+/// The two Arabic families are loaded alongside the Latin three because they
+/// are `fontFamilyFallback` on every style, so an Arabic golden or layout
+/// assertion needs them registered exactly as much as the primaries.
 const List<String> auraFontFamilies = <String>[
   AuraFonts.display,
   AuraFonts.app,
   AuraFonts.system,
+  AuraFonts.displayArabic,
+  AuraFonts.textArabic,
 ];
 
 /// Loads Aura's bundled fonts into the test binding.

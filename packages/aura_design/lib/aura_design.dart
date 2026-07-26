@@ -5,6 +5,7 @@
 /// declare a visual literal.
 library;
 
+export 'src/aura_font_licenses.dart';
 export 'src/components/aura_button.dart';
 export 'src/components/aura_city_card.dart';
 export 'src/components/aura_forecast_row.dart';

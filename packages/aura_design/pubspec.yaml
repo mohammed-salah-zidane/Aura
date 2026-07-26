@@ -21,6 +21,10 @@ dev_dependencies:
 flutter:
   # Variable fonts, declared once per family. Weight is driven through
   # fontVariations in AuraText, so no per-weight assets are needed.
+  #
+  # The three Latin families carry no Arabic glyphs at all, so the two Noto
+  # Arabic families back them as fontFamilyFallback. Both are variable on wght
+  # over 100-900, which covers every weight the type scale asks for.
   fonts:
     - family: Fraunces
       fonts:
@@ -31,3 +35,18 @@ flutter:
     - family: Inter
       fonts:
         - asset: fonts/Inter.ttf
+    - family: NotoKufiArabic
+      fonts:
+        - asset: fonts/NotoKufiArabic.ttf
+    - family: NotoSansArabic
+      fonts:
+        - asset: fonts/NotoSansArabic.ttf
+
+  # The Open Font License requires the licence to travel with the fonts, so the
+  # texts ship as assets and are added to the LicenseRegistry at startup.
+  assets:
+    - fonts/OFL-Fraunces.txt
+    - fonts/OFL-Inter.txt
+    - fonts/OFL-NotoKufiArabic.txt
+    - fonts/OFL-NotoSansArabic.txt
+    - fonts/OFL-Outfit.txt
