@@ -41,8 +41,8 @@ jobs:
       # no localization delegate until these have run.
       - name: Generate
         run: |
-          melos run gen
-          melos run gen:l10n
+          melos run --no-select gen
+          melos run --no-select gen:l10n
 
       - name: Write the API credential
         # Compile-time only. Nothing here reaches a build artefact that ships.
@@ -85,8 +85,8 @@ jobs:
 
       - name: Generate
         run: |
-          melos run gen
-          melos run gen:l10n
+          melos run --no-select gen
+          melos run --no-select gen:l10n
 
       - name: Compare goldens
         run: melos run gold
@@ -137,8 +137,8 @@ jobs:
 
       - name: Generate
         run: |
-          melos run gen
-          melos run gen:l10n
+          melos run --no-select gen
+          melos run --no-select gen:l10n
 
       - name: Write the API credential
         run: |

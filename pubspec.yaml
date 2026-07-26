@@ -96,22 +96,29 @@ melos:
     gold:
       description: Golden tests only.
       run: flutter test --tags golden
+      exec:
+        concurrency: 4
       packageFilters:
-        dirExists: test
+        dirExists: test/goldens
 
     gold:update:
       description: Regenerate goldens. Review the diff by eye before committing.
       run: flutter test --tags golden --update-goldens
+      exec:
+        concurrency: 1
       packageFilters:
-        dirExists: test
+        dirExists: test/goldens
 
     ci:
       description: Everything CI runs. Must pass before any commit.
       # gen runs first: generated sources are gitignored, so a fresh clone has
       # no *.g.dart and analysis would fail on the missing part files.
+      #
+      # --no-select throughout: a script with packageFilters stops to offer a
+      # single package to run in, and a chained script must not stop to ask.
       run: |
-        melos run gen && \
-        melos run gen:l10n && \
-        melos run format && \
-        melos run analyze && \
-        melos run test
+        melos run --no-select gen && \
+        melos run --no-select gen:l10n && \
+        melos run --no-select format && \
+        melos run --no-select analyze && \
+        melos run --no-select test
