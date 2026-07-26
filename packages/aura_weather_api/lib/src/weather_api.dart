@@ -6,7 +6,10 @@ import 'package:aura_weather_api/src/dto/search_result_dto.dart';
 import 'package:aura_weather_api/src/weather_api_failure.dart';
 
 /// The WeatherAPI.com endpoints Aura uses. Returns DTOs, never entities.
-final class WeatherApi {
+///
+/// Deliberately not `final`: this is the seam the repository is tested against,
+/// and a fake has to be able to implement it.
+class WeatherApi {
   /// Wraps an already-configured network client.
   ///
   /// Use [WeatherApi.withKey] unless you are supplying a stub in a test.
