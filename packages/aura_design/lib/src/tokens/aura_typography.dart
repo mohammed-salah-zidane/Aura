@@ -368,6 +368,30 @@ abstract final class AuraText {
     letterSpacing: 0.5,
   );
 
+  /// Rain probability in a forecast row. `10%`
+  static const TextStyle numericLabel = TextStyle(
+    fontFamily: AuraFonts.system,
+    package: AuraFonts.package,
+    fontSize: 12,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
+  );
+
+  /// High and low pair on a city card. `H:37° L:24°`
+  static const TextStyle cityCardHighLow = TextStyle(
+    fontFamily: AuraFonts.system,
+    package: AuraFonts.package,
+    fontSize: 12,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
+  );
+
+  /// Condition on a city card. `Mostly Sunny`
+  static const TextStyle cityCardCondition = TextStyle(
+    fontFamily: AuraFonts.app,
+    package: AuraFonts.package,
+    fontSize: 13,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
+  );
+
   /// Live-data pill label. `LIVE`
   static const TextStyle pillLabel = TextStyle(
     fontFamily: AuraFonts.system,
