@@ -1,0 +1,103 @@
+name: aura_workspace
+description: Aura — a weather app for iOS and Android.
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
+
+workspace:
+  - apps/aura
+  - packages/aura_core
+  - packages/aura_design
+  - packages/aura_network
+  - packages/aura_weather_api
+  - packages/aura_storage
+  - packages/aura_domain
+  - packages/aura_data
+  - packages/features/aura_feature_home
+  - packages/features/aura_feature_search
+  - packages/features/aura_feature_saved_cities
+  - packages/features/aura_feature_settings
+  - packages/features/aura_feature_details
+  - packages/features/aura_feature_onboarding
+  - tool/pen_extract
+
+dev_dependencies:
+  # Held at 7.8.x: 7.8.2+ needs cli_util ^0.5.0, but drift_dev (capped at 2.34.0
+  # by the SDK analyzer ceiling) needs ^0.4.0. One shared resolution, one answer.
+  melos: ">=7.8.0 <7.8.2"
+  very_good_analysis: ^10.3.0
+
+melos:
+  name: aura
+
+  command:
+    bootstrap:
+      environment:
+        sdk: ^3.12.0
+        flutter: ">=3.44.0"
+
+  scripts:
+    gen:
+      description: Run build_runner across every package that needs codegen.
+      run: dart run build_runner build --delete-conflicting-outputs
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: build_runner
+
+    gen:watch:
+      description: Watch and regenerate codegen output.
+      run: dart run build_runner watch --delete-conflicting-outputs
+      exec:
+        concurrency: 1
+      packageFilters:
+        dependsOn: build_runner
+
+    tokens:
+      description: Regenerate design tokens from aura.pen.
+      run: dart run tool/pen_extract/bin/pen_extract.dart
+
+    analyze:
+      description: Static analysis across the workspace. Infos are fatal.
+      run: dart analyze --fatal-infos --fatal-warnings .
+
+    format:
+      description: Format every Dart file.
+      run: dart format --set-exit-if-changed .
+
+    test:
+      description: Unit and widget tests for every package that has them.
+      run: flutter test
+      exec:
+        concurrency: 4
+      packageFilters:
+        dirExists: test
+
+    test:coverage:
+      description: Tests with coverage, generated files excluded.
+      run: flutter test --coverage
+      exec:
+        concurrency: 4
+      packageFilters:
+        dirExists: test
+
+    gold:
+      description: Golden tests only.
+      run: flutter test --tags golden
+      packageFilters:
+        dirExists: test
+
+    gold:update:
+      description: Regenerate goldens. Review the diff by eye before committing.
+      run: flutter test --tags golden --update-goldens
+      packageFilters:
+        dirExists: test
+
+    ci:
+      description: Everything CI runs. Must pass before any commit.
+      run: |
+        melos run format && \
+        melos run analyze && \
+        melos run test
