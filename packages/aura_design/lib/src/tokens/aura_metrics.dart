@@ -5,8 +5,14 @@ import 'dart:ui';
 /// The design sits on a 4-point grid with a few deliberate half-steps inside
 /// dense components such as hour cells and metric cards.
 abstract final class AuraSpacing {
+  /// 1. Between a title and the line directly under it.
+  static const double micro = 1;
+
   /// 2. Hairline separation inside a stacked label.
   static const double hairline = 2;
+
+  /// 5. Between the parts of an astro column.
+  static const double xxsPlus = 5;
 
   /// 4. Tightest grid step.
   static const double xxs = 4;
@@ -90,11 +96,12 @@ abstract final class AuraSizes {
   /// content takes its height from the real screen.
   static const double referenceHeight = 852;
 
-  /// Metric card, 172 by 116.
-  static const Size metricCard = Size(172, 116);
+  /// Metric card height. Both cards in a row fill the width between them, so
+  /// the pen's 172 is a consequence of the 393 canvas rather than a value.
+  static const double metricCardHeight = 116;
 
-  /// City card, 400 by 116.
-  static const Size cityCard = Size(400, 116);
+  /// City card height. The card fills the width of its list.
+  static const double cityCardHeight = 116;
 
   /// Forecast day row height.
   static const double forecastRowHeight = 54;
@@ -119,6 +126,9 @@ abstract final class AuraSizes {
 
   /// Icon on the alert banner.
   static const double iconBanner = 20;
+
+  /// The spinner on the loading screen.
+  static const double iconSpinner = 24;
 
   /// Metric and UI icon.
   static const double iconUi = 18;
@@ -162,8 +172,35 @@ abstract final class AuraSizes {
   /// Index scale bar on a detail screen, where it carries end labels.
   static const double indexScaleHeightLarge = 10;
 
-  /// Divider between the columns of the sun and moon card.
+  /// Thickness of a hairline divider.
+  static const double divider = 1;
+
+  /// Height of the divider between the columns of the sun and moon card.
   static const double astroDividerHeight = 46;
+
+  /// Width of the loading placeholder standing in for the kicker.
+  static const double skeletonKickerWidth = 120;
+
+  /// Height of that placeholder.
+  static const double skeletonKickerHeight = 14;
+
+  /// Width of the loading placeholder standing in for the hero temperature.
+  static const double skeletonHeroWidth = 190;
+
+  /// Height of that placeholder.
+  static const double skeletonHeroHeight = 58;
+
+  /// Width of the loading placeholder standing in for the condition line.
+  static const double skeletonConditionWidth = 150;
+
+  /// Height of that placeholder.
+  static const double skeletonConditionHeight = 18;
+
+  /// Height of the loading placeholder standing in for the hourly panel.
+  static const double skeletonHourly = 150;
+
+  /// Height of a loading placeholder standing in for a metric card.
+  static const double skeletonMetric = 100;
 
   /// Splash loading dot.
   static const double splashDot = 6;

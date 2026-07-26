@@ -76,6 +76,15 @@ abstract final class AuraText {
     letterSpacing: 0.5,
   );
 
+  /// The wordmark in the brand bar above the hero. `Aura`
+  static const TextStyle wordmarkSmall = TextStyle(
+    fontFamily: AuraFonts.display,
+    fontFamilyFallback: _displayFallback,
+    package: AuraFonts.package,
+    fontSize: 18,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
+  );
+
   /// Hero temperature. `35°`
   static const TextStyle display = TextStyle(
     fontFamily: AuraFonts.display,
@@ -364,7 +373,8 @@ abstract final class AuraText {
     letterSpacing: 0.6,
   );
 
-  /// Location kicker above the hero. `CURRENT LOCATION`
+  /// A tracked small-caps heading: the kicker above the hero, and the title
+  /// on a card. `CURRENT LOCATION`
   static const TextStyle kicker = TextStyle(
     fontFamily: AuraFonts.system,
     fontFamilyFallback: _textFallback,
@@ -384,7 +394,7 @@ abstract final class AuraText {
     letterSpacing: 0.4,
   );
 
-  /// Chip and supporting note text. `Level 1 of 6 · Low health risk`
+  /// A chip, a compact label, or a supporting note. `Waiting for data`
   static const TextStyle chip = TextStyle(
     fontFamily: AuraFonts.system,
     fontFamilyFallback: _textFallback,

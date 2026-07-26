@@ -33,6 +33,7 @@ class AuraGlass extends StatelessWidget {
     this.padding,
     this.width,
     this.height,
+    this.constraints,
     this.borderColor = AuraColors.border,
     super.key,
   });
@@ -78,6 +79,10 @@ class AuraGlass extends StatelessWidget {
   /// Fixed height, when the design specifies one.
   final double? height;
 
+  /// Bounds, for a surface whose authored size is a floor rather than a fixed
+  /// one.
+  final BoxConstraints? constraints;
+
   /// Stroke colour. Only the alert banner overrides this.
   final Color borderColor;
 
@@ -86,6 +91,7 @@ class AuraGlass extends StatelessWidget {
     return Container(
       width: width,
       height: height,
+      constraints: constraints,
       padding: padding,
       decoration: BoxDecoration(
         color: level.fill,

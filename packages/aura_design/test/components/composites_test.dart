@@ -52,18 +52,64 @@ void main() {
       expect(find.byType(Text), findsNWidgets(2));
     });
 
-    testWidgets('matches the height in the design', (tester) async {
+    testWidgets('takes the height in the design as its floor', (tester) async {
+      // The pen draws every metric card at 116. It is a minimum rather than a
+      // fixed height, because the ultraviolet card carries a scale bar as well
+      // as a sub-line and a font whose metrics run tall would clip it.
       await tester.pumpWidget(
         _host(
-          const AuraMetricCard(
-            icon: AuraIcons.gauge,
-            label: 'PRESSURE',
-            value: '1013',
+          const Align(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                AuraMetricCard(
+                  icon: AuraIcons.gauge,
+                  label: 'PRESSURE',
+                  value: '1013',
+                ),
+              ],
+            ),
           ),
           width: 172,
         ),
       );
-      expect(tester.getSize(find.byType(AuraMetricCard)).height, 116);
+      expect(
+        tester.getSize(find.byType(AuraMetricCard)).height,
+        AuraSizes.metricCardHeight,
+      );
+    });
+
+    testWidgets('grows past that floor rather than clipping', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const Align(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                AuraMetricCard(
+                  icon: AuraIcons.sun,
+                  label: 'UV INDEX',
+                  value: '9',
+                  sub: 'Very High',
+                  scale: AuraScaleBar(
+                    colors: <Color>[
+                      AuraColors.scaleLevel1,
+                      AuraColors.scaleLevel4,
+                    ],
+                    stops: <double>[0, 1],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          width: 172,
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(
+        tester.getSize(find.byType(AuraMetricCard)).height,
+        greaterThanOrEqualTo(AuraSizes.metricCardHeight),
+      );
     });
 
     testWidgets('accepts a scale bar for the UV variant', (tester) async {

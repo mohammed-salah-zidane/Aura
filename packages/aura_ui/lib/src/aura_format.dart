@@ -77,7 +77,13 @@ class AuraFormat {
   }
 
   /// Pressure in millibars, which is the same number as hectopascals.
-  String pressure(Pressure value) => _integer(value.millibars);
+  ///
+  /// Written without a thousands separator, the way a barometer reading is
+  /// always written: `1013`, never `1,013`.
+  String pressure(Pressure value) =>
+      (NumberFormat.decimalPattern()..turnOffGrouping()).format(
+        value.millibars.round(),
+      );
 
   /// Pressure as the service publishes it in inches of mercury.
   String pressureInches(double inchesOfMercury) =>

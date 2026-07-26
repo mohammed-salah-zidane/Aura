@@ -52,7 +52,7 @@ class AuraAlertBanner extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 1,
+                  spacing: AuraSpacing.micro,
                   children: <Widget>[
                     Text(
                       title,

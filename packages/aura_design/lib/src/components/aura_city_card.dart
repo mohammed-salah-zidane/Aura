@@ -53,7 +53,7 @@ class AuraCityCard extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          height: AuraSizes.cityCard.height,
+          height: AuraSizes.cityCardHeight,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AuraRadii.card),

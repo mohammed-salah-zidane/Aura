@@ -1,4 +1,5 @@
 import 'package:aura_design/src/foundations/aura_glass.dart';
+import 'package:aura_design/src/foundations/aura_script.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
 import 'package:aura_design/src/tokens/aura_typography.dart';
@@ -175,9 +176,9 @@ class AuraStateNote extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: AuraText.captionTracked.copyWith(
-                color: AuraColors.textTertiary,
-              ),
+              style: AuraText.captionTracked
+                  .forScript(context)
+                  .copyWith(color: AuraColors.textTertiary),
             ),
           ),
         ],

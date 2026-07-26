@@ -1,4 +1,5 @@
 import 'package:aura_design/src/foundations/aura_glass.dart';
+import 'package:aura_design/src/foundations/aura_script.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
 import 'package:aura_design/src/tokens/aura_typography.dart';
@@ -38,7 +39,12 @@ class AuraMetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AuraGlass(
-      height: AuraSizes.metricCard.height,
+      // The pen's 116 is the height every card is drawn at, and a floor rather
+      // than a ceiling: the ultraviolet card carries a scale bar as well as a
+      // sub-line, and a font whose metrics run a point tall would clip it.
+      constraints: const BoxConstraints(
+        minHeight: AuraSizes.metricCardHeight,
+      ),
       padding: const EdgeInsets.all(AuraSpacing.mdPlus),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,9 +63,9 @@ class AuraMetricCard extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AuraText.label.copyWith(
-                    color: AuraColors.textTertiary,
-                  ),
+                  style: AuraText.label
+                      .forScript(context)
+                      .copyWith(color: AuraColors.textTertiary),
                 ),
               ),
             ],

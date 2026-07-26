@@ -1,4 +1,5 @@
 import 'package:aura_design/src/foundations/aura_glass.dart';
+import 'package:aura_design/src/foundations/aura_script.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
 import 'package:aura_design/src/tokens/aura_typography.dart';
@@ -35,7 +36,9 @@ class AuraPillLive extends StatelessWidget {
           ),
           Text(
             label,
-            style: AuraText.pillLabel.copyWith(color: AuraColors.accent),
+            style: AuraText.pillLabel
+                .forScript(context)
+                .copyWith(color: AuraColors.accent),
           ),
         ],
       ),
