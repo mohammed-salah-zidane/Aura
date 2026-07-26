@@ -368,6 +368,15 @@ abstract final class AuraText {
     letterSpacing: 0.5,
   );
 
+  /// Live-data pill label. `LIVE`
+  static const TextStyle pillLabel = TextStyle(
+    fontFamily: AuraFonts.system,
+    package: AuraFonts.package,
+    fontSize: 11,
+    fontVariations: <FontVariation>[FontVariation('wght', 700)],
+    letterSpacing: 1.2,
+  );
+
   /// Alert metadata label. `EFFECTIVE`
   static const TextStyle metaLabel = TextStyle(
     fontFamily: AuraFonts.system,
