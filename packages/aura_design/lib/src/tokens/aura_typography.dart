@@ -4,6 +4,14 @@ import 'package:flutter/painting.dart';
 ///
 /// Fonts are bundled rather than fetched so text renders offline and golden
 /// tests stay deterministic.
+///
+/// All three ship as variable fonts, and their axis defaults are not the
+/// weights Aura uses: Fraunces defaults to `wght 900` and Outfit to `wght 100`.
+/// Weight is therefore driven through `fontVariations` rather than
+/// `fontWeight`, which also stops the engine synthesising a bold on top of the
+/// real axis value. The remaining Fraunces axes (`opsz 9`, `SOFT 0`, `WONK 1`)
+/// already match the font's named instances, so they are left at their
+/// defaults.
 abstract final class AuraFonts {
   /// Package that ships the font assets.
   static const String package = 'aura_design';
@@ -28,7 +36,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.display,
     package: AuraFonts.package,
     fontSize: 98,
-    fontWeight: FontWeight.w300,
+    fontVariations: <FontVariation>[FontVariation('wght', 300)],
     height: 1.05,
   );
 
@@ -37,7 +45,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.display,
     package: AuraFonts.package,
     fontSize: 34,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   /// Headline on a full-screen state. `You're Offline`
@@ -45,7 +53,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.display,
     package: AuraFonts.package,
     fontSize: 26,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
   );
 
   /// Large numeric read-out. `210`
@@ -53,7 +61,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.display,
     package: AuraFonts.package,
     fontSize: 26,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
   /// Screen title. `3-Day Forecast`
@@ -61,7 +69,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.display,
     package: AuraFonts.package,
     fontSize: 24,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   /// Card title, and the city on a city card. `Waxing Crescent`
@@ -69,7 +77,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.display,
     package: AuraFonts.package,
     fontSize: 22,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   /// Smaller card title. `Waxing Crescent`
@@ -77,7 +85,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.display,
     package: AuraFonts.package,
     fontSize: 20,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   // ------------------------------------------------------------ Outfit, app
@@ -87,7 +95,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 42,
-    fontWeight: FontWeight.w300,
+    fontVariations: <FontVariation>[FontVariation('wght', 300)],
   );
 
   /// Primary value inside a metric card. `18 km/h`
@@ -95,7 +103,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 29,
-    fontWeight: FontWeight.w300,
+    fontVariations: <FontVariation>[FontVariation('wght', 300)],
   );
 
   /// Current condition under the hero. `Mostly Sunny`
@@ -103,7 +111,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 20,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
   /// Temperature in a search result. `35°`
@@ -111,7 +119,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 18,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
   /// High and low, and hour-cell temperatures. `H:37°`
@@ -119,7 +127,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 17,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   /// Primary button label. `Try Again`
@@ -127,7 +135,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 16,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
   );
 
   /// Secondary button label. `Use Saved Data`
@@ -135,7 +143,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 16,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   /// Settings row label. `Temperature`
@@ -143,7 +151,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 15,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   /// Multi-line summary paragraph above the hourly strip.
@@ -151,7 +159,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 15,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
     height: 1.35,
   );
 
@@ -160,7 +168,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 15,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
   /// Hour label in the hourly strip. `3 PM`
@@ -168,7 +176,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 13,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
   /// Hour label for the current hour. `Now`
@@ -176,7 +184,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 13,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
   );
 
   /// Sub-line under a metric value. `NW · gusts 22`
@@ -184,7 +192,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.app,
     package: AuraFonts.package,
     fontSize: 12.5,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
   // -------------------------------------------------------- Inter, system
@@ -194,7 +202,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 17,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
   );
 
   /// Daily high in a forecast row. `37°`
@@ -202,7 +210,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 16,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
   );
 
   /// Daily low in a forecast row. `25°`
@@ -210,7 +218,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 16,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   /// Day name in a forecast row. `Mon`
@@ -218,7 +226,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 15,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   /// Alert banner title. `Heat Advisory`
@@ -226,7 +234,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 14,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
   );
 
   /// Long-form body copy.
@@ -234,7 +242,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 14,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
     height: 1.45,
   );
 
@@ -243,7 +251,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 14,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
     height: 1.4,
   );
 
@@ -252,7 +260,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 14,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
   /// Temperature in a compact forecast strip. `37°`
@@ -260,7 +268,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 13,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
   );
 
   /// Metric card label. `PRESSURE`
@@ -268,7 +276,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 12,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
     letterSpacing: 0.6,
   );
 
@@ -277,7 +285,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 12,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
     letterSpacing: 1.4,
   );
 
@@ -286,7 +294,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 12,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
     letterSpacing: 0.4,
   );
 
@@ -295,7 +303,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 12,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
   /// Secondary caption. `Queensland, Australia`
@@ -303,7 +311,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 12,
-    fontWeight: FontWeight.w400,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
   /// Hour index on an instrument chart. `01`
@@ -311,7 +319,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 12,
-    fontWeight: FontWeight.w700,
+    fontVariations: <FontVariation>[FontVariation('wght', 700)],
     letterSpacing: 2.4,
   );
 
@@ -320,7 +328,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 11,
-    fontWeight: FontWeight.w500,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
     letterSpacing: 0.6,
   );
 
@@ -329,7 +337,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 11,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
     letterSpacing: 1.4,
   );
 
@@ -338,7 +346,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 11,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
     letterSpacing: 2,
   );
 
@@ -347,7 +355,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 10,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
     letterSpacing: 0.8,
   );
 
@@ -356,7 +364,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 10,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
     letterSpacing: 0.5,
   );
 
@@ -365,7 +373,7 @@ abstract final class AuraText {
     fontFamily: AuraFonts.system,
     package: AuraFonts.package,
     fontSize: 10,
-    fontWeight: FontWeight.w600,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
     letterSpacing: 1,
   );
 }
