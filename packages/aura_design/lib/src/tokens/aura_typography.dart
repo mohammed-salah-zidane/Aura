@@ -66,6 +66,16 @@ abstract final class AuraText {
 
   // ------------------------------------------------------ Fraunces, display
 
+  /// The wordmark on the splash screen. `Aura`
+  static const TextStyle wordmark = TextStyle(
+    fontFamily: AuraFonts.display,
+    fontFamilyFallback: _displayFallback,
+    package: AuraFonts.package,
+    fontSize: 46,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
+    letterSpacing: 0.5,
+  );
+
   /// Hero temperature. `35°`
   static const TextStyle display = TextStyle(
     fontFamily: AuraFonts.display,
@@ -411,6 +421,26 @@ abstract final class AuraText {
     fontSize: 11,
     fontVariations: <FontVariation>[FontVariation('wght', 600)],
     letterSpacing: 1.4,
+  );
+
+  /// Brand line under the wordmark. `WEATHER IN A NEW LIGHT`
+  static const TextStyle tagline = TextStyle(
+    fontFamily: AuraFonts.system,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 13,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
+    letterSpacing: 3,
+  );
+
+  /// Weather service credit. `POWERED BY WEATHERAPI.COM`
+  static const TextStyle attribution = TextStyle(
+    fontFamily: AuraFonts.system,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 10,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
+    letterSpacing: 1.8,
   );
 
   /// Widely tracked location kicker. `CAIRO, EGYPT`

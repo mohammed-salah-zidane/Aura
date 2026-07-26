@@ -14,6 +14,9 @@ abstract final class AuraSpacing {
   /// 6. Half-step used inside dense cells.
   static const double xs = 6;
 
+  /// 7. Between the loading dots on the splash screen.
+  static const double xsPlus = 7;
+
   /// 8. Between a label and its value.
   static const double sm = 8;
 
@@ -37,6 +40,9 @@ abstract final class AuraSpacing {
 
   /// 24. Around a full-screen state's content.
   static const double xxl = 24;
+
+  /// 26. Between the parts of the splash lockup.
+  static const double xxlPlus = 26;
 
   /// 32. Above a primary action.
   static const double xxxl = 32;
@@ -116,4 +122,39 @@ abstract final class AuraSizes {
 
   /// Live pill indicator dot.
   static const double liveDot = 7;
+
+  /// Splash loading dot.
+  static const double splashDot = 6;
+
+  /// Icon disc on a full-screen state.
+  static const double stateIconDisc = 88;
+
+  /// Icon inside that disc.
+  static const double iconState = 36;
+
+  /// Gap above the disc, inside the content padding.
+  static const double stateHeadroom = 90;
+
+  /// Measure the body copy on a full-screen state is set to.
+  ///
+  /// Narrower than the content width, so the paragraph breaks where the design
+  /// breaks it rather than running the full 345 points.
+  static const double stateBodyMeasure = 300;
+
+  /// Gap below a full-screen state's actions.
+  ///
+  /// Measured from the screen edge, not the safe area: the design canvas is a
+  /// 393 by 852 screen and runs under the home indicator, and the pen sets the
+  /// secondary button against that edge on purpose.
+  static const double stateBottomInset = 30;
+
+  /// Gap from the bottom of the screen to the splash loader.
+  ///
+  /// The splash pins its loader and its attribution rather than laying them
+  /// out, and the design canvas runs to the very bottom edge of the screen, so
+  /// these are measured from that edge and not from the safe area.
+  static const double splashLoaderInset = 94;
+
+  /// Gap from the bottom of the screen to the splash attribution.
+  static const double splashAttributionInset = 50;
 }
