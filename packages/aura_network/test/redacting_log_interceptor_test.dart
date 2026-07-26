@@ -10,7 +10,7 @@ class _MockAdapter extends Mock implements HttpClientAdapter {}
 
 class _FakeRequestOptions extends Fake implements RequestOptions {}
 
-const String _key = '6f27a7b9512c4882a45162444252101';
+const String _key = 'test-key-not-a-real-credential';
 
 Uri _uri(String query) =>
     Uri.parse('https://api.example.test/v1/f.json?$query');
