@@ -1,0 +1,32 @@
+name: aura_ui
+description: "Presentation shared by every Aura feature."
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
+
+# The seam between a domain value and the design system. `aura_design` may not
+# import the domain and `aura_domain` may not import Flutter, so the mapping
+# between them has to sit above both, and every feature needs the same one.
+dependencies:
+  aura_core:
+    path: ../aura_core
+  aura_design:
+    path: ../aura_design
+  aura_domain:
+    path: ../aura_domain
+  aura_l10n:
+    path: ../aura_l10n
+  flutter:
+    sdk: flutter
+  # Matches the SDK's own pin exactly; see docs/ARCHITECTURE.md section 10.
+  intl: ^0.20.2
+  meta: ^1.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.3.0
