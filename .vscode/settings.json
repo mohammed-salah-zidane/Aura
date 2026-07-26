@@ -1,0 +1,27 @@
+{
+  "dart.projectSearchDepth": 4,
+
+  // Melos owns linking in this workspace. Letting the editor run `pub get` on a
+  // single package resolves it outside the workspace and unlinks the rest.
+  "dart.runPubGetOnPubspecChanges": "never",
+
+  "dart.flutterScreenshotPath": "build/screenshots",
+  "editor.formatOnSave": true,
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.rulers": [80],
+    "editor.selectionHighlight": false,
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off"
+  },
+  "files.exclude": {
+    "**/.dart_tool": true,
+    "**/.flutter-plugins-dependencies": true
+  },
+  "search.exclude": {
+    "**/*.g.dart": true,
+    "**/*.freezed.dart": true,
+    "**/lib/l10n/generated": true,
+    "**/test/goldens": true
+  }
+}

@@ -30,9 +30,14 @@ pubspec_overrides.yaml
 env/*
 !env/example.json
 
-# IDE
+# IDE — the run configurations and the workspace settings are the exception.
+# One carries the --dart-define-from-file the app cannot start without, the
+# other stops the editor running `pub get` on a single package and unlinking
+# the workspace. Everything else under .vscode is personal editor state.
+.vscode/*
+!.vscode/launch.json
+!.vscode/settings.json
 .idea/
-.vscode/
 *.iml
 *.ipr
 *.iws
