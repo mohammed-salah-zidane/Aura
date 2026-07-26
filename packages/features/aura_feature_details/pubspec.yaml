@@ -24,7 +24,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.3.2
-  go_router: ^17.3.0
   # Matches the SDK's own pin exactly; see docs/ARCHITECTURE.md section 10.
   meta: ^1.18.0
 

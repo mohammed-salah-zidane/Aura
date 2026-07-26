@@ -32,7 +32,11 @@ void main() {
         tester,
         UncontrolledProviderScope(
           container: container,
-          child: SavedCitiesScreen(onOpenSearch: () {}, onSelect: () {}),
+          child: SavedCitiesScreen(
+            onOpenSearch: () {},
+            onSelect: () {},
+            onBack: () {},
+          ),
         ),
         locale: locale,
       );
