@@ -11,6 +11,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Built from the `State · Search` frame. Picking a match makes it the active
 /// place and keeps it in the saved list, so a place the user looked up once is
 /// there the next time without a second search.
+///
+/// The pen closes this screen with a cross on the trailing side. Every other
+/// pushed screen leaves by the leading back button, and a cross that does
+/// exactly what back does is a second control for one action, so the back
+/// button is what ships here too.
 class SearchScreen extends ConsumerWidget {
   /// Creates the search screen.
   const SearchScreen({required this.onDone, super.key});
@@ -43,18 +48,23 @@ class SearchScreen extends ConsumerWidget {
             spacing: AuraSpacing.lg,
             children: <Widget>[
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: AuraSpacing.md,
                 children: <Widget>[
-                  Text(
-                    l10n.searchTitle,
-                    style: AuraText.titleState.copyWith(
-                      color: AuraColors.textPrimary,
-                    ),
-                  ),
                   AuraCircleButton(
-                    icon: AuraIcons.close,
-                    semanticLabel: l10n.searchClose,
+                    icon: AuraChevron.back(context),
+                    size: AuraCircleButtonSize.back,
+                    semanticLabel: l10n.commonBack,
                     onPressed: onDone,
+                  ),
+                  Expanded(
+                    child: Text(
+                      l10n.searchTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AuraText.titleState.copyWith(
+                        color: AuraColors.textPrimary,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -134,8 +144,8 @@ class _UseCurrentLocation extends StatelessWidget {
                   ),
                 ),
               ),
-              const Icon(
-                AuraIcons.chevronRight,
+              Icon(
+                AuraChevron.forward(context),
                 size: AuraSizes.iconSmall,
                 color: AuraColors.textTertiary,
               ),

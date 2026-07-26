@@ -31,8 +31,8 @@ class HomeSectionHeader extends StatelessWidget {
           ),
         ),
         if (onTap != null)
-          const Icon(
-            AuraIcons.chevronRight,
+          Icon(
+            AuraChevron.forward(context),
             size: AuraSizes.iconSmall,
             color: AuraColors.textTertiary,
           ),

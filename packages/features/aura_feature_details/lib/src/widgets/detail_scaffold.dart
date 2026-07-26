@@ -57,9 +57,9 @@ class DetailScaffold extends StatelessWidget {
                 spacing: AuraSpacing.md,
                 children: <Widget>[
                   AuraCircleButton(
-                    icon: AuraIcons.chevronLeft,
+                    icon: AuraChevron.back(context),
                     size: AuraCircleButtonSize.back,
-                    semanticLabel: context.l10n.detailBack,
+                    semanticLabel: context.l10n.commonBack,
                     onPressed: onBack,
                   ),
                   Expanded(

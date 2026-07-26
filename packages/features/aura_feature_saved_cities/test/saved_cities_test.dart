@@ -32,14 +32,18 @@ final class _Harness {
   final FakeSavedCities cities;
   late final ProviderContainer container;
 
-  Widget screen({VoidCallback? onOpenSearch, VoidCallback? onSelect}) =>
-      UncontrolledProviderScope(
-        container: container,
-        child: SavedCitiesScreen(
-          onOpenSearch: onOpenSearch ?? () {},
-          onSelect: onSelect ?? () {},
-        ),
-      );
+  Widget screen({
+    VoidCallback? onOpenSearch,
+    VoidCallback? onSelect,
+    VoidCallback? onBack,
+  }) => UncontrolledProviderScope(
+    container: container,
+    child: SavedCitiesScreen(
+      onOpenSearch: onOpenSearch ?? () {},
+      onSelect: onSelect ?? () {},
+      onBack: onBack ?? () {},
+    ),
+  );
 }
 
 void main() {
@@ -83,6 +87,20 @@ void main() {
   });
 
   group('SavedCitiesScreen', () {
+    testWidgets('build offers a way back, which the design leaves out', (
+      tester,
+    ) async {
+      var back = 0;
+      final harness = _Harness();
+      await pumpScreen(tester, harness.screen(onBack: () => back++));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(AuraIcons.chevronLeft));
+      await tester.pump();
+
+      expect(back, 1);
+    });
+
     testWidgets('build shows the heading and the way into search', (
       tester,
     ) async {
@@ -189,20 +207,34 @@ void main() {
     testWidgets('build the device position cannot be forgotten', (
       tester,
     ) async {
-      final harness = _Harness();
+      final harness = _Harness(saved: <SavedCity>[savedCityFixture()]);
       await pumpScreen(tester, harness.screen());
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(AuraIcons.more));
       await tester.pumpAndSettle();
 
+      // Two cards are on screen, and only the kept one can be removed.
+      expect(find.byType(AuraCityCard), findsNWidgets(2));
       expect(
         find.descendant(
           of: find.byType(AuraCityCard),
           matching: find.byIcon(AuraIcons.close),
         ),
-        findsNothing,
+        findsOneWidget,
       );
+    });
+
+    testWidgets('build offers no edit button when nothing can be removed', (
+      tester,
+    ) async {
+      final harness = _Harness();
+      await pumpScreen(tester, harness.screen());
+      await tester.pumpAndSettle();
+
+      // The list holds the device's own position and nothing else, and that
+      // is not a place the user kept, so there is nothing to edit.
+      expect(find.byIcon(AuraIcons.more), findsNothing);
     });
 
     testWidgets('build renders the Arabic screen without overflowing', (

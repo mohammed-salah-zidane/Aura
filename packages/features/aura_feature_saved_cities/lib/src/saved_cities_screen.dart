@@ -16,6 +16,7 @@ class SavedCitiesScreen extends ConsumerStatefulWidget {
   const SavedCitiesScreen({
     required this.onOpenSearch,
     required this.onSelect,
+    required this.onBack,
     super.key,
   });
 
@@ -25,6 +26,12 @@ class SavedCitiesScreen extends ConsumerStatefulWidget {
   /// Leaves the screen once a place has been picked.
   final VoidCallback onSelect;
 
+  /// Leaves the screen with nothing picked.
+  ///
+  /// The design draws this screen with an overflow button and no way back,
+  /// which works on a canvas and strands a user on a device.
+  final VoidCallback onBack;
+
   @override
   ConsumerState<SavedCitiesScreen> createState() => _SavedCitiesScreenState();
 }
@@ -33,7 +40,10 @@ class _SavedCitiesScreenState extends ConsumerState<SavedCitiesScreen> {
   /// Whether the remove controls are showing.
   ///
   /// The overflow button in the design has no menu drawn behind it, and the
-  /// list needs a way to forget a place, so it turns this on instead.
+  /// list needs a way to forget a place, so it turns this on instead. The
+  /// button only appears when there is a place that can be forgotten: the
+  /// device's own position cannot, so on a list holding nothing else the
+  /// button would change its own glyph and nothing more.
   bool _isEditing = false;
 
   /// The pen's `Content` padding on this frame.
@@ -51,6 +61,10 @@ class _SavedCitiesScreenState extends ConsumerState<SavedCitiesScreen> {
     final units =
         ref.watch(unitPreferencesProvider).value ?? const UnitPreferences();
     final format = AuraFormat(l10n: l10n, units: units);
+    final canEdit =
+        rows?.any((row) => !row.isCurrentLocation && row.snapshot != null) ??
+        false;
+    final isEditing = _isEditing && canEdit;
 
     return AuraSky(
       kind: AuraSkyKind.systemBrand,
@@ -63,21 +77,32 @@ class _SavedCitiesScreenState extends ConsumerState<SavedCitiesScreen> {
             spacing: AuraSpacing.mdPlus,
             children: <Widget>[
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(
-                    l10n.savedCitiesTitle,
-                    style: AuraText.titleLarge.copyWith(
-                      color: AuraColors.textPrimary,
+                  AuraCircleButton(
+                    icon: AuraChevron.back(context),
+                    size: AuraCircleButtonSize.back,
+                    semanticLabel: l10n.commonBack,
+                    onPressed: widget.onBack,
+                  ),
+                  const SizedBox(width: AuraSpacing.md),
+                  Expanded(
+                    child: Text(
+                      l10n.savedCitiesTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AuraText.titleLarge.copyWith(
+                        color: AuraColors.textPrimary,
+                      ),
                     ),
                   ),
-                  AuraCircleButton(
-                    icon: _isEditing ? AuraIcons.close : AuraIcons.more,
-                    semanticLabel: _isEditing
-                        ? l10n.savedCitiesDone
-                        : l10n.savedCitiesEdit,
-                    onPressed: () => setState(() => _isEditing = !_isEditing),
-                  ),
+                  if (canEdit)
+                    AuraCircleButton(
+                      icon: isEditing ? AuraIcons.close : AuraIcons.more,
+                      semanticLabel: isEditing
+                          ? l10n.savedCitiesDone
+                          : l10n.savedCitiesEdit,
+                      onPressed: () => setState(() => _isEditing = !_isEditing),
+                    ),
                 ],
               ),
               AuraSearchField(
@@ -90,7 +115,7 @@ class _SavedCitiesScreenState extends ConsumerState<SavedCitiesScreen> {
                     : _CityList(
                         rows: rows,
                         format: format,
-                        isEditing: _isEditing,
+                        isEditing: isEditing,
                         onSelect: _select,
                         onRemove: (location) => ref
                             .read(savedCitiesViewModelProvider.notifier)

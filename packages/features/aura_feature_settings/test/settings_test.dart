@@ -222,13 +222,13 @@ void main() {
       );
     });
 
-    testWidgets('build closes when the user is done', (tester) async {
+    testWidgets('build closes when the back button is tapped', (tester) async {
       var done = 0;
       final harness = _Harness();
       await pumpScreen(tester, harness.screen(onDone: () => done++));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text((await _copy()).settingsDone));
+      await tester.tap(find.byIcon(AuraIcons.chevronLeft));
       await tester.pump();
 
       expect(done, 1);

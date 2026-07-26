@@ -13,6 +13,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// picker, because Aura's palette is one condition-driven theme and there is no
 /// light mode to choose. The store rating row is absent, because it has no
 /// listing to open and a button that opens nothing is worse than no button.
+///
+/// The pen's "Done" link is gone for the same reason the search screen's cross
+/// is. Every choice here applies as it is made, so Done only closed the screen,
+/// which is what the back button does on every other pushed screen.
 class SettingsScreen extends ConsumerWidget {
   /// Creates the settings screen.
   const SettingsScreen({
@@ -52,23 +56,21 @@ class SettingsScreen extends ConsumerWidget {
             spacing: AuraSpacing.lgPlus,
             children: <Widget>[
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: AuraSpacing.md,
                 children: <Widget>[
-                  Text(
-                    l10n.settingsTitle,
-                    style: AuraText.titleSettings.copyWith(
-                      color: AuraColors.textPrimary,
-                    ),
+                  AuraCircleButton(
+                    icon: AuraChevron.back(context),
+                    size: AuraCircleButtonSize.back,
+                    semanticLabel: l10n.commonBack,
+                    onPressed: onDone,
                   ),
-                  Semantics(
-                    button: true,
-                    child: GestureDetector(
-                      onTap: onDone,
-                      child: Text(
-                        l10n.settingsDone,
-                        style: AuraText.buttonPrimary.copyWith(
-                          color: AuraColors.accent,
-                        ),
+                  Expanded(
+                    child: Text(
+                      l10n.settingsTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AuraText.titleSettings.copyWith(
+                        color: AuraColors.textPrimary,
                       ),
                     ),
                   ),

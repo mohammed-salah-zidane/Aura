@@ -120,11 +120,6 @@
     "description": "Kicker above the city name when the reading is for wherever the device is. Set in small caps by the view."
   },
 
-  "homeLive": "Live",
-  "@homeLive": {
-    "description": "Pill marking the reading on screen as one this run fetched, rather than one read back from the cache. Set in small caps by the view."
-  },
-
   "homeLastUpdated": "Last updated {age} ago",
   "@homeLastUpdated": {
     "description": "How old the reading on screen is, shown in place of the live pill once it came from the cache.",
@@ -462,11 +457,6 @@
     "description": "Heading on the screen that finds a city to add."
   },
 
-  "searchClose": "Close",
-  "@searchClose": {
-    "description": "Spoken label for the button that leaves the search screen, which carries an icon and no text."
-  },
-
   "searchPlaceholder": "Search for a city or airport",
   "@searchPlaceholder": {
     "description": "Shown in the search field while it is empty."
@@ -524,8 +514,8 @@
     "placeholders": { "time": { "type": "String", "example": "2:34 PM" } }
   },
 
-  "detailBack": "Back",
-  "@detailBack": {"description": "Spoken label for the button that goes back from a detail screen, which carries an icon and no text."},
+  "commonBack": "Back",
+  "@commonBack": {"description": "Spoken label for the button that leaves any pushed screen, which carries an icon and no text."},
 
   "forecastTitle": "3-Day Forecast",
   "@forecastTitle": {"description": "Heading on the full forecast screen. Three days is what the free tier returns, which is what the screen shows."},
@@ -652,9 +642,6 @@
 
   "settingsTitle": "Settings",
   "@settingsTitle": {"description": "Heading on the settings screen."},
-
-  "settingsDone": "Done",
-  "@settingsDone": {"description": "Closes the settings screen."},
 
   "settingsUnits": "Units",
   "@settingsUnits": {"description": "Heading above the unit choices. Set in small caps by the view."},

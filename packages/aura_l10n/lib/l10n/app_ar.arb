@@ -45,8 +45,6 @@
 
   "homeCurrentLocation": "موقعك الحالي",
 
-  "homeLive": "مباشر",
-
   "homeLastUpdated": "آخر تحديث منذ {age}",
 
   "homeSettings": "الإعدادات",
@@ -177,8 +175,6 @@
 
   "searchTitle": "إضافة مدينة",
 
-  "searchClose": "إغلاق",
-
   "searchPlaceholder": "ابحث عن مدينة أو مطار",
 
   "searchClear": "مسح البحث",
@@ -201,7 +197,7 @@
 
   "savedCityCurrentTime": "{time} · موقعك الحالي",
 
-  "detailBack": "رجوع",
+  "commonBack": "رجوع",
 
   "forecastTitle": "توقعات 3 أيام",
 
@@ -286,8 +282,6 @@
   "astroNoSunset": "لا غروب",
 
   "settingsTitle": "الإعدادات",
-
-  "settingsDone": "تم",
 
   "settingsUnits": "الوحدات",
 
