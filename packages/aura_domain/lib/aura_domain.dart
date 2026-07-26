@@ -10,6 +10,7 @@ library;
 
 export 'src/derived/air_quality_scales.dart';
 export 'src/derived/aura_condition.dart';
+export 'src/derived/hourly_window.dart';
 export 'src/derived/moon_phase.dart';
 export 'src/derived/range_bar_geometry.dart';
 export 'src/derived/sun_geometry.dart';
