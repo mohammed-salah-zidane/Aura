@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:aura_design/aura_design.dart';
 import 'package:aura_l10n/aura_l10n.dart';
+import 'package:flutter/material.dart' show MaterialPageRoute;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +25,9 @@ const List<String> _families = <String>[
 /// package-qualified one, because `AuraText` sets `package:`.
 Future<void> loadAuraFonts() async {
   TestWidgetsFlutterBinding.ensureInitialized();
+  // `DateFormat` throws on a locale whose symbols were never loaded, and the
+  // screens format an hour and a weekday in both of them.
+  await AuraLocales.loadDateSymbols();
   final designRoot = _packageRoot(AuraFonts.package);
   for (final family in _families) {
     await _register(
@@ -94,6 +98,11 @@ Future<void> _register(File file, List<String> keys) async {
 /// lines up with the pen frame point for point. Text direction comes from the
 /// locale rather than being passed in, so an Arabic pump exercises the same
 /// resolution the real app does.
+///
+/// The locale is also given to `intl`, exactly as the composition root gives it
+/// once `Localizations` has resolved. Without that a clock time formats in
+/// English inside an Arabic screen, which is a defect a test would otherwise
+/// bake into a golden.
 Future<void> pumpScreen(
   WidgetTester tester,
   Widget screen, {
@@ -103,11 +112,13 @@ Future<void> pumpScreen(
     AuraSizes.referenceWidth,
     AuraSizes.referenceHeight,
   ),
+  bool withNavigator = false,
 }) async {
   tester.view
     ..devicePixelRatio = 1
     ..physicalSize = size;
   addTearDown(tester.view.reset);
+  AuraLocales.adopt(locale);
 
   await tester.pumpWidget(
     Localizations(
@@ -121,7 +132,15 @@ Future<void> pumpScreen(
         ),
         child: Directionality(
           textDirection: _directionOf(locale),
-          child: screen,
+          // A screen that opens a sheet needs the Navigator and the Overlay it
+          // has in the app. Off by default, so a plain screen is pumped with
+          // nothing above it that the design did not put there.
+          child: withNavigator
+              ? Navigator(
+                  onGenerateRoute: (settings) =>
+                      MaterialPageRoute<void>(builder: (context) => screen),
+                )
+              : screen,
         ),
       ),
     ),

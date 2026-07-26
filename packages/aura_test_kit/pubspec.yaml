@@ -11,12 +11,19 @@ environment:
 # flutter_test is a real dependency here rather than a dev one: this package is
 # the harness itself, and every consumer takes it as a dev_dependency.
 dependencies:
+  aura_core:
+    path: ../aura_core
   aura_design:
     path: ../aura_design
+  aura_domain:
+    path: ../aura_domain
   aura_l10n:
     path: ../aura_l10n
+  aura_providers:
+    path: ../aura_providers
   flutter:
     sdk: flutter
+  flutter_riverpod: ^3.3.2
   flutter_test:
     sdk: flutter
 

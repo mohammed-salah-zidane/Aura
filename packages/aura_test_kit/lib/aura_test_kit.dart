@@ -5,4 +5,6 @@
 /// to keep in step. It lives here so there is one.
 library;
 
+export 'src/fake_ports.dart';
 export 'src/pump_screen.dart';
+export 'src/weather_fixture.dart';
