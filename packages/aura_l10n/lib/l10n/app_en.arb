@@ -34,5 +34,426 @@
   "permissionEnterManually": "Enter City Manually",
   "@permissionEnterManually": {
     "description": "Secondary button on the permission screen. Skips location and opens search instead."
+  },
+
+  "unitSpeedKilometersPerHour": "km/h",
+  "@unitSpeedKilometersPerHour": {
+    "description": "Symbol for kilometres per hour, shown after a wind speed."
+  },
+
+  "unitSpeedMilesPerHour": "mph",
+  "@unitSpeedMilesPerHour": {
+    "description": "Symbol for miles per hour, shown after a wind speed."
+  },
+
+  "unitDistanceKilometers": "km",
+  "@unitDistanceKilometers": {
+    "description": "Symbol for kilometres, shown after a visibility reading."
+  },
+
+  "unitDistanceMiles": "mi",
+  "@unitDistanceMiles": {
+    "description": "Symbol for miles, shown after a visibility reading."
+  },
+
+  "unitPressureInchesOfMercury": "inHg",
+  "@unitPressureInchesOfMercury": {
+    "description": "Symbol for inches of mercury, shown after the second pressure reading."
+  },
+
+  "temperatureHigh": "H:{value}",
+  "@temperatureHigh": {
+    "description": "The day's highest temperature, under the hero and on a city card.",
+    "placeholders": { "value": { "type": "String", "example": "37°" } }
+  },
+
+  "temperatureLow": "L:{value}",
+  "@temperatureLow": {
+    "description": "The day's lowest temperature, under the hero and on a city card.",
+    "placeholders": { "value": { "type": "String", "example": "24°" } }
+  },
+
+  "temperatureHighLow": "{high} {low}",
+  "@temperatureHighLow": {
+    "description": "The high and low pair on one line, as a city card shows them.",
+    "placeholders": {
+      "high": { "type": "String", "example": "H:37°" },
+      "low": { "type": "String", "example": "L:24°" }
+    }
+  },
+
+  "hourNow": "Now",
+  "@hourNow": {
+    "description": "Label on the first cell of the hourly strip, in place of a clock time."
+  },
+
+  "dayToday": "Today",
+  "@dayToday": {
+    "description": "Label on the first row of the forecast, in place of a weekday name."
+  },
+
+  "durationMinutes": "{minutes, plural, =1{1 minute} other{{minutes} minutes}}",
+  "@durationMinutes": {
+    "description": "How old a cached reading is, when it is under an hour.",
+    "placeholders": { "minutes": { "type": "int", "example": "45" } }
+  },
+
+  "durationHours": "{hours, plural, =1{1 hour} other{{hours} hours}}",
+  "@durationHours": {
+    "description": "How old a cached reading is, when it is under a day.",
+    "placeholders": { "hours": { "type": "int", "example": "2" } }
+  },
+
+  "durationDays": "{days, plural, =1{1 day} other{{days} days}}",
+  "@durationDays": {
+    "description": "How old a cached reading is, once it passes a day.",
+    "placeholders": { "days": { "type": "int", "example": "3" } }
+  },
+
+  "durationJustNow": "a moment",
+  "@durationJustNow": {
+    "description": "How old a reading taken seconds ago is. Reads inside 'Last updated ... ago'."
+  },
+
+  "homeCurrentLocation": "Current location",
+  "@homeCurrentLocation": {
+    "description": "Kicker above the city name when the reading is for wherever the device is. Set in small caps by the view."
+  },
+
+  "homeLive": "Live",
+  "@homeLive": {
+    "description": "Pill marking the reading on screen as one this run fetched, rather than one read back from the cache. Set in small caps by the view."
+  },
+
+  "homeLastUpdated": "Last updated {age} ago",
+  "@homeLastUpdated": {
+    "description": "How old the reading on screen is, shown in place of the live pill once it came from the cache.",
+    "placeholders": { "age": { "type": "String", "example": "2 hours" } }
+  },
+
+  "homeSettings": "Settings",
+  "@homeSettings": {
+    "description": "Spoken label for the settings button in the brand bar, which carries an icon and no text."
+  },
+
+  "homeSearch": "Search for a city",
+  "@homeSearch": {
+    "description": "Spoken label for the search button in the bottom bar, which carries an icon and no text."
+  },
+
+  "homeSavedCities": "Saved cities",
+  "@homeSavedCities": {
+    "description": "Spoken label for the saved cities button in the bottom bar, which carries an icon and no text."
+  },
+
+  "homeLoadingStatus": "Fetching latest conditions…",
+  "@homeLoadingStatus": {
+    "description": "Under the city name while the first reading is on its way."
+  },
+
+  "metricFeelsLike": "Feels like",
+  "@metricFeelsLike": {
+    "description": "Label on the apparent temperature card. Set in small caps by the view."
+  },
+
+  "metricWind": "Wind",
+  "@metricWind": {
+    "description": "Label on the wind card. Set in small caps by the view."
+  },
+
+  "metricHumidity": "Humidity",
+  "@metricHumidity": {
+    "description": "Label on the humidity card. Set in small caps by the view."
+  },
+
+  "metricUvIndex": "UV index",
+  "@metricUvIndex": {
+    "description": "Label on the ultraviolet index card. Set in small caps by the view."
+  },
+
+  "metricVisibility": "Visibility",
+  "@metricVisibility": {
+    "description": "Label on the visibility card. Set in small caps by the view."
+  },
+
+  "metricPressure": "Pressure",
+  "@metricPressure": {
+    "description": "Label on the atmospheric pressure card. Set in small caps by the view."
+  },
+
+  "metricWindSub": "{direction} · gusts {gusts}",
+  "@metricWindSub": {
+    "description": "Second line of the wind card. The direction is WeatherAPI's own compass abbreviation and is not translated.",
+    "placeholders": {
+      "direction": { "type": "String", "example": "NW" },
+      "gusts": { "type": "String", "example": "22" }
+    }
+  },
+
+  "metricDewPoint": "Dew point {value}",
+  "@metricDewPoint": {
+    "description": "Second line of the humidity card.",
+    "placeholders": { "value": { "type": "String", "example": "19°" } }
+  },
+
+  "uvBandNone": "None",
+  "@uvBandNone": {
+    "description": "WHO ultraviolet band for an index of zero, which is what night reads as."
+  },
+
+  "uvBandLow": "Low",
+  "@uvBandLow": {
+    "description": "WHO ultraviolet band for an index of 1 to 2."
+  },
+
+  "uvBandModerate": "Moderate",
+  "@uvBandModerate": {
+    "description": "WHO ultraviolet band for an index of 3 to 5."
+  },
+
+  "uvBandHigh": "High",
+  "@uvBandHigh": {
+    "description": "WHO ultraviolet band for an index of 6 to 7."
+  },
+
+  "uvBandVeryHigh": "Very High",
+  "@uvBandVeryHigh": {
+    "description": "WHO ultraviolet band for an index of 8 to 10."
+  },
+
+  "uvBandExtreme": "Extreme",
+  "@uvBandExtreme": {
+    "description": "WHO ultraviolet band for an index of 11 and above."
+  },
+
+  "sectionForecast": "3-day forecast",
+  "@sectionForecast": {
+    "description": "Heading on the forecast card. Three days is what the free tier returns. Set in small caps by the view."
+  },
+
+  "sectionAirQuality": "Air quality",
+  "@sectionAirQuality": {
+    "description": "Heading on the air quality card. Set in small caps by the view."
+  },
+
+  "sectionSunAndMoon": "Sun & moon",
+  "@sectionSunAndMoon": {
+    "description": "Heading on the sun and moon card. Set in small caps by the view."
+  },
+
+  "airQualityIndexName": "US EPA Index",
+  "@airQualityIndexName": {
+    "description": "Names the published scale the air quality category comes from, beside the category itself."
+  },
+
+  "epaGood": "Good",
+  "@epaGood": {
+    "description": "US EPA air quality category 1."
+  },
+
+  "epaModerate": "Moderate",
+  "@epaModerate": {
+    "description": "US EPA air quality category 2."
+  },
+
+  "epaUnhealthyForSensitiveGroups": "Unhealthy for Sensitive Groups",
+  "@epaUnhealthyForSensitiveGroups": {
+    "description": "US EPA air quality category 3."
+  },
+
+  "epaUnhealthy": "Unhealthy",
+  "@epaUnhealthy": {
+    "description": "US EPA air quality category 4."
+  },
+
+  "epaVeryUnhealthy": "Very Unhealthy",
+  "@epaVeryUnhealthy": {
+    "description": "US EPA air quality category 5."
+  },
+
+  "epaHazardous": "Hazardous",
+  "@epaHazardous": {
+    "description": "US EPA air quality category 6."
+  },
+
+  "epaGoodMeaning": "Air quality is satisfactory, and air pollution poses little or no risk.",
+  "@epaGoodMeaning": {
+    "description": "The EPA's own published description of category 1. Rendered rather than summarised, so nothing on the screen is written here."
+  },
+
+  "epaModerateMeaning": "Air quality is acceptable. There may be a risk for people who are unusually sensitive to air pollution.",
+  "@epaModerateMeaning": {
+    "description": "The EPA's own published description of category 2."
+  },
+
+  "epaUnhealthyForSensitiveGroupsMeaning": "Members of sensitive groups may experience health effects. The general public is less likely to be affected.",
+  "@epaUnhealthyForSensitiveGroupsMeaning": {
+    "description": "The EPA's own published description of category 3."
+  },
+
+  "epaUnhealthyMeaning": "Some members of the general public may experience health effects. Members of sensitive groups may experience more serious effects.",
+  "@epaUnhealthyMeaning": {
+    "description": "The EPA's own published description of category 4."
+  },
+
+  "epaVeryUnhealthyMeaning": "Health alert. The risk of health effects is increased for everyone.",
+  "@epaVeryUnhealthyMeaning": {
+    "description": "The EPA's own published description of category 5."
+  },
+
+  "epaHazardousMeaning": "Health warning of emergency conditions. Everyone is more likely to be affected.",
+  "@epaHazardousMeaning": {
+    "description": "The EPA's own published description of category 6."
+  },
+
+  "astroSunrise": "Sunrise",
+  "@astroSunrise": {
+    "description": "Label under the sunrise time. Set in small caps by the view."
+  },
+
+  "astroSunset": "Sunset",
+  "@astroSunset": {
+    "description": "Label under the sunset time. Set in small caps by the view."
+  },
+
+  "moonNewMoon": "New Moon",
+  "@moonNewMoon": {
+    "description": "Moon phase, as WeatherAPI names it in astro.moon_phase."
+  },
+
+  "moonWaxingCrescent": "Waxing Crescent",
+  "@moonWaxingCrescent": {
+    "description": "Moon phase, as WeatherAPI names it in astro.moon_phase."
+  },
+
+  "moonFirstQuarter": "First Quarter",
+  "@moonFirstQuarter": {
+    "description": "Moon phase, as WeatherAPI names it in astro.moon_phase."
+  },
+
+  "moonWaxingGibbous": "Waxing Gibbous",
+  "@moonWaxingGibbous": {
+    "description": "Moon phase, as WeatherAPI names it in astro.moon_phase."
+  },
+
+  "moonFullMoon": "Full Moon",
+  "@moonFullMoon": {
+    "description": "Moon phase, as WeatherAPI names it in astro.moon_phase."
+  },
+
+  "moonWaningGibbous": "Waning Gibbous",
+  "@moonWaningGibbous": {
+    "description": "Moon phase, as WeatherAPI names it in astro.moon_phase."
+  },
+
+  "moonLastQuarter": "Last Quarter",
+  "@moonLastQuarter": {
+    "description": "Moon phase, as WeatherAPI names it in astro.moon_phase."
+  },
+
+  "moonWaningCrescent": "Waning Crescent",
+  "@moonWaningCrescent": {
+    "description": "Moon phase, as WeatherAPI names it in astro.moon_phase."
+  },
+
+  "alertInEffectUntil": "In effect until {time} · tap for details",
+  "@alertInEffectUntil": {
+    "description": "Second line of the alert banner, when the issuer gave an expiry time.",
+    "placeholders": { "time": { "type": "String", "example": "8:00 PM" } }
+  },
+
+  "alertTapForDetails": "Tap for details",
+  "@alertTapForDetails": {
+    "description": "Second line of the alert banner, when the issuer gave no expiry time."
+  },
+
+  "offlineTitle": "You're Offline",
+  "@offlineTitle": {
+    "description": "Heading on the screen shown when the weather service cannot be reached."
+  },
+
+  "offlineBody": "We can't reach the weather service right now. Check your connection and try again.",
+  "@offlineBody": {
+    "description": "Explains the offline screen, under its heading."
+  },
+
+  "offlineNote": "{age} · {city} {temperature}",
+  "@offlineNote": {
+    "description": "Chip on the offline screen naming the cached reading it can fall back to.",
+    "placeholders": {
+      "age": { "type": "String", "example": "Last updated 2 hours ago" },
+      "city": { "type": "String", "example": "Cairo" },
+      "temperature": { "type": "String", "example": "35°" }
+    }
+  },
+
+  "offlineTryAgain": "Try Again",
+  "@offlineTryAgain": {
+    "description": "Primary action on the offline screen. Asks the service again."
+  },
+
+  "offlineUseSavedData": "Use Saved Data",
+  "@offlineUseSavedData": {
+    "description": "Secondary action on the offline screen. Shows the cached reading instead of waiting for the network."
+  },
+
+  "failureInvalidCityTitle": "No Such Place",
+  "@failureInvalidCityTitle": {
+    "description": "Heading when the service matched no location for the query."
+  },
+
+  "failureInvalidCityBody": "We couldn't find that place. Check the spelling, or search for a nearby city.",
+  "@failureInvalidCityBody": {
+    "description": "Explains that the query matched no location."
+  },
+
+  "failureUnauthorizedTitle": "Service Unavailable",
+  "@failureUnauthorizedTitle": {
+    "description": "Heading when the weather service rejected the app's credential."
+  },
+
+  "failureUnauthorizedBody": "This build can't sign in to the weather service. The key it was built with is missing or no longer valid.",
+  "@failureUnauthorizedBody": {
+    "description": "Explains that the app's credential was rejected."
+  },
+
+  "failureRateLimitedTitle": "Monthly Limit Reached",
+  "@failureRateLimitedTitle": {
+    "description": "Heading when the weather service's request quota is spent."
+  },
+
+  "failureRateLimitedBody": "The weather service has had all the requests it allows this month. It will start answering again next month.",
+  "@failureRateLimitedBody": {
+    "description": "Explains that the request quota is spent."
+  },
+
+  "failureServerTitle": "Service Is Down",
+  "@failureServerTitle": {
+    "description": "Heading when the weather service answered with an error of its own."
+  },
+
+  "failureServerBody": "The weather service ran into a problem answering. This one is at their end, so it is worth trying again shortly.",
+  "@failureServerBody": {
+    "description": "Explains that the service itself failed."
+  },
+
+  "failureTimeoutTitle": "Taking Too Long",
+  "@failureTimeoutTitle": {
+    "description": "Heading when the request reached the service but no answer arrived in time."
+  },
+
+  "failureTimeoutBody": "The weather service didn't answer in time. Your connection may be slow right now.",
+  "@failureTimeoutBody": {
+    "description": "Explains that the request timed out."
+  },
+
+  "failureUnknownTitle": "Something Went Wrong",
+  "@failureUnknownTitle": {
+    "description": "Heading for a failure that fits none of the others."
+  },
+
+  "failureUnknownBody": "We couldn't load the weather. Try again, and if it keeps happening, restart the app.",
+  "@failureUnknownBody": {
+    "description": "Explains a failure that fits none of the others."
   }
 }

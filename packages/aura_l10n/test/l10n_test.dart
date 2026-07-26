@@ -28,7 +28,17 @@ void main() {
     test('no Arabic value is the English one copied over', () {
       // A copied value is the failure mode that survives review: it compiles,
       // it renders, and it is only wrong to someone who reads Arabic.
+      //
+      // A message made only of placeholders and punctuation is exempt, because
+      // there is no word in it to translate. `{high} {low}` is the same string
+      // in every language.
+      final hasWords = RegExp('[A-Za-z]');
       for (final key in _messages(en)) {
+        final source = (en[key]! as String).replaceAll(
+          RegExp(r'\{\w+\}'),
+          '',
+        );
+        if (!hasWords.hasMatch(source)) continue;
         expect(
           ar[key],
           isNot(en[key]),

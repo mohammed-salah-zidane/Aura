@@ -13,5 +13,165 @@
 
   "permissionAllow": "السماح بالوصول إلى الموقع",
 
-  "permissionEnterManually": "إدخال المدينة يدويًا"
+  "permissionEnterManually": "إدخال المدينة يدويًا",
+
+  "unitSpeedKilometersPerHour": "كم/س",
+
+  "unitSpeedMilesPerHour": "ميل/س",
+
+  "unitDistanceKilometers": "كم",
+
+  "unitDistanceMiles": "ميل",
+
+  "unitPressureInchesOfMercury": "بوصة زئبق",
+
+  "temperatureHigh": "العظمى {value}",
+
+  "temperatureLow": "الصغرى {value}",
+
+  "temperatureHighLow": "{high} {low}",
+
+  "hourNow": "الآن",
+
+  "dayToday": "اليوم",
+
+  "durationMinutes": "{minutes, plural, zero{{minutes} دقيقة} one{دقيقة} two{دقيقتين} few{{minutes} دقائق} many{{minutes} دقيقة} other{{minutes} دقيقة}}",
+
+  "durationHours": "{hours, plural, zero{{hours} ساعة} one{ساعة} two{ساعتين} few{{hours} ساعات} many{{hours} ساعة} other{{hours} ساعة}}",
+
+  "durationDays": "{days, plural, zero{{days} يوم} one{يوم} two{يومين} few{{days} أيام} many{{days} يومًا} other{{days} يوم}}",
+
+  "durationJustNow": "لحظات",
+
+  "homeCurrentLocation": "موقعك الحالي",
+
+  "homeLive": "مباشر",
+
+  "homeLastUpdated": "آخر تحديث منذ {age}",
+
+  "homeSettings": "الإعدادات",
+
+  "homeSearch": "ابحث عن مدينة",
+
+  "homeSavedCities": "المدن المحفوظة",
+
+  "homeLoadingStatus": "جارٍ جلب أحدث الأحوال…",
+
+  "metricFeelsLike": "الإحساس الفعلي",
+
+  "metricWind": "الرياح",
+
+  "metricHumidity": "الرطوبة",
+
+  "metricUvIndex": "الأشعة فوق البنفسجية",
+
+  "metricVisibility": "مدى الرؤية",
+
+  "metricPressure": "الضغط الجوي",
+
+  "metricWindSub": "{direction} · هبّات {gusts}",
+
+  "metricDewPoint": "نقطة الندى {value}",
+
+  "uvBandNone": "لا شيء",
+
+  "uvBandLow": "منخفض",
+
+  "uvBandModerate": "متوسط",
+
+  "uvBandHigh": "مرتفع",
+
+  "uvBandVeryHigh": "مرتفع جدًا",
+
+  "uvBandExtreme": "شديد الخطورة",
+
+  "sectionForecast": "توقعات 3 أيام",
+
+  "sectionAirQuality": "جودة الهواء",
+
+  "sectionSunAndMoon": "الشمس والقمر",
+
+  "airQualityIndexName": "مؤشر EPA الأمريكي",
+
+  "epaGood": "جيدة",
+
+  "epaModerate": "متوسطة",
+
+  "epaUnhealthyForSensitiveGroups": "غير صحية للفئات الحساسة",
+
+  "epaUnhealthy": "غير صحية",
+
+  "epaVeryUnhealthy": "غير صحية إطلاقًا",
+
+  "epaHazardous": "خطِرة",
+
+  "epaGoodMeaning": "جودة الهواء مُرضية، والتلوث لا يشكل خطرًا يُذكر.",
+
+  "epaModerateMeaning": "جودة الهواء مقبولة، وقد يشعر بأثرها من لديهم حساسية شديدة تجاه تلوث الهواء.",
+
+  "epaUnhealthyForSensitiveGroupsMeaning": "قد تظهر أعراض على الفئات الحساسة، أما عامة الناس فالأرجح ألا يتأثروا.",
+
+  "epaUnhealthyMeaning": "قد تظهر أعراض على بعض عامة الناس، وقد تكون أشد على الفئات الحساسة.",
+
+  "epaVeryUnhealthyMeaning": "تحذير صحي: احتمال ظهور الأعراض على الجميع أعلى من المعتاد.",
+
+  "epaHazardousMeaning": "تحذير من حالة طارئة: الأرجح أن يتأثر الجميع.",
+
+  "astroSunrise": "الشروق",
+
+  "astroSunset": "الغروب",
+
+  "moonNewMoon": "المحاق",
+
+  "moonWaxingCrescent": "الهلال المتزايد",
+
+  "moonFirstQuarter": "التربيع الأول",
+
+  "moonWaxingGibbous": "الأحدب المتزايد",
+
+  "moonFullMoon": "البدر",
+
+  "moonWaningGibbous": "الأحدب المتناقص",
+
+  "moonLastQuarter": "التربيع الأخير",
+
+  "moonWaningCrescent": "الهلال المتناقص",
+
+  "alertInEffectUntil": "سارٍ حتى {time} · اضغط للتفاصيل",
+
+  "alertTapForDetails": "اضغط للتفاصيل",
+
+  "offlineTitle": "لا يوجد اتصال",
+
+  "offlineBody": "تعذّر الوصول إلى خدمة الطقس الآن. تحقق من اتصالك ثم أعد المحاولة.",
+
+  "offlineNote": "{age} · {city} {temperature}",
+
+  "offlineTryAgain": "إعادة المحاولة",
+
+  "offlineUseSavedData": "عرض البيانات المحفوظة",
+
+  "failureInvalidCityTitle": "لم نجد هذا المكان",
+
+  "failureInvalidCityBody": "لم نعثر على هذا المكان. راجع طريقة كتابته، أو ابحث عن مدينة قريبة.",
+
+  "failureUnauthorizedTitle": "الخدمة غير متاحة",
+
+  "failureUnauthorizedBody": "تعذّر على هذه النسخة تسجيل الدخول إلى خدمة الطقس. المفتاح الذي بُنيت به مفقود أو لم يعد صالحًا.",
+
+  "failureRateLimitedTitle": "انتهت حصة الشهر",
+
+  "failureRateLimitedBody": "استهلكت الخدمة كل الطلبات المسموح بها هذا الشهر. ستعود للرد مع بداية الشهر القادم.",
+
+  "failureServerTitle": "الخدمة متوقفة",
+
+  "failureServerBody": "واجهت خدمة الطقس مشكلة أثناء الرد. العطل عندهم، لذا تستحق المحاولة بعد قليل.",
+
+  "failureTimeoutTitle": "استغرق الأمر وقتًا طويلًا",
+
+  "failureTimeoutBody": "لم ترد خدمة الطقس في الوقت المتاح. قد يكون اتصالك بطيئًا الآن.",
+
+  "failureUnknownTitle": "حدث خطأ ما",
+
+  "failureUnknownBody": "تعذّر تحميل الطقس. أعد المحاولة، وإن تكرر الأمر فأعد تشغيل التطبيق."
 }
