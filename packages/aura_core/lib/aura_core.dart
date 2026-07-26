@@ -12,3 +12,8 @@ export 'src/app_failure.dart';
 export 'src/clock.dart';
 export 'src/result.dart';
 export 'src/stale.dart';
+export 'src/units/distance.dart';
+export 'src/units/precipitation.dart';
+export 'src/units/pressure.dart';
+export 'src/units/speed.dart';
+export 'src/units/temperature.dart';
