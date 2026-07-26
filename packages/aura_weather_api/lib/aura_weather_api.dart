@@ -17,3 +17,5 @@ export 'src/dto/forecast_response_dto.dart';
 export 'src/dto/hour_dto.dart';
 export 'src/dto/location_dto.dart';
 export 'src/dto/search_result_dto.dart';
+export 'src/weather_api.dart';
+export 'src/weather_api_failure.dart';
