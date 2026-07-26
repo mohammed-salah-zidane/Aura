@@ -22,9 +22,14 @@ final class DeviceLocation implements LocationPort {
   /// Geolocator does not distinguish "never asked" from "asked and refused":
   /// both arrive as `denied`. Before asking, that means the prompt has not been
   /// answered yet, which is [LocationPermission.notDetermined].
+  ///
+  /// Geolocator throws rather than answering when the platform is not set up
+  /// for it, and a port that throws stops a screen dead. A build that cannot
+  /// ask has, as far as the app is concerned, been refused.
   @override
-  Future<LocationPermission> permission() async =>
-      switch (await geo.Geolocator.checkPermission()) {
+  Future<LocationPermission> permission() async {
+    try {
+      return switch (await geo.Geolocator.checkPermission()) {
         geo.LocationPermission.always ||
         geo.LocationPermission.whileInUse => LocationPermission.granted,
         geo.LocationPermission.deniedForever =>
@@ -33,12 +38,17 @@ final class DeviceLocation implements LocationPort {
         geo.LocationPermission.unableToDetermine =>
           LocationPermission.notDetermined,
       };
+    } on Object {
+      return LocationPermission.permanentlyDenied;
+    }
+  }
 
   /// After the prompt has been answered, the same `denied` means the user has
   /// just refused.
   @override
-  Future<LocationPermission> request() async =>
-      switch (await geo.Geolocator.requestPermission()) {
+  Future<LocationPermission> request() async {
+    try {
+      return switch (await geo.Geolocator.requestPermission()) {
         geo.LocationPermission.always ||
         geo.LocationPermission.whileInUse => LocationPermission.granted,
         geo.LocationPermission.deniedForever =>
@@ -47,6 +57,10 @@ final class DeviceLocation implements LocationPort {
         geo.LocationPermission.unableToDetermine =>
           LocationPermission.notDetermined,
       };
+    } on Object {
+      return LocationPermission.permanentlyDenied;
+    }
+  }
 
   @override
   Future<Result<LocationRef, AppFailure>> currentPosition() async {
