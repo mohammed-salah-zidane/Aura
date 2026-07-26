@@ -1,4 +1,5 @@
 import 'package:aura_design/src/foundations/aura_glass.dart';
+import 'package:aura_design/src/foundations/aura_script.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_icons.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
@@ -74,8 +75,8 @@ class AuraAlertBanner extends StatelessWidget {
                 ),
               ),
               if (onTap != null)
-                const Icon(
-                  AuraIcons.chevronRight,
+                Icon(
+                  AuraChevron.forward(context),
                   size: AuraSizes.iconUi,
                   color: AuraColors.textSecondary,
                 ),
@@ -171,8 +172,8 @@ class AuraSettingsRow extends StatelessWidget {
                         ),
                       ),
                     if (onTap != null)
-                      const Icon(
-                        AuraIcons.chevronRight,
+                      Icon(
+                        AuraChevron.forward(context),
                         size: AuraSizes.iconSmall,
                         color: AuraColors.textTertiary,
                       ),
