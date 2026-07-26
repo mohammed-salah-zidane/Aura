@@ -48,12 +48,12 @@ abstract final class AuraRoutes {
 ///
 /// [version] is the build the About row reports, read from the package at the
 /// root rather than hard-coded in the feature.
-GoRouter auraRouter({required String version}) {
+GoRouter auraRouter({required String version, String? initialLocation}) {
   void back(BuildContext context) =>
       context.canPop() ? context.pop() : context.go(AuraRoutes.home);
 
   return GoRouter(
-    initialLocation: AuraRoutes.splash,
+    initialLocation: initialLocation ?? AuraRoutes.splash,
     routes: <RouteBase>[
       GoRoute(
         path: AuraRoutes.splash,

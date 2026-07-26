@@ -51,7 +51,12 @@ class AuraApp extends ConsumerStatefulWidget {
 }
 
 class _AuraAppState extends ConsumerState<AuraApp> {
-  late final GoRouter _router = auraRouter(version: widget.version);
+  late final GoRouter _router = auraRouter(
+    version: widget.version,
+    initialLocation: const String.fromEnvironment('AURA_ROUTE').isEmpty
+        ? null
+        : const String.fromEnvironment('AURA_ROUTE'),
+  );
   String? _language;
 
   @override

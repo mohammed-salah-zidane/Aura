@@ -1,4 +1,3 @@
-import 'package:aura_design/src/foundations/aura_glass.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_gradients.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
@@ -11,6 +10,14 @@ import 'package:flutter/widgets.dart';
 /// forecast period, already worked out by the domain. Keeping the arithmetic
 /// out of the widget lets the bar be tested as geometry and the span be tested
 /// as a pure function, separately.
+///
+/// The row paints no surface of its own: the design puts every row inside one
+/// panel with hairlines between them, so a row carrying its own glass would
+/// draw a second border inside the first.
+///
+/// Each column is a floor rather than a fixed width. The pen's widths are what
+/// its own sample text needs, and a longer word or a wider digit has to push
+/// the bar along rather than be cut off.
 class AuraForecastRow extends StatelessWidget {
   /// Creates a forecast row.
   const AuraForecastRow({
@@ -60,14 +67,15 @@ class AuraForecastRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AuraGlass.flat(
+    return Container(
+      color: AuraColors.transparent,
       height: AuraSizes.forecastRowHeight,
       padding: const EdgeInsets.symmetric(horizontal: AuraSpacing.lg),
       child: Row(
         spacing: AuraSpacing.sm,
         children: <Widget>[
-          SizedBox(
-            width: _dayWidth,
+          _Column(
+            minWidth: _dayWidth,
             child: Text(
               day,
               maxLines: 1,
@@ -82,8 +90,8 @@ class AuraForecastRow extends StatelessWidget {
             ),
           ),
           Icon(icon, size: AuraSizes.iconConditionSmall, color: iconTint),
-          SizedBox(
-            width: _rainWidth,
+          _Column(
+            minWidth: _rainWidth,
             child: rainProbability == null
                 ? null
                 : Text(
@@ -94,8 +102,8 @@ class AuraForecastRow extends StatelessWidget {
                     ),
                   ),
           ),
-          SizedBox(
-            width: _lowWidth,
+          _Column(
+            minWidth: _lowWidth,
             child: Text(
               low,
               maxLines: 1,
@@ -108,8 +116,8 @@ class AuraForecastRow extends StatelessWidget {
           Expanded(
             child: AuraRangeBar(start: rangeStart, extent: rangeExtent),
           ),
-          SizedBox(
-            width: _highWidth,
+          _Column(
+            minWidth: _highWidth,
             child: Text(
               high,
               maxLines: 1,
@@ -121,6 +129,22 @@ class AuraForecastRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// One column of a forecast row, no narrower than the design draws it.
+class _Column extends StatelessWidget {
+  const _Column({required this.minWidth, this.child});
+
+  final double minWidth;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(minWidth: minWidth),
+      child: child,
     );
   }
 }
@@ -155,6 +179,9 @@ class AuraRangeBar extends StatelessWidget {
           child: FractionallySizedBox(
             alignment: AlignmentDirectional(clampedStart * 2 - 1, 0),
             widthFactor: clampedExtent,
+            // Align loosens the constraints it passes down, so a decoration
+            // with no child of its own would collapse to no height at all.
+            heightFactor: 1,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(

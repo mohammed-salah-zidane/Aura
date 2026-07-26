@@ -91,6 +91,10 @@ class AuraAlertBanner extends StatelessWidget {
 ///
 /// Exactly one of [value] or [trailing] is used. A row that shows a value opens
 /// a picker; a row that carries a control acts in place.
+///
+/// The row paints no surface of its own. Every settings screen in the pen puts
+/// its rows inside one panel with hairlines between them, so a row that carried
+/// its own glass would draw a second border inside the first.
 class AuraSettingsRow extends StatelessWidget {
   /// Creates a settings row.
   const AuraSettingsRow({
@@ -127,7 +131,8 @@ class AuraSettingsRow extends StatelessWidget {
       button: onTap != null,
       child: GestureDetector(
         onTap: onTap,
-        child: AuraGlass.flat(
+        child: Container(
+          color: AuraColors.transparent,
           padding: const EdgeInsets.symmetric(
             vertical: 13,
             horizontal: AuraSpacing.lg,
