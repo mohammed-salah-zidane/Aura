@@ -1,5 +1,4 @@
 import 'package:aura_design/aura_design.dart';
-import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_feature_home/src/home_ui_state.dart';
 import 'package:aura_feature_home/src/home_view_model.dart';
 import 'package:aura_feature_home/src/widgets/home_content.dart';
@@ -60,7 +59,6 @@ class HomeScreen extends ConsumerWidget {
     // does not blank the screen it was pulled on.
     final state = ref.watch(homeViewModelProvider).value;
     final location = ref.watch(activeLocationProvider);
-    final saved = ref.watch(savedCitiesProvider).value ?? const <SavedCity>[];
 
     return AuraSky(
       kind: state is HomeReady
@@ -80,8 +78,6 @@ class HomeScreen extends ConsumerWidget {
           child: HomeContent(
             state: state,
             isCurrentLocation: location.isCurrentLocation,
-            savedCityCount: saved.length,
-            activePage: _pageOf(location, saved),
             onOpenSettings: onOpenSettings,
             onOpenSearch: onOpenSearch,
             onOpenSavedCities: onOpenSavedCities,
@@ -97,14 +93,6 @@ class HomeScreen extends ConsumerWidget {
 
   static Future<void> _refresh(WidgetRef ref) =>
       ref.read(homeViewModelProvider.notifier).refresh();
-
-  /// Where the active place sits among the current location and the saved
-  /// ones, which is what the bottom bar's indicator reports.
-  static int _pageOf(LocationRef location, List<SavedCity> saved) {
-    if (location.isCurrentLocation) return 0;
-    final index = saved.indexWhere((city) => city.location == location);
-    return index < 0 ? 0 : index + 1;
-  }
 }
 
 /// The offline screen, with the stored reading it can fall back to.

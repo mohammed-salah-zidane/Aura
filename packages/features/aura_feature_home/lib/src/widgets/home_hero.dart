@@ -4,41 +4,6 @@ import 'package:aura_l10n/aura_l10n.dart';
 import 'package:aura_ui/aura_ui.dart';
 import 'package:flutter/widgets.dart';
 
-/// The wordmark and the way into settings, above the hero.
-class HomeBrandBar extends StatelessWidget {
-  /// Creates the brand bar.
-  const HomeBrandBar({required this.onOpenSettings, super.key});
-
-  /// Opens the settings screen.
-  final VoidCallback onOpenSettings;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Row(
-          spacing: AuraSpacing.sm,
-          children: <Widget>[
-            const AuraMark(size: AuraMarkSize.brandBar),
-            Text(
-              AuraBrand.name,
-              style: AuraText.wordmarkSmall.copyWith(
-                color: AuraColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-        AuraCircleButton(
-          icon: AuraIcons.settings,
-          semanticLabel: context.l10n.homeSettings,
-          onPressed: onOpenSettings,
-        ),
-      ],
-    );
-  }
-}
-
 /// The place, the temperature and the condition, centred.
 ///
 /// The pen's narrative line under the condition has no field behind it, so the

@@ -2,12 +2,12 @@ import 'package:aura_design/aura_design.dart';
 import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_feature_home/src/home_ui_state.dart';
 import 'package:aura_feature_home/src/widgets/home_air_quality_card.dart';
-import 'package:aura_feature_home/src/widgets/home_bottom_bar.dart';
 import 'package:aura_feature_home/src/widgets/home_forecast_preview.dart';
 import 'package:aura_feature_home/src/widgets/home_hero.dart';
 import 'package:aura_feature_home/src/widgets/home_hourly_strip.dart';
 import 'package:aura_feature_home/src/widgets/home_metric_grid.dart';
 import 'package:aura_feature_home/src/widgets/home_sun_and_moon_card.dart';
+import 'package:aura_feature_home/src/widgets/home_top_bar.dart';
 import 'package:aura_l10n/aura_l10n.dart';
 import 'package:aura_ui/aura_ui.dart';
 import 'package:flutter/widgets.dart';
@@ -23,8 +23,6 @@ class HomeContent extends StatelessWidget {
   const HomeContent({
     required this.state,
     required this.isCurrentLocation,
-    required this.savedCityCount,
-    required this.activePage,
     required this.onOpenSettings,
     required this.onOpenSearch,
     required this.onOpenSavedCities,
@@ -40,12 +38,6 @@ class HomeContent extends StatelessWidget {
 
   /// Whether the place is wherever the device is.
   final bool isCurrentLocation;
-
-  /// How many places sit beside the current location.
-  final int savedCityCount;
-
-  /// Which of those pages is showing.
-  final int activePage;
 
   /// Opens settings.
   final VoidCallback onOpenSettings;
@@ -73,7 +65,7 @@ class HomeContent extends StatelessWidget {
     AuraSpacing.xl,
     AuraSpacing.sm,
     AuraSpacing.xl,
-    AuraSpacing.lg,
+    AuraSpacing.xxl,
   );
 
   @override
@@ -93,7 +85,11 @@ class HomeContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: AuraSpacing.xl,
           children: <Widget>[
-            HomeBrandBar(onOpenSettings: onOpenSettings),
+            HomeTopBar(
+              onOpenSearch: onOpenSearch,
+              onOpenSavedCities: onOpenSavedCities,
+              onOpenSettings: onOpenSettings,
+            ),
             if (alert != null)
               AuraAlertBanner(
                 title: alert.event,
@@ -131,12 +127,6 @@ class HomeContent extends StatelessWidget {
               astro: snapshot.today.astro,
               format: format,
               onOpen: onOpenSunAndMoon,
-            ),
-            HomeBottomBar(
-              savedCityCount: savedCityCount,
-              activeIndex: activePage,
-              onOpenSearch: onOpenSearch,
-              onOpenSavedCities: onOpenSavedCities,
             ),
           ],
         ),

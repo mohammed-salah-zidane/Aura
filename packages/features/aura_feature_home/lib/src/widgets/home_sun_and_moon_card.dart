@@ -101,7 +101,9 @@ class _AstroColumn extends StatelessWidget {
         ),
         Text(
           label.toUpperCase(),
-          maxLines: 1,
+          // A moon phase is two words. Wrapping reads; clipping "Waxing
+          // Crescent" to "WAXING CRESC…" does not.
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
           textAlign: TextAlign.center,
           style: AuraText.astroLabel
