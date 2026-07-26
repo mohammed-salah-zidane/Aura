@@ -20,12 +20,20 @@ dependencies:
   shared_preferences: ^2.5.5
 
 dev_dependencies:
+  # Dev only, and deliberately not dependencies. The cache round trip is tested
+  # against the entity the mapper really produces from a captured response, so
+  # a shape this package cannot store fails here rather than on a device. No
+  # production edge exists, and the layering holds.
+  aura_data:
+    path: ../aura_data
+  aura_weather_api:
+    path: ../aura_weather_api
   build_runner: ^2.4.0
   # Held at 2.34.0: 2.34.1+ needs analyzer ^13, but flutter_test + test cap
   # the workspace at analyzer <13.0.0 on Flutter 3.44.8.
   drift_dev: ">=2.34.0 <2.34.1"
   flutter_test:
     sdk: flutter
-  mocktail: ^1.0.5
-  test: ^1.25.0
+  # The in-memory SharedPreferencesAsync double lives in the platform interface.
+  shared_preferences_platform_interface: ^2.4.1
   very_good_analysis: ^10.3.0
