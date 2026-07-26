@@ -17,6 +17,7 @@ export 'src/derived/sun_geometry.dart';
 export 'src/derived/uv_band.dart';
 export 'src/entities/air_quality.dart';
 export 'src/entities/astro_info.dart';
+export 'src/entities/city_reading.dart';
 export 'src/entities/current_conditions.dart';
 export 'src/entities/forecast_day.dart';
 export 'src/entities/hourly_point.dart';

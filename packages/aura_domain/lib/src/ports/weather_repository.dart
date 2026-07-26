@@ -1,4 +1,5 @@
 import 'package:aura_core/aura_core.dart';
+import 'package:aura_domain/src/entities/city_reading.dart';
 import 'package:aura_domain/src/entities/location_ref.dart';
 import 'package:aura_domain/src/entities/weather_snapshot.dart';
 
@@ -42,4 +43,14 @@ abstract interface class WeatherRepository {
 
   /// City autocomplete.
   Future<Result<List<CitySuggestion>, AppFailure>> search(String prefix);
+
+  /// One place's reading for right now, with no forecast behind it.
+  ///
+  /// Never falls back to the cache. It answers the temperature beside a search
+  /// result, where a stale reading would be worse than none: the user is
+  /// choosing between places, and a number from yesterday would decide it.
+  Future<Result<CityReading, AppFailure>> reading(
+    LocationRef location, {
+    String? lang,
+  });
 }

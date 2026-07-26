@@ -46,7 +46,7 @@ class AuraAlertBanner extends StatelessWidget {
             children: <Widget>[
               const Icon(
                 AuraIcons.alert,
-                size: AuraSizes.iconBanner,
+                size: AuraSizes.iconMedium,
                 color: AuraColors.alertIcon,
               ),
               Expanded(

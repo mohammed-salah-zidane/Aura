@@ -32,8 +32,20 @@ void main() {
       // A message made only of placeholders and punctuation is exempt, because
       // there is no word in it to translate. `{high} {low}` is the same string
       // in every language.
+      // A chemical symbol and a domain name read the same in every language.
+      // Listing them is deliberate: the rule catches a copied translation, and
+      // an exception has to be argued for one key at a time.
+      const identicalEverywhere = <String>{
+        'pollutantPm25',
+        'pollutantPm10',
+        'pollutantNo2',
+        'pollutantSo2',
+        'pollutantCo',
+        'settingsDataSourceValue',
+      };
       final hasWords = RegExp('[A-Za-z]');
       for (final key in _messages(en)) {
+        if (identicalEverywhere.contains(key)) continue;
         final source = (en[key]! as String).replaceAll(
           RegExp(r'\{\w+\}'),
           '',

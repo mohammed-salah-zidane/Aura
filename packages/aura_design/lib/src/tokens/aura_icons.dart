@@ -108,6 +108,9 @@ abstract final class AuraIcons {
   /// Dismiss.
   static const IconData close = LucideIcons.x;
 
+  /// Empty a field. Ringed, unlike the bare dismiss cross.
+  static const IconData clear = LucideIcons.circleX;
+
   /// Overflow menu.
   static const IconData more = LucideIcons.ellipsisVertical;
 

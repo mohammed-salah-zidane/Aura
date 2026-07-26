@@ -171,6 +171,7 @@ AirQuality? _decodeAirQuality(Object? entry) {
 
 Map<String, Object?> _encodeAlert(WeatherAlert alert) => <String, Object?>{
   'event': alert.event,
+  'headline': alert.headline,
   'severity': alert.severity.name,
   'category': alert.category,
   'areas': alert.areas,
@@ -184,6 +185,7 @@ WeatherAlert _decodeAlert(Object? entry) {
   final json = _asObject(entry, 'alert');
   return WeatherAlert(
     event: _field<String>(json, 'event'),
+    headline: _field<String>(json, 'headline'),
     severity: _enum(AlertSeverity.values, json, 'severity'),
     category: _field<String>(json, 'category'),
     areas: _list(

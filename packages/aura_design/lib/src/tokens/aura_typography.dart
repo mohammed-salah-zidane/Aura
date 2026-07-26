@@ -104,6 +104,15 @@ abstract final class AuraText {
     fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
+  /// The largest screen title, on a screen that carries no hero. `Weather`
+  static const TextStyle titleLarge = TextStyle(
+    fontFamily: AuraFonts.display,
+    fontFamilyFallback: _displayFallback,
+    package: AuraFonts.package,
+    fontSize: 30,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
+  );
+
   /// Headline on a full-screen state. `You're Offline`
   static const TextStyle titleState = TextStyle(
     fontFamily: AuraFonts.display,
@@ -120,6 +129,16 @@ abstract final class AuraText {
     package: AuraFonts.package,
     fontSize: 26,
     fontVariations: <FontVariation>[FontVariation('wght', 400)],
+  );
+
+  /// Air quality category on its own screen. `Good`
+  static const TextStyle categoryHero = TextStyle(
+    fontFamily: AuraFonts.display,
+    fontFamilyFallback: _displayFallback,
+    package: AuraFonts.package,
+    fontSize: 58,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
+    height: 1,
   );
 
   /// Air quality category on a card. `Good`
@@ -178,12 +197,57 @@ abstract final class AuraText {
     fontVariations: <FontVariation>[FontVariation('wght', 300)],
   );
 
+  /// The scale a category came from, beside it. `US EPA Index`
+  static const TextStyle categorySource = TextStyle(
+    fontFamily: AuraFonts.app,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 22,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
+  );
+
+  /// A value under a tracked meta label. `Today · 20:00`
+  static const TextStyle metaValue = TextStyle(
+    fontFamily: AuraFonts.app,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 16,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
+  );
+
+  /// An astro time on a detail screen. `09:42`
+  static const TextStyle astroValue = TextStyle(
+    fontFamily: AuraFonts.app,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 15,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
+  );
+
   /// Current condition under the hero. `Mostly Sunny`
   static const TextStyle condition = TextStyle(
     fontFamily: AuraFonts.app,
     fontFamilyFallback: _textFallback,
     package: AuraFonts.package,
     fontSize: 20,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
+  );
+
+  /// City name in a search result. `Cairns`
+  static const TextStyle searchResultCity = TextStyle(
+    fontFamily: AuraFonts.app,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 16,
+    fontVariations: <FontVariation>[FontVariation('wght', 500)],
+  );
+
+  /// What the user has typed into the search field. `Cair`
+  static const TextStyle searchQuery = TextStyle(
+    fontFamily: AuraFonts.app,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 16,
     fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
@@ -316,6 +380,15 @@ abstract final class AuraText {
     fontVariations: <FontVariation>[FontVariation('wght', 500)],
   );
 
+  /// Day name on the first forecast row, which the design sets heavier.
+  static const TextStyle forecastDayToday = TextStyle(
+    fontFamily: AuraFonts.system,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 15,
+    fontVariations: <FontVariation>[FontVariation('wght', 700)],
+  );
+
   /// Alert banner title. `Heat Advisory`
   static const TextStyle alertTitle = TextStyle(
     fontFamily: AuraFonts.system,
@@ -333,6 +406,25 @@ abstract final class AuraText {
     fontSize: 14,
     fontVariations: <FontVariation>[FontVariation('wght', 400)],
     height: 1.45,
+  );
+
+  /// Body copy set a point smaller, under a reading rather than a heading.
+  static const TextStyle bodySmall = TextStyle(
+    fontFamily: AuraFonts.system,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 13,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
+    height: 1.4,
+  );
+
+  /// The unit after a reading. `µg/m³`
+  static const TextStyle unitLabel = TextStyle(
+    fontFamily: AuraFonts.system,
+    fontFamilyFallback: _textFallback,
+    package: AuraFonts.package,
+    fontSize: 11,
+    fontVariations: <FontVariation>[FontVariation('wght', 400)],
   );
 
   /// Body copy in a tighter block, such as a bulleted instruction.

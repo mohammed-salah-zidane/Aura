@@ -1,5 +1,6 @@
 import 'package:aura_design/src/foundations/aura_sky.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
+import 'package:aura_design/src/tokens/aura_icons.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
 import 'package:aura_design/src/tokens/aura_shadows.dart';
 import 'package:aura_design/src/tokens/aura_typography.dart';
@@ -21,6 +22,8 @@ class AuraCityCard extends StatelessWidget {
     required this.highLow,
     required this.sky,
     this.onTap,
+    this.onRemove,
+    this.removeSemanticLabel,
     super.key,
   });
 
@@ -44,6 +47,15 @@ class AuraCityCard extends StatelessWidget {
 
   /// Tap handler.
   final VoidCallback? onTap;
+
+  /// Forgets this place. Shown only while the list is being edited.
+  ///
+  /// The design draws no delete affordance, and a saved list with no way to
+  /// unsave is not a list. The glyph is the pen's own dismiss cross.
+  final VoidCallback? onRemove;
+
+  /// What removing does, for assistive technology.
+  final String? removeSemanticLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -115,12 +127,26 @@ class AuraCityCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(
-                    temperature,
-                    style: AuraText.cityCardTemperature.copyWith(
-                      color: AuraColors.textPrimary,
+                  if (onRemove == null)
+                    Text(
+                      temperature,
+                      style: AuraText.cityCardTemperature.copyWith(
+                        color: AuraColors.textPrimary,
+                      ),
+                    )
+                  else
+                    Semantics(
+                      button: true,
+                      label: removeSemanticLabel,
+                      child: GestureDetector(
+                        onTap: onRemove,
+                        child: const Icon(
+                          AuraIcons.close,
+                          size: AuraSizes.iconMedium,
+                          color: AuraColors.textPrimary,
+                        ),
+                      ),
                     ),
-                  ),
                   Text(
                     highLow,
                     style: AuraText.cityCardHighLow.copyWith(

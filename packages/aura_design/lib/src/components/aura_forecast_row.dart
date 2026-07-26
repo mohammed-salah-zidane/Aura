@@ -22,6 +22,7 @@ class AuraForecastRow extends StatelessWidget {
     required this.rangeStart,
     required this.rangeExtent,
     this.rainProbability,
+    this.isToday = false,
     super.key,
   });
 
@@ -49,10 +50,13 @@ class AuraForecastRow extends StatelessWidget {
   /// Rain chance, shown only when the API reports one above zero.
   final String? rainProbability;
 
+  /// Whether this is the first row, which the design sets heavier.
+  final bool isToday;
+
   static const double _dayWidth = 46;
   static const double _rainWidth = 34;
   static const double _lowWidth = 34;
-  static const double _highWidth = 30;
+  static const double _highWidth = 28;
 
   @override
   Widget build(BuildContext context) {
@@ -68,9 +72,13 @@ class AuraForecastRow extends StatelessWidget {
               day,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: AuraText.forecastDay.copyWith(
-                color: AuraColors.textSecondary,
-              ),
+              style:
+                  (isToday ? AuraText.forecastDayToday : AuraText.forecastDay)
+                      .copyWith(
+                        color: isToday
+                            ? AuraColors.textPrimary
+                            : AuraColors.textSecondary,
+                      ),
             ),
           ),
           Icon(icon, size: AuraSizes.iconConditionSmall, color: iconTint),
@@ -140,7 +148,7 @@ class AuraRangeBar extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AuraColors.rangeBarTrack,
-          borderRadius: BorderRadius.circular(AuraRadii.bar),
+          borderRadius: BorderRadius.circular(AuraSizes.rangeBarHeight / 2),
         ),
         child: Align(
           alignment: AlignmentDirectional.centerStart,
@@ -149,7 +157,9 @@ class AuraRangeBar extends StatelessWidget {
             widthFactor: clampedExtent,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AuraRadii.bar),
+                borderRadius: BorderRadius.circular(
+                  AuraSizes.rangeBarHeight / 2,
+                ),
                 gradient: LinearGradient(
                   begin: AlignmentDirectional.centerStart,
                   end: AlignmentDirectional.centerEnd,

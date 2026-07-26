@@ -29,25 +29,10 @@ class HomeBrandBar extends StatelessWidget {
             ),
           ],
         ),
-        Semantics(
-          button: true,
-          label: context.l10n.homeSettings,
-          child: GestureDetector(
-            onTap: onOpenSettings,
-            child: const AuraGlass(
-              width: AuraSizes.brandButton,
-              height: AuraSizes.brandButton,
-              radius: AuraRadii.pill,
-              shadow: <BoxShadow>[],
-              child: Center(
-                child: Icon(
-                  AuraIcons.settings,
-                  size: AuraSizes.iconUi,
-                  color: AuraColors.textSecondary,
-                ),
-              ),
-            ),
-          ),
+        AuraCircleButton(
+          icon: AuraIcons.settings,
+          semanticLabel: context.l10n.homeSettings,
+          onPressed: onOpenSettings,
         ),
       ],
     );

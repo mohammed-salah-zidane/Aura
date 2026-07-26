@@ -46,6 +46,15 @@ CitySuggestion citySuggestionFromDto(SearchResultDto dto) => CitySuggestion(
   country: dto.country,
 );
 
+/// Turns a `current.json` response into the reading a list row shows.
+CityReading cityReadingFromDto(CurrentResponseDto dto) => CityReading(
+  placeName: dto.location.name,
+  region: dto.location.region,
+  country: dto.location.country,
+  localTime: DateTime.parse(dto.location.localtime),
+  current: _currentFromDto(dto.current),
+);
+
 CurrentConditions _currentFromDto(CurrentDto dto) => CurrentConditions(
   observedAt: DateTime.parse(dto.lastUpdated),
   temperature: Temperature.celsius(dto.tempC),
@@ -125,6 +134,7 @@ AirQuality? _airQualityFromDto(AirQualityDto? dto) {
 
 WeatherAlert _alertFromDto(AlertDto dto) => WeatherAlert(
   event: dto.event,
+  headline: dto.headline,
   severity: alertSeverityFromName(dto.severity),
   category: dto.category,
   areas: _areasFromDto(dto.areas),

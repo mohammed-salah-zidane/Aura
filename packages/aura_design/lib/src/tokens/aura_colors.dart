@@ -70,6 +70,15 @@ abstract final class AuraColors {
   /// Alert banner stroke.
   static const Color alertBorder = Color(0x66FF8A5B);
 
+  /// Alert detail panel fill.
+  static const Color alertPanel = Color(0x24FF8A5B);
+
+  /// Alert detail panel stroke.
+  static const Color alertPanelBorder = Color(0x70FF8A5B);
+
+  /// The tile behind the alert detail's glyph.
+  static const Color alertTile = Color(0x33FF8A5B);
+
   /// Alert banner icon.
   static const Color alertIcon = Color(0xFFFFC08A);
 
@@ -155,6 +164,15 @@ abstract final class AuraColors {
   /// Tint for the moon phase glyph on the sun and moon card, which is drawn
   /// cooler than the moon that stands for a clear night.
   static const Color conditionMoonPhase = Color(0xFFD8DEEA);
+
+  /// The unlit face of the moon phase disc.
+  static const Color moonShadow = Color(0xFF26305A);
+
+  /// The sun and the horizon markers on the sun path.
+  static const Color sunPath = Color(0xFFFFD68A);
+
+  /// The dots marking sunrise and sunset on that path. White at 80%.
+  static const Color sunPathMarker = Color(0xCCFFFFFF);
 
   /// Tint for the moon-behind-cloud glyph.
   static const Color conditionCloudMoon = Color(0xFFE8EEF5);

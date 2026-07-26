@@ -77,6 +77,12 @@ abstract final class AuraRadii {
   /// 18. List rows.
   static const double row = 18;
 
+  /// 20. A card inside a detail screen.
+  static const double detailCard = 20;
+
+  /// 24. A detail screen's largest panel.
+  static const double detailPanel = 24;
+
   /// 22. Cards. The most common radius in the design.
   static const double card = 22;
 
@@ -124,8 +130,9 @@ abstract final class AuraSizes {
   /// Condition icon in a compact row.
   static const double iconConditionSmall = 22;
 
-  /// Icon on the alert banner.
-  static const double iconBanner = 20;
+  /// Middle icon step. The alert banner's glyph, and a condition glyph beside
+  /// a search result.
+  static const double iconMedium = 20;
 
   /// The spinner on the loading screen.
   static const double iconSpinner = 24;
@@ -135,6 +142,10 @@ abstract final class AuraSizes {
 
   /// Chevron on a card heading, and the glyph inside a settings row's tile.
   static const double iconSmall = 16;
+
+  /// The clear glyph inside an active search field, which the design draws as
+  /// a ringed cross rather than a bare one.
+  static const double iconClear = 17;
 
   /// Glyph beside a note or a location kicker.
   static const double iconCaption = 12;
@@ -171,6 +182,39 @@ abstract final class AuraSizes {
 
   /// Index scale bar on a detail screen, where it carries end labels.
   static const double indexScaleHeightLarge = 10;
+
+  /// Back button on a detail screen, a step larger than the brand bar's.
+  static const double backButton = 36;
+
+  /// Glyph inside that button.
+  static const double iconBack = 20;
+
+  /// The tile behind the alert detail's glyph.
+  static const double alertTile = 46;
+
+  /// The sun path chart, on the design's 393 point canvas.
+  static const double sunChartWidth = 321;
+
+  /// Its height.
+  static const double sunChartHeight = 118;
+
+  /// The sun travelling that path.
+  static const double sunDisc = 16;
+
+  /// Its glow.
+  static const double sunGlow = 46;
+
+  /// The dots marking sunrise and sunset on it.
+  static const double sunPathMarker = 8;
+
+  /// The moon phase disc, including its glow.
+  static const double moonPhase = 80;
+
+  /// The disc itself inside that glow.
+  static const double moonDisc = 56;
+
+  /// Divider between the two halves of the alert timing card.
+  static const double alertTimingDividerHeight = 40;
 
   /// Thickness of a hairline divider.
   static const double divider = 1;

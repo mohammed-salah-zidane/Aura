@@ -4,6 +4,7 @@ import 'package:test/test.dart';
 
 WeatherAlert _alert(String event, AlertSeverity severity) => WeatherAlert(
   event: event,
+  headline: '$event issued by the met service',
   severity: severity,
   category: 'Met',
   areas: const <String>['Cairo'],

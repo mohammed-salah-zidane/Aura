@@ -166,4 +166,10 @@ class _EmptyRepository implements WeatherRepository {
   Future<Result<List<CitySuggestion>, AppFailure>> search(
     String prefix,
   ) async => const Ok<List<CitySuggestion>, AppFailure>(<CitySuggestion>[]);
+
+  @override
+  Future<Result<CityReading, AppFailure>> reading(
+    LocationRef location, {
+    String? lang,
+  }) async => const Err<CityReading, AppFailure>(CacheMiss());
 }

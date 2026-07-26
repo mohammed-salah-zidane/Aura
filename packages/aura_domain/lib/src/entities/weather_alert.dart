@@ -52,6 +52,7 @@ final class WeatherAlert {
   /// Creates an alert.
   const WeatherAlert({
     required this.event,
+    required this.headline,
     required this.severity,
     required this.category,
     required this.areas,
@@ -63,6 +64,10 @@ final class WeatherAlert {
 
   /// The event name, for example `Heat Advisory`.
   final String event;
+
+  /// The issuer's own one-line summary, which usually names them and says how
+  /// long the notice runs. Empty when they sent none.
+  final String headline;
 
   /// How serious the issuer graded it.
   final AlertSeverity severity;

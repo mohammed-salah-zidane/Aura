@@ -455,5 +455,267 @@
   "failureUnknownBody": "We couldn't load the weather. Try again, and if it keeps happening, restart the app.",
   "@failureUnknownBody": {
     "description": "Explains a failure that fits none of the others."
-  }
+  },
+
+  "searchTitle": "Add Location",
+  "@searchTitle": {
+    "description": "Heading on the screen that finds a city to add."
+  },
+
+  "searchClose": "Close",
+  "@searchClose": {
+    "description": "Spoken label for the button that leaves the search screen, which carries an icon and no text."
+  },
+
+  "searchPlaceholder": "Search for a city or airport",
+  "@searchPlaceholder": {
+    "description": "Shown in the search field while it is empty."
+  },
+
+  "searchClear": "Clear the search",
+  "@searchClear": {
+    "description": "Spoken label for the button that empties the search field."
+  },
+
+  "searchUseCurrentLocation": "Use my current location",
+  "@searchUseCurrentLocation": {
+    "description": "Row above the results that reads the weather for wherever the device is."
+  },
+
+  "searchResultsLabel": "Search results",
+  "@searchResultsLabel": {
+    "description": "Heading above the list of matches. Set in small caps by the view."
+  },
+
+  "searchNoResults": "No places match that.",
+  "@searchNoResults": {
+    "description": "Shown in place of the list when the service matched nothing."
+  },
+
+  "savedCitiesTitle": "Weather",
+  "@savedCitiesTitle": {
+    "description": "Heading on the screen listing the places the user has kept."
+  },
+
+  "savedCitiesEdit": "Edit saved cities",
+  "@savedCitiesEdit": {
+    "description": "Spoken label for the button that turns the remove controls on and off, which carries an icon and no text."
+  },
+
+  "savedCitiesDone": "Done editing",
+  "@savedCitiesDone": {
+    "description": "Spoken label for the same button once the remove controls are showing."
+  },
+
+  "savedCitiesRemove": "Remove {city}",
+  "@savedCitiesRemove": {
+    "description": "Spoken label for the button that forgets one kept city.",
+    "placeholders": { "city": { "type": "String", "example": "London" } }
+  },
+
+  "savedCitiesEmpty": "No places kept yet.",
+  "@savedCitiesEmpty": {
+    "description": "Shown in place of the list when nothing has been saved."
+  },
+
+  "savedCityCurrentTime": "{time} · Current",
+  "@savedCityCurrentTime": {
+    "description": "Under the name of the place the device is in: its local time, marked as the current location.",
+    "placeholders": { "time": { "type": "String", "example": "2:34 PM" } }
+  },
+
+  "detailBack": "Back",
+  "@detailBack": {"description": "Spoken label for the button that goes back from a detail screen, which carries an icon and no text."},
+
+  "forecastTitle": "3-Day Forecast",
+  "@forecastTitle": {"description": "Heading on the full forecast screen. Three days is what the free tier returns, which is what the screen shows."},
+
+  "forecastTierNote": "Free plan provides 3 forecast days · extend up to 14 with WeatherAPI Pro",
+  "@forecastTierNote": {"description": "Under the forecast, naming the limit the free tier of the weather service imposes."},
+
+  "airQualityTitle": "Air Quality",
+  "@airQualityTitle": {"description": "Heading on the air quality screen."},
+
+  "airQualityLevel": "Level {index} of 6",
+  "@airQualityLevel": {"description": "Where the reading sits on the US EPA index, which runs 1 to 6.", "placeholders": {"index": {"type": "String", "example": "1"}}},
+
+  "pollutantsLabel": "Pollutants",
+  "@pollutantsLabel": {"description": "Heading above the per-pollutant readings. Set in small caps by the view."},
+
+  "pollutantPm25": "PM2.5",
+  "@pollutantPm25": {"description": "Fine particulate matter under 2.5 micrometres, as the reading is labelled."},
+
+  "pollutantPm10": "PM10",
+  "@pollutantPm10": {"description": "Particulate matter under 10 micrometres, as the reading is labelled."},
+
+  "pollutantOzone": "Ozone O₃",
+  "@pollutantOzone": {"description": "Ozone, as the reading is labelled."},
+
+  "pollutantNo2": "NO₂",
+  "@pollutantNo2": {"description": "Nitrogen dioxide, as the reading is labelled."},
+
+  "pollutantSo2": "SO₂",
+  "@pollutantSo2": {"description": "Sulphur dioxide, as the reading is labelled."},
+
+  "pollutantCo": "CO",
+  "@pollutantCo": {"description": "Carbon monoxide, as the reading is labelled."},
+
+  "unitMicrogramsPerCubicMetre": "µg/m³",
+  "@unitMicrogramsPerCubicMetre": {"description": "Symbol for micrograms per cubic metre, after a pollutant reading."},
+
+  "airBandGood": "Good",
+  "@airBandGood": {"description": "European Air Quality Index band 1 for a single pollutant."},
+
+  "airBandFair": "Fair",
+  "@airBandFair": {"description": "European Air Quality Index band 2 for a single pollutant."},
+
+  "airBandModerate": "Moderate",
+  "@airBandModerate": {"description": "European Air Quality Index band 3 for a single pollutant."},
+
+  "airBandPoor": "Poor",
+  "@airBandPoor": {"description": "European Air Quality Index band 4 for a single pollutant."},
+
+  "airBandVeryPoor": "Very Poor",
+  "@airBandVeryPoor": {"description": "European Air Quality Index band 5 for a single pollutant."},
+
+  "airBandExtremelyPoor": "Extremely Poor",
+  "@airBandExtremelyPoor": {"description": "European Air Quality Index band 6 for a single pollutant."},
+
+  "alertTitle": "Weather Alert",
+  "@alertTitle": {"description": "Heading on the alert screen."},
+
+  "alertEffective": "Effective",
+  "@alertEffective": {"description": "Label above the time an alert takes effect. Set in small caps by the view."},
+
+  "alertExpires": "Expires",
+  "@alertExpires": {"description": "Label above the time an alert stops applying. Set in small caps by the view."},
+
+  "alertWhatToExpect": "What to expect",
+  "@alertWhatToExpect": {"description": "Heading above the issuer's description of the alert. Set in small caps by the view."},
+
+  "alertRecommendedActions": "Recommended actions",
+  "@alertRecommendedActions": {"description": "Heading above what the issuer advises people to do. Set in small caps by the view."},
+
+  "alertAreasAffected": "Areas affected",
+  "@alertAreasAffected": {"description": "Heading above the places the alert covers. Set in small caps by the view."},
+
+  "alertSource": "Issued via WeatherAPI.com",
+  "@alertSource": {"description": "At the foot of the alert screen, naming where the notice came from."},
+
+  "alertTimeToday": "Today · {time}",
+  "@alertTimeToday": {"description": "An alert time that falls today.", "placeholders": {"time": {"type": "String", "example": "20:00"}}},
+
+  "alertTimeOn": "{date} · {time}",
+  "@alertTimeOn": {"description": "An alert time that falls on another day.", "placeholders": {"date": {"type": "String", "example": "27 Jul"}, "time": {"type": "String", "example": "20:00"}}},
+
+  "alertSeverityMinor": "Minor",
+  "@alertSeverityMinor": {"description": "How serious the issuing service graded the alert."},
+
+  "alertSeverityModerate": "Moderate",
+  "@alertSeverityModerate": {"description": "How serious the issuing service graded the alert."},
+
+  "alertSeveritySevere": "Severe",
+  "@alertSeveritySevere": {"description": "How serious the issuing service graded the alert."},
+
+  "alertSeverityExtreme": "Extreme",
+  "@alertSeverityExtreme": {"description": "How serious the issuing service graded the alert."},
+
+  "alertNone": "No alerts are in effect for this place.",
+  "@alertNone": {"description": "Shown on the alert screen when the service returned no active alert."},
+
+  "sunAndMoonTitle": "Sun & Moon",
+  "@sunAndMoonTitle": {"description": "Heading on the sun and moon screen."},
+
+  "astroSunSection": "Sun",
+  "@astroSunSection": {"description": "Heading on the sun path card. Set in small caps by the view."},
+
+  "astroMoonSection": "Moon",
+  "@astroMoonSection": {"description": "Heading on the moon card. Set in small caps by the view."},
+
+  "astroDaylight": "{hours}h {minutes}m daylight",
+  "@astroDaylight": {"description": "How long the sun is up, beside the sun path.", "placeholders": {"hours": {"type": "String", "example": "13"}, "minutes": {"type": "String", "example": "48"}}},
+
+  "astroMoonrise": "Moonrise",
+  "@astroMoonrise": {"description": "Label above the time the moon rises. Set in small caps by the view."},
+
+  "astroMoonset": "Moonset",
+  "@astroMoonset": {"description": "Label above the time the moon sets. Set in small caps by the view."},
+
+  "astroIlluminated": "{percent} illuminated",
+  "@astroIlluminated": {"description": "How much of the moon's disc is lit.", "placeholders": {"percent": {"type": "String", "example": "34%"}}},
+
+  "astroNoSunrise": "No sunrise",
+  "@astroNoSunrise": {"description": "Shown where a sunrise time would be, at a latitude that has none that day."},
+
+  "astroNoSunset": "No sunset",
+  "@astroNoSunset": {"description": "Shown where a sunset time would be, at a latitude that has none that day."},
+
+  "settingsTitle": "Settings",
+  "@settingsTitle": {"description": "Heading on the settings screen."},
+
+  "settingsDone": "Done",
+  "@settingsDone": {"description": "Closes the settings screen."},
+
+  "settingsUnits": "Units",
+  "@settingsUnits": {"description": "Heading above the unit choices. Set in small caps by the view."},
+
+  "settingsNotificationsSection": "Notifications",
+  "@settingsNotificationsSection": {"description": "Heading above the notification switches. Set in small caps by the view."},
+
+  "settingsGeneral": "General",
+  "@settingsGeneral": {"description": "Heading above the general rows. Set in small caps by the view."},
+
+  "settingsAbout": "About",
+  "@settingsAbout": {"description": "Heading above the about rows. Set in small caps by the view."},
+
+  "settingsTemperature": "Temperature",
+  "@settingsTemperature": {"description": "Row that chooses which scale temperatures are shown in."},
+
+  "settingsWindSpeed": "Wind Speed",
+  "@settingsWindSpeed": {"description": "Row that chooses which unit wind speeds are shown in."},
+
+  "settingsPrecipitation": "Precipitation",
+  "@settingsPrecipitation": {"description": "Row that chooses which unit precipitation is shown in."},
+
+  "unitCelsius": "Celsius °C",
+  "@unitCelsius": {"description": "The Celsius scale, as the settings row names it."},
+
+  "unitFahrenheit": "Fahrenheit °F",
+  "@unitFahrenheit": {"description": "The Fahrenheit scale, as the settings row names it."},
+
+  "unitMillimetres": "Millimetres",
+  "@unitMillimetres": {"description": "Millimetres of precipitation, as the settings row names it."},
+
+  "unitInches": "Inches",
+  "@unitInches": {"description": "Inches of precipitation, as the settings row names it."},
+
+  "settingsDailyForecast": "Daily Forecast",
+  "@settingsDailyForecast": {"description": "Row that switches a forecast each morning on and off."},
+
+  "settingsSevereAlerts": "Severe Weather Alerts",
+  "@settingsSevereAlerts": {"description": "Row that switches a push for a severe alert on and off."},
+
+  "settingsPrecipitationStart": "Rain & Snow Start",
+  "@settingsPrecipitationStart": {"description": "Row that switches a push for precipitation starting on and off."},
+
+  "settingsAppearance": "Appearance",
+  "@settingsAppearance": {"description": "Row naming how the app decides its own colours."},
+
+  "settingsAppearanceValue": "Follows the weather",
+  "@settingsAppearanceValue": {"description": "What the appearance row reports: the sky the app paints is the condition itself, so there is nothing to choose."},
+
+  "settingsDataSource": "Data Source",
+  "@settingsDataSource": {"description": "Row naming where the weather comes from."},
+
+  "settingsDataSourceValue": "WeatherAPI.com",
+  "@settingsDataSourceValue": {"description": "The weather service, named as the free tier requires."},
+
+  "settingsVersion": "Version",
+  "@settingsVersion": {"description": "Row naming which build is installed."},
+
+  "notificationDailyTitle": "Today in {city}",
+  "@notificationDailyTitle": {"description": "Title of the notification sent each morning.", "placeholders": {"city": {"type": "String", "example": "Cairo"}}},
+
+  "notificationDailyBody": "Open Aura for today's forecast.",
+  "@notificationDailyBody": {"description": "Body of the notification sent each morning."}
 }

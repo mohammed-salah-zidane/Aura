@@ -173,5 +173,161 @@
 
   "failureUnknownTitle": "حدث خطأ ما",
 
-  "failureUnknownBody": "تعذّر تحميل الطقس. أعد المحاولة، وإن تكرر الأمر فأعد تشغيل التطبيق."
+  "failureUnknownBody": "تعذّر تحميل الطقس. أعد المحاولة، وإن تكرر الأمر فأعد تشغيل التطبيق.",
+
+  "searchTitle": "إضافة مدينة",
+
+  "searchClose": "إغلاق",
+
+  "searchPlaceholder": "ابحث عن مدينة أو مطار",
+
+  "searchClear": "مسح البحث",
+
+  "searchUseCurrentLocation": "استخدام موقعي الحالي",
+
+  "searchResultsLabel": "نتائج البحث",
+
+  "searchNoResults": "لا توجد أماكن مطابقة.",
+
+  "savedCitiesTitle": "الطقس",
+
+  "savedCitiesEdit": "تعديل المدن المحفوظة",
+
+  "savedCitiesDone": "إنهاء التعديل",
+
+  "savedCitiesRemove": "حذف {city}",
+
+  "savedCitiesEmpty": "لم تحفظ أي مكان بعد.",
+
+  "savedCityCurrentTime": "{time} · موقعك الحالي",
+
+  "detailBack": "رجوع",
+
+  "forecastTitle": "توقعات 3 أيام",
+
+  "forecastTierNote": "الخطة المجانية تتيح توقعات 3 أيام · وتصل إلى 14 يومًا مع WeatherAPI Pro",
+
+  "airQualityTitle": "جودة الهواء",
+
+  "airQualityLevel": "المستوى {index} من 6",
+
+  "pollutantsLabel": "الملوثات",
+
+  "pollutantPm25": "PM2.5",
+
+  "pollutantPm10": "PM10",
+
+  "pollutantOzone": "الأوزون O₃",
+
+  "pollutantNo2": "NO₂",
+
+  "pollutantSo2": "SO₂",
+
+  "pollutantCo": "CO",
+
+  "unitMicrogramsPerCubicMetre": "ميكروغرام/م³",
+
+  "airBandGood": "جيد",
+
+  "airBandFair": "مقبول",
+
+  "airBandModerate": "متوسط",
+
+  "airBandPoor": "سيئ",
+
+  "airBandVeryPoor": "سيئ جدًا",
+
+  "airBandExtremelyPoor": "سيئ للغاية",
+
+  "alertTitle": "تنبيه جوي",
+
+  "alertEffective": "يبدأ",
+
+  "alertExpires": "ينتهي",
+
+  "alertWhatToExpect": "ما هو متوقع",
+
+  "alertRecommendedActions": "إجراءات موصى بها",
+
+  "alertAreasAffected": "المناطق المتأثرة",
+
+  "alertSource": "صادر عبر WeatherAPI.com",
+
+  "alertTimeToday": "اليوم · {time}",
+
+  "alertTimeOn": "{date} · {time}",
+
+  "alertSeverityMinor": "بسيط",
+
+  "alertSeverityModerate": "متوسط",
+
+  "alertSeveritySevere": "شديد",
+
+  "alertSeverityExtreme": "بالغ الشدة",
+
+  "alertNone": "لا توجد تنبيهات سارية لهذا المكان.",
+
+  "sunAndMoonTitle": "الشمس والقمر",
+
+  "astroSunSection": "الشمس",
+
+  "astroMoonSection": "القمر",
+
+  "astroDaylight": "{hours} س و{minutes} د من النهار",
+
+  "astroMoonrise": "شروق القمر",
+
+  "astroMoonset": "غروب القمر",
+
+  "astroIlluminated": "مضيء بنسبة {percent}",
+
+  "astroNoSunrise": "لا شروق",
+
+  "astroNoSunset": "لا غروب",
+
+  "settingsTitle": "الإعدادات",
+
+  "settingsDone": "تم",
+
+  "settingsUnits": "الوحدات",
+
+  "settingsNotificationsSection": "الإشعارات",
+
+  "settingsGeneral": "عام",
+
+  "settingsAbout": "حول التطبيق",
+
+  "settingsTemperature": "درجة الحرارة",
+
+  "settingsWindSpeed": "سرعة الرياح",
+
+  "settingsPrecipitation": "هطول الأمطار",
+
+  "unitCelsius": "مئوية °C",
+
+  "unitFahrenheit": "فهرنهايت °F",
+
+  "unitMillimetres": "مليمتر",
+
+  "unitInches": "بوصة",
+
+  "settingsDailyForecast": "توقعات يومية",
+
+  "settingsSevereAlerts": "تنبيهات الطقس الشديد",
+
+  "settingsPrecipitationStart": "بداية المطر والثلج",
+
+  "settingsAppearance": "المظهر",
+
+  "settingsAppearanceValue": "يتبع حالة الطقس",
+
+  "settingsDataSource": "مصدر البيانات",
+
+  "settingsDataSourceValue": "WeatherAPI.com",
+
+  "settingsVersion": "الإصدار",
+
+  "notificationDailyTitle": "اليوم في {city}",
+
+  "notificationDailyBody": "افتح Aura لتعرف توقعات اليوم."
 }

@@ -63,6 +63,15 @@ final class WeatherRepositoryImpl implements WeatherRepository {
     );
   }
 
+  @override
+  Future<Result<CityReading, AppFailure>> reading(
+    LocationRef location, {
+    String? lang,
+  }) async {
+    final response = await _api.current(query: location.query, lang: lang);
+    return response.map(cityReadingFromDto);
+  }
+
   /// Maps a fresh response, caches it, and hands it back stamped now.
   ///
   /// A failed write is not a failed read. The user has the reading they asked
