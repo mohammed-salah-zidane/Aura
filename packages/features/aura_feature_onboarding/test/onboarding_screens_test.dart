@@ -1,10 +1,9 @@
 import 'package:aura_design/aura_design.dart';
 import 'package:aura_feature_onboarding/aura_feature_onboarding.dart';
 import 'package:aura_l10n/aura_l10n.dart';
+import 'package:aura_test_kit/aura_test_kit.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'helpers/pump_screen.dart';
 
 const Locale _en = Locale('en');
 const Locale _ar = Locale('ar');

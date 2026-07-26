@@ -1,0 +1,24 @@
+name: aura_test_kit
+description: "The widget-test harness every Aura feature shares."
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
+
+# flutter_test is a real dependency here rather than a dev one: this package is
+# the harness itself, and every consumer takes it as a dev_dependency.
+dependencies:
+  aura_design:
+    path: ../aura_design
+  aura_l10n:
+    path: ../aura_l10n
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+
+dev_dependencies:
+  very_good_analysis: ^10.3.0

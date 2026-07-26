@@ -17,12 +17,18 @@ dependencies:
     path: ../../aura_domain
   aura_l10n:
     path: ../../aura_l10n
+  aura_providers:
+    path: ../../aura_providers
+  aura_ui:
+    path: ../../aura_ui
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.3.2
   go_router: ^17.3.0
 
 dev_dependencies:
+  aura_test_kit:
+    path: ../../aura_test_kit
   build_runner: ^2.4.0
   flutter_test:
     sdk: flutter

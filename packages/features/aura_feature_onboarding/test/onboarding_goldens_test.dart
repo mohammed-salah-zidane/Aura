@@ -2,10 +2,9 @@
 library;
 
 import 'package:aura_feature_onboarding/aura_feature_onboarding.dart';
+import 'package:aura_test_kit/aura_test_kit.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'helpers/pump_screen.dart';
 
 /// Goldens are taken at the 393 by 852 canvas the design was drawn on, at a
 /// pixel ratio of 1, so a file lines up with its pen frame point for point.

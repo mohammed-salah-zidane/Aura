@@ -7,9 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Where the design system keeps its font assets, from this package.
-const String _fontsDir = '../../aura_design/fonts';
-
 /// Every family `AuraText` can reach, primaries and Arabic fallbacks alike.
 const List<String> _families = <String>[
   AuraFonts.display,
@@ -27,9 +24,10 @@ const List<String> _families = <String>[
 /// package-qualified one, because `AuraText` sets `package:`.
 Future<void> loadAuraFonts() async {
   TestWidgetsFlutterBinding.ensureInitialized();
+  final designRoot = _packageRoot(AuraFonts.package);
   for (final family in _families) {
     await _register(
-      File('$_fontsDir/$family.ttf'),
+      File.fromUri(designRoot.resolve('fonts/$family.ttf')),
       <String>[family, 'packages/${AuraFonts.package}/$family'],
     );
   }
@@ -38,10 +36,8 @@ Future<void> loadAuraFonts() async {
 
 /// Registers the Lucide glyphs `AuraIcons` names.
 ///
-/// Icons come from a pub package rather than from this repo, so the asset is
-/// found through the package config instead of a path that would only work on
-/// one machine. Without it every icon in a golden is an empty box, which is
-/// easy to miss and looks like a design decision.
+/// Without it every icon in a golden is an empty box, which is easy to miss
+/// and looks like a design decision.
 Future<void> _loadLucide() async {
   const package = 'lucide_icons_flutter';
   final root = _packageRoot(package);
@@ -51,11 +47,12 @@ Future<void> _loadLucide() async {
   );
 }
 
-/// Resolves a pub package's directory from the workspace package config.
+/// Resolves a package's directory from the workspace package config.
 ///
-/// `Isolate.resolvePackageUri` throws under `flutter_test`, and the pub cache
+/// `Isolate.resolvePackageUri` throws under `flutter_test`, and a pub-cache
 /// path differs per machine, so the config the tool already wrote is the only
-/// portable answer.
+/// portable answer. It also has to answer for `aura_design`, whose assets this
+/// harness reads from whichever package is running the suite.
 Uri _packageRoot(String name) {
   for (
     var dir = Directory.current;
@@ -101,14 +98,15 @@ Future<void> pumpScreen(
   WidgetTester tester,
   Widget screen, {
   Locale locale = const Locale('en'),
-  EdgeInsets viewPadding = _iPhonePadding,
+  EdgeInsets viewPadding = iPhoneViewPadding,
+  Size size = const Size(
+    AuraSizes.referenceWidth,
+    AuraSizes.referenceHeight,
+  ),
 }) async {
   tester.view
     ..devicePixelRatio = 1
-    ..physicalSize = const Size(
-      AuraSizes.referenceWidth,
-      AuraSizes.referenceHeight,
-    );
+    ..physicalSize = size;
   addTearDown(tester.view.reset);
 
   await tester.pumpWidget(
@@ -117,10 +115,7 @@ Future<void> pumpScreen(
       delegates: AppLocalizations.localizationsDelegates,
       child: MediaQuery(
         data: MediaQueryData(
-          size: const Size(
-            AuraSizes.referenceWidth,
-            AuraSizes.referenceHeight,
-          ),
+          size: size,
           padding: viewPadding,
           viewPadding: viewPadding,
         ),
@@ -139,7 +134,7 @@ Future<void> pumpScreen(
 /// The pen draws a 62 point status bar and runs its canvas under the home
 /// indicator, so a screen only lines up with the frame when the insets are
 /// there.
-const EdgeInsets _iPhonePadding = EdgeInsets.only(top: 59, bottom: 34);
+const EdgeInsets iPhoneViewPadding = EdgeInsets.only(top: 59, bottom: 34);
 
 TextDirection _directionOf(Locale locale) =>
     locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr;

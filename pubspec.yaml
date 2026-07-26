@@ -11,6 +11,9 @@ workspace:
   - packages/aura_core
   - packages/aura_design
   - packages/aura_l10n
+  - packages/aura_providers
+  - packages/aura_test_kit
+  - packages/aura_ui
   - packages/aura_network
   - packages/aura_weather_api
   - packages/aura_storage
