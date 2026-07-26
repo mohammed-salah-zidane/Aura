@@ -75,7 +75,6 @@ void main() {
             value: '9',
             sub: 'Very High',
             scale: AuraScaleBar(
-              position: 0.9,
               colors: <Color>[AuraColors.scaleLevel1, AuraColors.scaleLevel4],
               stops: <double>[0, 1],
             ),
@@ -88,30 +87,10 @@ void main() {
   });
 
   group('AuraScaleBar', () {
-    testWidgets('clamps a position outside the bar', (tester) async {
-      for (final position in <double>[-1, 0, 0.5, 1, 2]) {
-        await tester.pumpWidget(
-          _host(
-            AuraScaleBar(
-              position: position,
-              colors: const <Color>[
-                AuraColors.scaleLevel1,
-                AuraColors.scaleLevel5,
-              ],
-              stops: const <double>[0, 1],
-            ),
-            width: 100,
-          ),
-        );
-        expect(tester.takeException(), isNull, reason: 'failed at $position');
-      }
-    });
-
     testWidgets('matches the height in the design', (tester) async {
       await tester.pumpWidget(
         _host(
           const AuraScaleBar(
-            position: 0.5,
             colors: <Color>[AuraColors.scaleLevel1, AuraColors.scaleLevel5],
             stops: <double>[0, 1],
           ),
@@ -119,6 +98,46 @@ void main() {
         ),
       );
       expect(tester.getSize(find.byType(AuraScaleBar)).height, 4);
+    });
+
+    // The pen draws the whole ramp and nothing over it: no marker, and no
+    // dimming past the reading. The value and its band are the card's text.
+    testWidgets('draws the ramp with nothing layered over it', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const AuraScaleBar(
+            colors: <Color>[AuraColors.scaleLevel1, AuraColors.scaleLevel5],
+            stops: <double>[0, 1],
+          ),
+          width: 100,
+        ),
+      );
+
+      final decoration =
+          tester
+                  .widget<DecoratedBox>(
+                    find.descendant(
+                      of: find.byType(AuraScaleBar),
+                      matching: find.byType(DecoratedBox),
+                    ),
+                  )
+                  .decoration
+              as BoxDecoration;
+      expect(
+        decoration.gradient,
+        isA<LinearGradient>().having(
+          (g) => g.colors,
+          'colors',
+          <Color>[AuraColors.scaleLevel1, AuraColors.scaleLevel5],
+        ),
+      );
+      expect(
+        find.descendant(
+          of: find.byType(AuraScaleBar),
+          matching: find.byType(ColoredBox),
+        ),
+        findsNothing,
+      );
     });
   });
 

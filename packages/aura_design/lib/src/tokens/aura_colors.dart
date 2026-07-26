@@ -49,6 +49,12 @@ abstract final class AuraColors {
   /// Concentric rings of the Aura mark.
   static const Color auraRing = Color(0xFFFFE9C2);
 
+  /// Specular highlight on the Aura mark's core. White at 80%.
+  static const Color auraSpecular = Color(0xCCFFFFFF);
+
+  /// A star on the clear-night sky. Each star's own opacity is applied on top.
+  static const Color starfield = Color(0xFFFFFFFF);
+
   // ---------------------------------------------------------------- alert
 
   /// Warning accent.

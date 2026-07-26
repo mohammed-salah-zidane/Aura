@@ -1,4 +1,5 @@
 import 'package:aura_design/src/tokens/aura_colors.dart';
+import 'package:aura_design/src/tokens/aura_gradients.dart';
 import 'package:flutter/widgets.dart';
 
 /// The Aura mark: a glowing orb inside two concentric rings.
@@ -73,9 +74,9 @@ class _AuraMarkPainter extends CustomPainter {
       rect.center,
       unit / 2,
       Paint()
-        ..shader = const RadialGradient(
-          colors: <Color>[Color(0x55FFD68A), Color(0x00FFD68A)],
-          stops: <double>[0, 0.72],
+        ..shader = RadialGradient(
+          colors: AuraGradients.markGlow.colors,
+          stops: AuraGradients.markGlow.stops,
         ).createShader(rect),
     );
   }
@@ -115,14 +116,10 @@ class _AuraMarkPainter extends CustomPainter {
       rect.center,
       rect.width / 2,
       Paint()
-        ..shader = const RadialGradient(
+        ..shader = RadialGradient(
           center: _coreFocal,
-          colors: <Color>[
-            Color(0xFFFFF7E0),
-            AuraColors.auraCore,
-            Color(0xFFEF9E30),
-          ],
-          stops: <double>[0, 0.55, 1],
+          colors: AuraGradients.markCore.colors,
+          stops: AuraGradients.markCore.stops,
         ).createShader(rect),
     );
   }
@@ -132,7 +129,7 @@ class _AuraMarkPainter extends CustomPainter {
     canvas.drawCircle(
       Offset(_specX * unit + diameter / 2, _specY * unit + diameter / 2),
       diameter / 2,
-      Paint()..color = const Color(0xCCFFFFFF),
+      Paint()..color = AuraColors.auraSpecular,
     );
   }
 

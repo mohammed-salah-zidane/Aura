@@ -1,3 +1,4 @@
+import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_gradients.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
 import 'package:aura_design/src/tokens/aura_motion.dart';
@@ -150,7 +151,7 @@ class _StarfieldPainter extends CustomPainter {
     final scaleY = size.height / _canvasHeight;
     final paint = Paint();
     for (final star in _stars) {
-      paint.color = const Color(0xFFFFFFFF).withValues(alpha: star.opacity);
+      paint.color = AuraColors.starfield.withValues(alpha: star.opacity);
       canvas.drawCircle(
         Offset(star.dx * scaleX, star.dy * scaleY),
         star.diameter / 2,

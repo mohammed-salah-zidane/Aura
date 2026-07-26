@@ -93,21 +93,13 @@ class AuraMetricCard extends StatelessWidget {
   }
 }
 
-/// The four-point severity bar under a UV reading.
+/// The four-point severity ramp under a UV reading.
 ///
-/// [position] is a fraction of the bar, already resolved by the domain from the
-/// UV value. The bar itself knows nothing about UV bands.
+/// The bar carries no marker. In the pen it is the whole ramp, drawn once, with
+/// the reading itself shown as the card's value and its band as the sub-line.
 class AuraScaleBar extends StatelessWidget {
   /// Creates a scale bar.
-  const AuraScaleBar({
-    required this.position,
-    required this.colors,
-    required this.stops,
-    super.key,
-  });
-
-  /// Where the marker sits, from 0 to 1.
-  final double position;
+  const AuraScaleBar({required this.colors, required this.stops, super.key});
 
   /// Ramp colours.
   final List<Color> colors;
@@ -117,29 +109,14 @@ class AuraScaleBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AuraRadii.bar),
-      child: SizedBox(
-        height: AuraSizes.scaleBarHeight,
-        child: Stack(
-          children: <Widget>[
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: colors, stops: stops),
-              ),
-              child: const SizedBox.expand(),
-            ),
-            // Everything past the reading is dimmed, so the filled portion
-            // reads as the current level rather than the whole scale.
-            Align(
-              alignment: Alignment.centerRight,
-              child: FractionallySizedBox(
-                widthFactor: (1 - position).clamp(0.0, 1.0),
-                child: const ColoredBox(color: Color(0x8A000000)),
-              ),
-            ),
-          ],
+    return SizedBox(
+      height: AuraSizes.scaleBarHeight,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AuraRadii.bar),
+          gradient: LinearGradient(colors: colors, stops: stops),
         ),
+        child: const SizedBox.expand(),
       ),
     );
   }
