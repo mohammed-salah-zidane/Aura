@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The one colour the platform needs to know about: the top stop of the splash
+  sky. The native window is painted with it so the Flutter splash starts from a
+  background that is already the right one, with no flash between them.
+-->
+<resources>
+    <color name="aura_splash">#0B1630</color>
+</resources>

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
+<!--
+  Flat, and deliberately empty. The native splash cannot be removed, only made
+  invisible: painting it the top stop of the splash sky means the animated
+  Flutter splash rises out of the same colour rather than out of a flash of
+  white.
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@android:color/white" />
-
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+    <item android:drawable="@color/aura_splash" />
 </layer-list>

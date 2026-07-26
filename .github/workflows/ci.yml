@@ -1,0 +1,150 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: 3.44.8
+
+jobs:
+  # Format, analysis and the unit and widget suites, minus the goldens.
+  #
+  # Goldens are excluded here on purpose: they are generated on macOS, and a
+  # Linux runner renders antialiasing differently enough to fail every file.
+  check:
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install melos
+        run: |
+          dart pub global activate melos 7.8.1
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
+      - name: Bootstrap
+        run: melos bootstrap
+
+      # Generated sources are gitignored, so a fresh clone has no *.g.dart and
+      # no localization delegate until these have run.
+      - name: Generate
+        run: |
+          melos run gen
+          melos run gen:l10n
+
+      - name: Write the API credential
+        # Compile-time only. Nothing here reaches a build artefact that ships.
+        run: |
+          mkdir -p env
+          printf '{"WEATHER_API_KEY":"%s"}\n' "${{ secrets.WEATHER_API_KEY }}" > env/dev.json
+
+      - name: Format
+        run: melos run format
+
+      - name: Analyze
+        run: melos run analyze
+
+      - name: Test with coverage
+        run: melos run coverage
+
+      - name: Coverage gate
+        run: ./tool/coverage_gate.sh
+
+  # Goldens, on the platform they were generated on.
+  goldens:
+    name: Goldens
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install melos
+        run: |
+          dart pub global activate melos 7.8.1
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
+      - name: Bootstrap
+        run: melos bootstrap
+
+      - name: Generate
+        run: |
+          melos run gen
+          melos run gen:l10n
+
+      - name: Compare goldens
+        run: melos run gold
+
+      - name: Keep what failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: "**/failures/**"
+
+  # The app has to build for both platforms, not only analyze.
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Android
+            os: ubuntu-latest
+            command: flutter build apk --debug
+          - platform: iOS
+            os: macos-latest
+            command: flutter build ios --simulator --debug
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        if: matrix.platform == 'Android'
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install melos
+        run: |
+          dart pub global activate melos 7.8.1
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
+      - name: Bootstrap
+        run: melos bootstrap
+
+      - name: Generate
+        run: |
+          melos run gen
+          melos run gen:l10n
+
+      - name: Write the API credential
+        run: |
+          mkdir -p env
+          printf '{"WEATHER_API_KEY":"%s"}\n' "${{ secrets.WEATHER_API_KEY }}" > env/dev.json
+
+      - name: Build
+        working-directory: apps/aura
+        run: ${{ matrix.command }} --dart-define-from-file=../../env/dev.json

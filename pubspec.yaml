@@ -82,8 +82,11 @@ melos:
       packageFilters:
         dirExists: test
 
-    test:coverage:
-      description: Tests with coverage, generated files excluded.
+    coverage:
+      description: |
+        Tests with coverage. Named `coverage` rather than `test:coverage`
+        because melos matches a script name by prefix, and `melos run test`
+        would otherwise stop to ask which of the two was meant.
       run: flutter test --coverage
       exec:
         concurrency: 4
