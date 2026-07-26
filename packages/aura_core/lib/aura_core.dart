@@ -9,4 +9,6 @@
 library;
 
 export 'src/app_failure.dart';
+export 'src/clock.dart';
 export 'src/result.dart';
+export 'src/stale.dart';
