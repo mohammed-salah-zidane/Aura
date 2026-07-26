@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:aura_design/aura_design.dart';
+import 'package:aura_feature_onboarding/src/splash/splash_view_model.dart';
 import 'package:aura_l10n/aura_l10n.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The first frame the app shows, while it works out where to send the user.
 ///
@@ -13,12 +17,30 @@ import 'package:flutter/widgets.dart';
 /// offsets are measured from the bottom edge of the canvas, which runs under
 /// the home indicator. They are therefore laid out against the screen edge and
 /// not against the safe area.
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   /// Creates the splash screen.
-  const SplashScreen({super.key});
+  const SplashScreen({required this.onReady, super.key});
+
+  /// Called with where the app should open, once that is known.
+  final ValueChanged<SplashDestination> onReady;
+
+  @override
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    unawaited(ref.read(splashViewModelProvider.notifier).decide());
+  }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(splashViewModelProvider, (previous, next) {
+      if (next != null) widget.onReady(next);
+    });
+
     return const AuraSky(
       kind: AuraSkyKind.splash,
       child: Stack(

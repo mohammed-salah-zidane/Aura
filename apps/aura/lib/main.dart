@@ -1,11 +1,13 @@
 import 'package:aura/src/di/providers.dart';
+import 'package:aura/src/router/aura_router.dart';
 import 'package:aura_design/aura_design.dart';
-import 'package:aura_feature_home/aura_feature_home.dart';
 import 'package:aura_l10n/aura_l10n.dart';
 import 'package:aura_providers/aura_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// Entry point. Composition happens here and nowhere else.
 Future<void> main() async {
@@ -23,22 +25,40 @@ Future<void> main() async {
   // overridden by the window on both platforms.
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
+  // Read once here rather than in the settings screen: the version is a fact
+  // about the package, and a feature that read it would need a plugin of its
+  // own to do it.
+  final package = await PackageInfo.fromPlatform();
+
   runApp(
-    ProviderScope(overrides: deviceOverrides(), child: const AuraApp()),
+    ProviderScope(
+      overrides: deviceOverrides(),
+      child: AuraApp(version: package.version),
+    ),
   );
 }
 
 /// Root of the application.
 class AuraApp extends ConsumerStatefulWidget {
   /// Creates the application root.
-  const AuraApp({super.key});
+  const AuraApp({required this.version, super.key});
+
+  /// The build the settings screen reports.
+  final String version;
 
   @override
   ConsumerState<AuraApp> createState() => _AuraAppState();
 }
 
 class _AuraAppState extends ConsumerState<AuraApp> {
+  late final GoRouter _router = auraRouter(version: widget.version);
   String? _language;
+
+  @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
 
   /// Keeps `intl` and the API's `lang` in step with the locale `Localizations`
   /// actually resolved.
@@ -57,7 +77,7 @@ class _AuraAppState extends ConsumerState<AuraApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       onGenerateTitle: (context) => AuraBrand.name,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -73,15 +93,7 @@ class _AuraAppState extends ConsumerState<AuraApp> {
         _adopt(Localizations.localeOf(context));
         return Material(type: MaterialType.transparency, child: child);
       },
-      home: HomeScreen(
-        onOpenSettings: () {},
-        onOpenSearch: () {},
-        onOpenSavedCities: () {},
-        onOpenForecast: () {},
-        onOpenAirQuality: () {},
-        onOpenAlert: () {},
-        onOpenSunAndMoon: () {},
-      ),
+      routerConfig: _router,
     );
   }
 }

@@ -164,6 +164,9 @@ class AuraFormat {
   /// A weekday, abbreviated. `Mon`
   String weekday(DateTime date) => DateFormat.E().format(date);
 
+  /// A date with no year, for something happening within days. `27 Jul`
+  String shortDate(DateTime date) => DateFormat.MMMd().format(date);
+
   /// A weekday, or the word for today on the first forecast day.
   String day(DateTime date, {required bool isToday}) =>
       isToday ? l10n.dayToday : weekday(date);

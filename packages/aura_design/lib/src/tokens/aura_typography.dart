@@ -113,6 +113,16 @@ abstract final class AuraText {
     fontVariations: <FontVariation>[FontVariation('wght', 600)],
   );
 
+  /// Heading on the settings screen, which the design sets between the
+  /// full-screen state's heading and the saved cities one. `Settings`
+  static const TextStyle titleSettings = TextStyle(
+    fontFamily: AuraFonts.display,
+    fontFamilyFallback: _displayFallback,
+    package: AuraFonts.package,
+    fontSize: 28,
+    fontVariations: <FontVariation>[FontVariation('wght', 600)],
+  );
+
   /// Headline on a full-screen state. `You're Offline`
   static const TextStyle titleState = TextStyle(
     fontFamily: AuraFonts.display,

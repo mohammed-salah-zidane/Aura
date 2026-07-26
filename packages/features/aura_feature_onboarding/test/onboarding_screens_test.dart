@@ -1,8 +1,13 @@
+import 'package:aura_core/aura_core.dart';
 import 'package:aura_design/aura_design.dart';
+import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_feature_onboarding/aura_feature_onboarding.dart';
 import 'package:aura_l10n/aura_l10n.dart';
+import 'package:aura_providers/aura_providers.dart';
 import 'package:aura_test_kit/aura_test_kit.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 
 const Locale _en = Locale('en');
@@ -19,7 +24,7 @@ void main() {
     testWidgets('shows the wordmark, the tagline and the attribution', (
       tester,
     ) async {
-      await pumpScreen(tester, const SplashScreen());
+      await pumpSplash(tester);
       final l10n = await _copy(_en);
 
       expect(find.text(AuraBrand.name), findsOneWidget);
@@ -30,7 +35,7 @@ void main() {
     testWidgets('carries the mark at the size the splash specifies', (
       tester,
     ) async {
-      await pumpScreen(tester, const SplashScreen());
+      await pumpSplash(tester);
       expect(
         tester.widget<AuraMark>(find.byType(AuraMark)).size,
         AuraMarkSize.splash,
@@ -38,7 +43,7 @@ void main() {
     });
 
     testWidgets('paints the splash sky', (tester) async {
-      await pumpScreen(tester, const SplashScreen());
+      await pumpSplash(tester);
       expect(
         tester.widget<AuraSky>(find.byType(AuraSky)).kind,
         AuraSkyKind.splash,
@@ -51,7 +56,7 @@ void main() {
       // Both are absolutely placed in the pen, measured from the bottom of a
       // canvas that runs under the home indicator, so neither moves with the
       // safe area.
-      await pumpScreen(tester, const SplashScreen());
+      await pumpSplash(tester);
       final attribution = tester.getRect(
         find.text((await _copy(_en)).splashAttribution.toUpperCase()),
       );
@@ -62,7 +67,7 @@ void main() {
     });
 
     testWidgets('the loader keeps moving', (tester) async {
-      await pumpScreen(tester, const SplashScreen());
+      await pumpSplash(tester);
       final opacities = <double>{};
       for (var i = 0; i < 4; i++) {
         await tester.pump(AuraMotion.shimmer ~/ 3);
@@ -82,7 +87,7 @@ void main() {
 
     testWidgets('speaks a label in place of the dots', (tester) async {
       final handle = tester.ensureSemantics();
-      await pumpScreen(tester, const SplashScreen());
+      await pumpSplash(tester);
       expect(
         find.bySemanticsLabel((await _copy(_en)).splashLoading),
         findsOneWidget,
@@ -91,7 +96,7 @@ void main() {
     });
 
     testWidgets('renders the Arabic copy right to left', (tester) async {
-      await pumpScreen(tester, const SplashScreen(), locale: _ar);
+      await pumpSplash(tester, locale: _ar);
       final l10n = await _copy(_ar);
 
       expect(find.text(l10n.splashTagline.toUpperCase()), findsOneWidget);
@@ -103,7 +108,7 @@ void main() {
     testWidgets('drops letter tracking in Arabic', (tester) async {
       // Arabic letters join. Tracking prises those joins apart and renders the
       // word as a row of disconnected shapes.
-      await pumpScreen(tester, const SplashScreen(), locale: _ar);
+      await pumpSplash(tester, locale: _ar);
       final tagline = tester.widget<Text>(
         find.text((await _copy(_ar)).splashTagline.toUpperCase()),
       );
@@ -111,7 +116,7 @@ void main() {
     });
 
     testWidgets('keeps letter tracking in English', (tester) async {
-      await pumpScreen(tester, const SplashScreen());
+      await pumpSplash(tester);
       final tagline = tester.widget<Text>(
         find.text((await _copy(_en)).splashTagline.toUpperCase()),
       );
@@ -120,7 +125,7 @@ void main() {
 
     testWidgets('nothing overflows on either locale', (tester) async {
       for (final locale in <Locale>[_en, _ar]) {
-        await pumpScreen(tester, const SplashScreen(), locale: locale);
+        await pumpSplash(tester, locale: locale);
         expect(
           tester.takeException(),
           isNull,
@@ -243,4 +248,78 @@ void main() {
       );
     });
   });
+}
+
+/// Pumps the splash and lets its decision resolve.
+///
+/// The screen holds itself on screen for one turn of the loader before it
+/// answers, so a test that never advances the clock leaves that timer pending
+/// and the binding fails the test on it.
+Future<void> pumpSplash(
+  WidgetTester tester, {
+  Locale locale = const Locale('en'),
+  LocationPermission permission = LocationPermission.notDetermined,
+  List<SavedCity> saved = const <SavedCity>[],
+  ValueChanged<SplashDestination>? onReady,
+}) async {
+  await pumpScreen(
+    tester,
+    splashScreen(permission: permission, saved: saved, onReady: onReady),
+    locale: locale,
+  );
+  await tester.pump(SplashViewModel.minimumOnScreen);
+  await tester.pump(AuraMotion.control);
+}
+
+/// A splash screen with its ports wired to fakes.
+///
+/// The screen decides where the app opens as soon as it is built, so it needs
+/// a location port and a saved list even when the test is only looking at the
+/// lockup.
+Widget splashScreen({
+  LocationPermission permission = LocationPermission.notDetermined,
+  List<SavedCity> saved = const <SavedCity>[],
+  ValueChanged<SplashDestination>? onReady,
+}) => ProviderScope(
+  overrides: <Override>[
+    locationPortProvider.overrideWithValue(_Location(permission)),
+    savedCitiesPortProvider.overrideWithValue(_Cities(saved)),
+  ],
+  child: SplashScreen(onReady: onReady ?? (_) {}),
+);
+
+class _Location implements LocationPort {
+  const _Location(this._permission);
+
+  final LocationPermission _permission;
+
+  @override
+  Future<LocationPermission> permission() async => _permission;
+
+  @override
+  Future<LocationPermission> request() async => _permission;
+
+  @override
+  Future<Result<LocationRef, AppFailure>> currentPosition() async =>
+      Ok<LocationRef, AppFailure>(
+        LocationRef.coordinates(latitude: 30.04, longitude: 31.24),
+      );
+}
+
+class _Cities implements SavedCitiesPort {
+  const _Cities(this._saved);
+
+  final List<SavedCity> _saved;
+
+  @override
+  Future<Result<List<SavedCity>, AppFailure>> readAll() async =>
+      Ok<List<SavedCity>, AppFailure>(_saved);
+
+  @override
+  Future<Result<void, AppFailure>> add(SavedCity city) async =>
+      const Ok<void, AppFailure>(null);
+
+  @override
+  Future<Result<void, AppFailure>> remove(LocationRef location) async =>
+      const Ok<void, AppFailure>(null);
 }
