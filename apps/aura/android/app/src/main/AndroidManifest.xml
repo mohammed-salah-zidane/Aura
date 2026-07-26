@@ -1,6 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      Location is asked for at the moment the user asks for their own weather,
+      and coarse is enough: the forecast is for a place, not a street corner.
+      Fine is declared as well so a device that offers precise accuracy can
+      give it.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Asked for when the user switches a notification on, never at launch. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
-        android:label="aura"
+        android:label="Aura"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

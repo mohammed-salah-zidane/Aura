@@ -6,6 +6,8 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Aura reads your location to show the weather where you are. Skipping this still works: the weather service resolves an approximate place from the request itself.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Aura</string>
 	<key>CFBundleExecutable</key>
