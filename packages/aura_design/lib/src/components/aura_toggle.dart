@@ -53,7 +53,13 @@ class AuraToggle extends StatelessWidget {
             child: AnimatedAlign(
               duration: AuraMotion.control,
               curve: AuraMotion.controlCurve,
-              alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+              // Directional, not left and right. The pen draws the knob at the
+              // end of the track when the switch is on, and in Arabic that end
+              // is the left one. Absolute alignment put an off switch where a
+              // reader of that script expects an on one.
+              alignment: value
+                  ? AlignmentDirectional.centerEnd
+                  : AlignmentDirectional.centerStart,
               child: Container(
                 width: AuraSizes.toggleKnob,
                 height: AuraSizes.toggleKnob,

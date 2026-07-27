@@ -331,7 +331,9 @@ void main() {
   });
 
   group('AuraToggle', () {
-    testWidgets('sits right when on and left when off', (tester) async {
+    testWidgets('sits at the end when on and the start when off', (
+      tester,
+    ) async {
       for (final value in <bool>[true, false]) {
         await tester.pumpWidget(
           _host(AuraToggle(value: value, onChanged: (_) {})),
@@ -339,7 +341,36 @@ void main() {
         await tester.pumpAndSettle();
         expect(
           tester.widget<AnimatedAlign>(find.byType(AnimatedAlign)).alignment,
-          value ? Alignment.centerRight : Alignment.centerLeft,
+          value
+              ? AlignmentDirectional.centerEnd
+              : AlignmentDirectional.centerStart,
+        );
+      }
+    });
+
+    testWidgets('the knob mirrors in a right to left script', (tester) async {
+      for (final (direction, onX) in <(TextDirection, bool)>[
+        (TextDirection.ltr, true),
+        (TextDirection.rtl, false),
+      ]) {
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: direction,
+            child: MediaQuery(
+              data: const MediaQueryData(size: Size(393, 852)),
+              child: Align(child: AuraToggle(value: true, onChanged: (_) {})),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final knob = tester.getCenter(find.byType(Container).last);
+        final track = tester.getCenter(find.byType(AnimatedContainer));
+        expect(
+          knob.dx > track.dx,
+          onX,
+          reason:
+              'an on switch drawn $direction put the knob on the wrong side',
         );
       }
     });
