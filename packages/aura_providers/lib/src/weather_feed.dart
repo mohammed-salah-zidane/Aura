@@ -10,10 +10,17 @@ import 'package:riverpod/riverpod.dart';
 final class WeatherFeed {
   /// Creates a feed.
   const WeatherFeed({
+    required this.location,
     required this.snapshot,
     required this.fetchedAt,
     required this.isLive,
   });
+
+  /// The place the call was made for.
+  ///
+  /// Carried so a screen paging between places can tell a reading for the
+  /// place it is showing from one that belongs to the page just left.
+  final LocationRef location;
 
   /// Everything the call returned.
   final WeatherSnapshot snapshot;
@@ -44,15 +51,14 @@ final weatherFeedProvider = FutureProvider<Result<WeatherFeed, AppFailure>>((
   ref,
 ) async {
   final startedAt = ref.watch(clockProvider).now();
+  final location = ref.watch(activeLocationProvider);
   final result = await ref
       .watch(weatherRepositoryProvider)
-      .snapshot(
-        ref.watch(activeLocationProvider),
-        lang: ref.watch(languageProvider),
-      );
+      .snapshot(location, lang: ref.watch(languageProvider));
 
   return result.map(
     (stale) => WeatherFeed(
+      location: location,
       snapshot: stale.value,
       fetchedAt: stale.fetchedAt,
       isLive: !stale.fetchedAt.isBefore(startedAt),
