@@ -1,4 +1,7 @@
 {
+  // Device ids come from `flutter devices --machine`. A simulator's id is its
+  // UDID and is specific to this machine, so the pinned configurations below
+  // need updating on a new checkout; "Aura" asks instead of assuming.
   "version": "0.2.0",
   "configurations": [
     {
@@ -10,21 +13,32 @@
       "toolArgs": ["--dart-define-from-file=../../env/dev.json"]
     },
     {
-      "name": "Aura · iOS Simulator",
+      "name": "Aura · iPhone 17 Pro (iOS 26.5)",
       "request": "launch",
       "type": "dart",
       "cwd": "apps/aura",
       "program": "lib/main.dart",
-      "deviceId": "apple_ios_simulator",
+      "deviceId": "6CADCE74-B301-4199-B46F-A5ADB06920EF",
+      "preLaunchTask": "boot ios simulator",
       "toolArgs": ["--dart-define-from-file=../../env/dev.json"]
     },
     {
-      "name": "Aura · Android Emulator",
+      "name": "Aura · Android emulator",
       "request": "launch",
       "type": "dart",
       "cwd": "apps/aura",
       "program": "lib/main.dart",
-      "deviceId": "android",
+      "deviceId": "emulator-5554",
+      "preLaunchTask": "boot android emulator",
+      "toolArgs": ["--dart-define-from-file=../../env/dev.json"]
+    },
+    {
+      "name": "Aura · iPhone (device)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "apps/aura",
+      "program": "lib/main.dart",
+      "deviceId": "00008140-00096999367B001C",
       "toolArgs": ["--dart-define-from-file=../../env/dev.json"]
     },
     {

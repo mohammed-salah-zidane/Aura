@@ -1,0 +1,26 @@
+{
+  // `flutter run -d <id>` only sees devices that are already running, so a
+  // launch configuration pinned to a simulator fails from cold with "no
+  // supported devices found". These tasks start the target and wait for it,
+  // which is what makes picking a configuration enough on its own.
+  //
+  // The ids match the ones in launch.json. Refresh both together from
+  // `xcrun simctl list devices available` and `flutter emulators`.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "boot ios simulator",
+      "type": "shell",
+      "command": "xcrun simctl bootstatus 6CADCE74-B301-4199-B46F-A5ADB06920EF -b && open -a Simulator",
+      "problemMatcher": [],
+      "presentation": { "reveal": "silent", "panel": "shared" }
+    },
+    {
+      "label": "boot android emulator",
+      "type": "shell",
+      "command": "adb devices | grep -q 'device$' || (flutter emulators --launch Pixel_9_Pro && adb wait-for-device)",
+      "problemMatcher": [],
+      "presentation": { "reveal": "silent", "panel": "shared" }
+    }
+  ]
+}
