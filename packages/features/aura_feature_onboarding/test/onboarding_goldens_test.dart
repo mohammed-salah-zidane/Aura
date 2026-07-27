@@ -55,7 +55,11 @@ void main() {
     });
 
     testWidgets('Arabic', (tester) async {
-      await pumpScreen(tester, subject(), locale: const Locale('ar'));
+      await pumpScreen(
+        tester,
+        subject(),
+        locale: const Locale('ar'),
+      );
       await expectGolden(tester, 'permission_ar');
     });
   });

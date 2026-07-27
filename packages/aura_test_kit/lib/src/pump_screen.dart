@@ -103,6 +103,16 @@ Future<void> _register(File file, List<String> keys) async {
 /// once `Localizations` has resolved. Without that a clock time formats in
 /// English inside an Arabic screen, which is a defect a test would otherwise
 /// bake into a golden.
+///
+/// [reduceMotion] sets the flag every animation in the app checks, and it is
+/// **on by default** because that is the only frame a test can reason about.
+/// The ambient sky repeats forever, so `pumpAndSettle` would never return on a
+/// screen that has one, and a frame caught mid-entrance is a different picture
+/// every time. At rest the app renders exactly what `aura.pen` draws, which is
+/// also what makes the goldens a regression test for that rule.
+///
+/// A test that is about the motion itself passes `reduceMotion: false` and
+/// drives the clock with `pump(duration)` rather than `pumpAndSettle`.
 Future<void> pumpScreen(
   WidgetTester tester,
   Widget screen, {
@@ -113,6 +123,7 @@ Future<void> pumpScreen(
     AuraSizes.referenceHeight,
   ),
   bool withNavigator = false,
+  bool reduceMotion = true,
 }) async {
   tester.view
     ..devicePixelRatio = 1
@@ -129,6 +140,7 @@ Future<void> pumpScreen(
           size: size,
           padding: viewPadding,
           viewPadding: viewPadding,
+          disableAnimations: reduceMotion,
         ),
         child: Directionality(
           textDirection: _directionOf(locale),

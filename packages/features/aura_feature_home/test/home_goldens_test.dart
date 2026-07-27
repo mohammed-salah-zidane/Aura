@@ -30,7 +30,12 @@ void main() {
     Locale locale = const Locale('en'),
     Size size = _page,
   }) async {
-    await pumpScreen(tester, harness.screen(), locale: locale, size: size);
+    await pumpScreen(
+      tester,
+      harness.screen(),
+      locale: locale,
+      size: size,
+    );
     await tester.pumpAndSettle();
   }
 

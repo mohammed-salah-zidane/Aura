@@ -67,7 +67,9 @@ void main() {
     });
 
     testWidgets('the loader keeps moving', (tester) async {
-      await pumpSplash(tester);
+      // The one splash test that is about the motion rather than the frame, so
+      // it is also the one that has to opt back into it.
+      await pumpSplash(tester, reduceMotion: false);
       final opacities = <double>{};
       for (var i = 0; i < 4; i++) {
         await tester.pump(AuraMotion.shimmer ~/ 3);
@@ -294,11 +296,13 @@ Future<void> pumpSplash(
   LocationPermission permission = LocationPermission.notDetermined,
   List<SavedCity> saved = const <SavedCity>[],
   ValueChanged<SplashDestination>? onReady,
+  bool reduceMotion = true,
 }) async {
   await pumpScreen(
     tester,
     splashScreen(permission: permission, saved: saved, onReady: onReady),
     locale: locale,
+    reduceMotion: reduceMotion,
   );
   await tester.pump(SplashViewModel.minimumOnScreen);
   await tester.pump(AuraMotion.control);

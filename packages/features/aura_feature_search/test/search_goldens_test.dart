@@ -29,7 +29,11 @@ void main() {
         ],
         reading: cityReading(28),
       );
-      await pumpScreen(tester, harness.screen(), locale: locale);
+      await pumpScreen(
+        tester,
+        harness.screen(),
+        locale: locale,
+      );
       await tester.enterText(find.byType(EditableText), 'Cair');
       await tester.pump(const Duration(milliseconds: 500));
       await tester.pump();
