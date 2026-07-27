@@ -50,27 +50,39 @@ class _Picker<T> extends StatelessWidget {
       top: false,
       child: Padding(
         padding: const EdgeInsets.all(AuraSpacing.lg),
-        child: AuraGlass(
-          radius: AuraRadii.detailPanel,
-          padding: const EdgeInsets.all(AuraSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: AuraSpacing.md,
-            children: <Widget>[
-              Text(
-                title.toUpperCase(),
-                style: AuraText.sectionLabel
-                    .forScript(context)
-                    .copyWith(color: AuraColors.textTertiary),
+        // The sky goes under the panel. Every other glass surface in the app
+        // has a sky behind it, and glass at ten per cent white is meant to let
+        // that through; over the settings screen it let the settings screen
+        // through instead, and the rows underneath stayed legible. The glass
+        // and its stroke are untouched, they finally have the background they
+        // were drawn against.
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AuraRadii.detailPanel),
+          child: AuraSky(
+            kind: AuraSkyKind.systemBrand,
+            child: AuraGlass(
+              radius: AuraRadii.detailPanel,
+              padding: const EdgeInsets.all(AuraSpacing.lg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                spacing: AuraSpacing.md,
+                children: <Widget>[
+                  Text(
+                    title.toUpperCase(),
+                    style: AuraText.sectionLabel
+                        .forScript(context)
+                        .copyWith(color: AuraColors.textTertiary),
+                  ),
+                  for (final option in options)
+                    _Option<T>(
+                      option: option,
+                      isSelected: option.value == selected,
+                      onTap: () => Navigator.of(context).pop(option.value),
+                    ),
+                ],
               ),
-              for (final option in options)
-                _Option<T>(
-                  option: option,
-                  isSelected: option.value == selected,
-                  onTap: () => Navigator.of(context).pop(option.value),
-                ),
-            ],
+            ),
           ),
         ),
       ),
