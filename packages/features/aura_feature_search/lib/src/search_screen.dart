@@ -39,68 +39,75 @@ class SearchScreen extends ConsumerWidget {
 
     return AuraSky(
       kind: AuraSkyKind.systemBrand,
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: _padding,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: AuraSpacing.lg,
-            children: <Widget>[
-              Row(
-                spacing: AuraSpacing.md,
-                children: <Widget>[
-                  AuraCircleButton(
-                    icon: AuraChevron.back(context),
-                    size: AuraCircleButtonSize.back,
-                    semanticLabel: l10n.commonBack,
-                    onPressed: onDone,
+      // The field takes focus the moment the screen opens, so the keyboard
+      // covers half of it. Tapping anywhere that is not a control gives the
+      // screen back without leaving it.
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: _padding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: AuraSpacing.lg,
+              children: <Widget>[
+                Row(
+                  spacing: AuraSpacing.md,
+                  children: <Widget>[
+                    AuraCircleButton(
+                      icon: AuraChevron.back(context),
+                      size: AuraCircleButtonSize.back,
+                      semanticLabel: l10n.commonBack,
+                      onPressed: onDone,
+                    ),
+                    Expanded(
+                      child: Text(
+                        l10n.searchTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AuraText.titleState.copyWith(
+                          color: AuraColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                AuraSearchField(
+                  variant: AuraSearchFieldVariant.active,
+                  placeholder: l10n.searchPlaceholder,
+                  clearSemanticLabel: l10n.searchClear,
+                  autofocus: true,
+                  onChanged: viewModel.query,
+                ),
+                _UseCurrentLocation(
+                  onTap: () async {
+                    await viewModel.useCurrentLocation();
+                    onDone();
+                  },
+                ),
+                if (state.hasQuery) ...<Widget>[
+                  Text(
+                    l10n.searchResultsLabel.toUpperCase(),
+                    style: AuraText.sectionLabel
+                        .forScript(context)
+                        .copyWith(color: AuraColors.textTertiary),
                   ),
                   Expanded(
-                    child: Text(
-                      l10n.searchTitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AuraText.titleState.copyWith(
-                        color: AuraColors.textPrimary,
-                      ),
+                    child: SearchResults(
+                      state: state,
+                      onSelect: (suggestion) async {
+                        ref.read(activeLocationProvider.notifier).location =
+                            suggestion.location;
+                        await viewModel.save(suggestion);
+                        onDone();
+                      },
                     ),
                   ),
                 ],
-              ),
-              AuraSearchField(
-                variant: AuraSearchFieldVariant.active,
-                placeholder: l10n.searchPlaceholder,
-                clearSemanticLabel: l10n.searchClear,
-                autofocus: true,
-                onChanged: viewModel.query,
-              ),
-              _UseCurrentLocation(
-                onTap: () async {
-                  await viewModel.useCurrentLocation();
-                  onDone();
-                },
-              ),
-              if (state.hasQuery) ...<Widget>[
-                Text(
-                  l10n.searchResultsLabel.toUpperCase(),
-                  style: AuraText.sectionLabel
-                      .forScript(context)
-                      .copyWith(color: AuraColors.textTertiary),
-                ),
-                Expanded(
-                  child: SearchResults(
-                    state: state,
-                    onSelect: (suggestion) async {
-                      ref.read(activeLocationProvider.notifier).location =
-                          suggestion.location;
-                      await viewModel.save(suggestion);
-                      onDone();
-                    },
-                  ),
-                ),
               ],
-            ],
+            ),
           ),
         ),
       ),

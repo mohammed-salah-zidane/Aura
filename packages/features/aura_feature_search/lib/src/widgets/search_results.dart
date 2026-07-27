@@ -54,6 +54,9 @@ class SearchResults extends ConsumerWidget {
           ),
           _ => ListView.separated(
             padding: EdgeInsets.zero,
+            // Dragging the list is the user reaching for a result, not for the
+            // field they have finished typing in.
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             itemCount: state.matches.length,
             separatorBuilder: (context, index) => const _Divider(),
             itemBuilder: (context, index) => _Row(
