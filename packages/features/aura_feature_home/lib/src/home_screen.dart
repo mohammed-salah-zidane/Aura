@@ -2,6 +2,7 @@ import 'package:aura_design/aura_design.dart';
 import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_feature_home/src/home_ui_state.dart';
 import 'package:aura_feature_home/src/home_view_model.dart';
+import 'package:aura_feature_home/src/widgets/home_bottom_bar.dart';
 import 'package:aura_feature_home/src/widgets/home_content.dart';
 import 'package:aura_feature_home/src/widgets/home_loading.dart';
 import 'package:aura_feature_home/src/widgets/home_refresh.dart';
@@ -69,9 +70,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   PageController? _pages;
   int _index = 0;
 
+  /// Whether the first reading has already been shown.
+  ///
+  /// The sun's arrival sweep, and the entrance held back for it, are spent on
+  /// the first reading only; a swipe to another place must not replay them.
+  bool _skyArrived = false;
+
+  /// Whether the floating bar is up.
+  ///
+  /// Owned here rather than by a page, so the bar rides above the pager and
+  /// survives a swipe: the page being left scrolls its own content, the page
+  /// arriving may still be loading, and the bar belongs to neither.
+  final ValueNotifier<bool> _navVisible = ValueNotifier<bool>(true);
+
   @override
   void dispose() {
     _pages?.dispose();
+    _navVisible.dispose();
     super.dispose();
   }
 
@@ -90,6 +105,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _onPageChanged(List<LocationRef> places, int page) {
     if (page < 0 || page >= places.length) return;
     setState(() => _index = page);
+    _navVisible.value = true;
     ref.read(activeLocationProvider.notifier).location = places[page];
   }
 
@@ -97,7 +113,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     // The previous reading is kept through a refresh, so pulling to refresh
     // does not blank the screen it was pulled on.
-    final state = ref.watch(homeViewModelProvider).value;
+    final reading = ref.watch(homeViewModelProvider);
+    final state = reading.value;
     final active = ref.watch(activeLocationProvider);
     final saved = ref.watch(savedCitiesProvider).value ?? const <SavedCity>[];
 
@@ -106,30 +123,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (index != _index) _index = index;
     _pages ??= PageController(initialPage: index);
 
+    // A reading fetched for the page just left must not dress the page just
+    // arrived at, so a state whose feed names another place is withheld and
+    // the new page shows its loading face until its own reading lands.
+    final matchesActive = switch (state) {
+      HomeReady(:final feed) ||
+      HomeStale(:final feed) => feed.location == active,
+      _ => true,
+    };
+    final shown = matchesActive ? state : null;
+
+    // Only a live reading knows where the sun is, and only a clear sky shows
+    // it at all.
+    final celestial = shown is HomeReady ? skyBodyFor(shown.snapshot) : null;
+    final skyLeadIn = !_skyArrived && celestial != null
+        ? AuraMotion.celestialArrival
+        : Duration.zero;
+    if (shown is HomeReady) _skyArrived = true;
+
     return AuraSky(
-      kind: state is HomeReady
-          ? AuraConditionVisuals.sky(state.snapshot.current.condition)
+      kind: shown is HomeReady
+          ? AuraConditionVisuals.sky(shown.snapshot.current.condition)
           : AuraSkyKind.systemBrand,
-      // Only a live reading knows where the sun is, and only a clear sky shows
-      // it at all.
-      celestial: state is HomeReady ? skyBodyFor(state.snapshot) : null,
-      child: PageView.builder(
-        controller: _pages,
-        itemCount: places.length,
-        // One place is not a set to page through.
-        physics: places.length < 2
-            ? const NeverScrollableScrollPhysics()
-            : null,
-        onPageChanged: (page) => _onPageChanged(places, page),
-        itemBuilder: (context, page) => _Page(
-          // Only the place on screen has a reading; the rest are still coming.
-          state: page == index ? state : null,
-          place: places[page],
-          placeCount: places.length,
-          placeIndex: page,
-          screen: widget,
-          ref: ref,
-        ),
+      celestial: celestial,
+      child: Stack(
+        children: <Widget>[
+          PageView.builder(
+            controller: _pages,
+            itemCount: places.length,
+            // One place is not a set to page through.
+            physics: places.length < 2
+                ? const NeverScrollableScrollPhysics()
+                : null,
+            onPageChanged: (page) => _onPageChanged(places, page),
+            itemBuilder: (context, page) => _Page(
+              // Only the place on screen has a reading; the rest are still
+              // coming.
+              state: page == index ? shown : null,
+              skyLeadIn: skyLeadIn,
+              place: places[page],
+              navVisible: _navVisible,
+              screen: widget,
+              ref: ref,
+            ),
+          ),
+          const HomeBottomScrim(),
+          HomeBottomBar(
+            isVisible: _navVisible,
+            placeCount: places.length,
+            placeIndex: index,
+            leadsWithCurrentLocation: places.first.isCurrentLocation,
+            isRefreshing: reading.isLoading && shown != null,
+            onOpenSearch: widget.onOpenSearch,
+            onOpenSavedCities: widget.onOpenSavedCities,
+            onOpenSettings: widget.onOpenSettings,
+          ),
+        ],
       ),
     );
   }
@@ -139,17 +188,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 class _Page extends StatelessWidget {
   const _Page({
     required this.state,
+    required this.skyLeadIn,
     required this.place,
-    required this.placeCount,
-    required this.placeIndex,
+    required this.navVisible,
     required this.screen,
     required this.ref,
   });
 
   final HomeUiState? state;
+  final Duration skyLeadIn;
   final LocationRef place;
-  final int placeCount;
-  final int placeIndex;
+  final ValueNotifier<bool> navVisible;
   final HomeScreen screen;
   final WidgetRef ref;
 
@@ -167,11 +216,8 @@ class _Page extends StatelessWidget {
         child: HomeContent(
           state: ready,
           isCurrentLocation: place.isCurrentLocation,
-          placeCount: placeCount,
-          placeIndex: placeIndex,
-          onOpenSettings: screen.onOpenSettings,
-          onOpenSearch: screen.onOpenSearch,
-          onOpenSavedCities: screen.onOpenSavedCities,
+          skyLeadIn: skyLeadIn,
+          navVisible: navVisible,
           onOpenForecast: screen.onOpenForecast,
           onOpenAirQuality: screen.onOpenAirQuality,
           onOpenAlert: screen.onOpenAlert,

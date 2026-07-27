@@ -35,7 +35,6 @@ class HomeSunAndMoonCard extends StatelessWidget {
     return HomeCard(
       onTap: onOpen,
       children: <Widget>[
-        HomeSectionHeader(title: l10n.sectionSunAndMoon.toUpperCase()),
         Row(
           children: <Widget>[
             Expanded(

@@ -36,10 +36,6 @@ class HomeAirQualityCard extends StatelessWidget {
       onTap: onOpen,
       gap: AuraSpacing.smPlus,
       children: <Widget>[
-        HomeSectionHeader(
-          title: context.l10n.sectionAirQuality.toUpperCase(),
-          onTap: onOpen,
-        ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           spacing: AuraSpacing.sm,

@@ -88,12 +88,20 @@ void main() {
       await pumpScreen(tester, harness.screen());
       await tester.pumpAndSettle();
 
+      // A pinned title shares its card's place in the cascade, so the indexes
+      // climb without skipping rather than being unique.
       final entrances = tester
           .widgetList<AuraEntrance>(find.byType(AuraEntrance))
+          .map((e) => e.index)
           .toList();
       expect(entrances.length, greaterThan(1));
-      for (var i = 0; i < entrances.length; i++) {
-        expect(entrances[i].index, i, reason: 'section $i is out of order');
+      expect(entrances.first, 0, reason: 'the hero leads the cascade');
+      for (var i = 1; i < entrances.length; i++) {
+        expect(
+          entrances[i] - entrances[i - 1],
+          inInclusiveRange(0, 1),
+          reason: 'section $i is out of order',
+        );
       }
     });
 
@@ -104,17 +112,30 @@ void main() {
       await pumpScreen(tester, harness.screen(), reduceMotion: false);
       await tester.pumpAndSettle();
 
-      final before = tester
-          .widgetList<Opacity>(find.byType(Opacity))
-          .map((o) => o.opacity)
-          .toList();
-      expect(before, everyElement(1.0));
+      // Only the entrances' own opacity is under test: the collapsing hero
+      // legitimately holds its condensed line at zero while the page rests.
+      Iterable<double> entranceOpacities() => tester
+          .widgetList<AuraEntrance>(find.byType(AuraEntrance))
+          .map(
+            (entrance) => tester
+                .widget<Opacity>(
+                  find
+                      .descendant(
+                        of: find.byWidget(entrance),
+                        matching: find.byType(Opacity),
+                      )
+                      .first,
+                )
+                .opacity,
+          );
+
+      expect(entranceOpacities(), everyElement(1.0));
 
       await harness.container.read(homeViewModelProvider.notifier).refresh();
       await tester.pump();
 
       expect(
-        tester.widgetList<Opacity>(find.byType(Opacity)).map((o) => o.opacity),
+        entranceOpacities(),
         everyElement(1.0),
         reason: 'the sections faded out again on a refresh',
       );
@@ -204,10 +225,10 @@ void main() {
     testWidgets('the content clears the bar rather than ending under it', (
       tester,
     ) async {
-      // The page runs beneath the glass on purpose, so only the last card has
+      // The page runs beneath the scrim on purpose, so only the last card has
       // to be given room.
       expect(
-        HomeContent.padding.bottom,
+        HomeContent.bottomInset,
         greaterThanOrEqualTo(HomeBottomBar.scrimHeight),
       );
     });
@@ -286,29 +307,73 @@ void main() {
       expect(
         before.dy - after.dy,
         moreOrLessEquals(60, epsilon: 0.5),
-        reason: 'the hero parallaxed with motion reduced',
+        reason: 'the hero condensed with motion reduced',
       );
     });
   });
 
-  testWidgets('the hero parallaxes behind the content as it scrolls', (
-    tester,
-  ) async {
-    final harness = HomeHarness(snapshot: _stillSky());
-    await pumpScreen(tester, harness.screen(), reduceMotion: false);
-    await tester.pumpAndSettle();
-
-    final before = tester.getTopLeft(find.byType(HomeHero));
-    await _scrollTo(tester, 60);
-    final after = tester.getTopLeft(find.byType(HomeHero));
-
-    // It lags the page rather than tracking it, so it travels less than the
-    // distance scrolled.
-    expect(
-      before.dy - after.dy,
-      moreOrLessEquals(60 * (1 - AuraMotion.heroParallax), epsilon: 0.5),
+  group('the hero condenses as the page scrolls', () {
+    // The prototypes that size the collapsing header carry their own copy of
+    // the hero, laid out but never shown, so the finders scope to the live
+    // child under the scroll listener.
+    final live = find.byWidgetPredicate(
+      (widget) => widget is ValueListenableBuilder<double>,
     );
-    await tester.pumpAndSettle();
+
+    testWidgets('the hero gives ground more slowly than the page', (
+      tester,
+    ) async {
+      final harness = HomeHarness(snapshot: _stillSky());
+      await pumpScreen(tester, harness.screen(), reduceMotion: false);
+      await tester.pumpAndSettle();
+
+      final hero = find.descendant(of: live, matching: find.byType(HomeHero));
+      final before = tester.getTopLeft(hero);
+      await _scrollTo(tester, 60);
+      final after = tester.getTopLeft(hero);
+
+      // The band of sky above the hero is what the collapse spends first, at
+      // the rate the condense range sets, so the hero travels less than the
+      // distance scrolled and the cards visibly catch it up.
+      expect(
+        before.dy - after.dy,
+        moreOrLessEquals(
+          HomeCollapsingHero.skyBand * (60 / AuraMotion.heroCondenseRange),
+          epsilon: 0.5,
+        ),
+      );
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('a deep scroll swaps the hero for the condensed line', (
+      tester,
+    ) async {
+      final harness = HomeHarness(snapshot: _stillSky());
+      await pumpScreen(tester, harness.screen(), reduceMotion: false);
+      await tester.pumpAndSettle();
+
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      final summary = find.text(l10n.homeCondensedSummary('35°', 'Sunny'));
+
+      // The line floats above the scroll view and is not built at all until
+      // the collapse calls for it, so nothing can ever pass over it.
+      expect(summary, findsNothing, reason: 'the line showed at rest');
+
+      await _scrollTo(tester, AuraMotion.heroCondenseRange);
+      expect(summary, findsOneWidget, reason: 'the line never took over');
+      expect(
+        tester
+            .widget<Opacity>(
+              find.ancestor(of: summary, matching: find.byType(Opacity)).first,
+            )
+            .opacity,
+        1,
+      );
+
+      await _scrollTo(tester, 0);
+      expect(summary, findsNothing, reason: 'the collapse did not reverse');
+      await tester.pumpAndSettle();
+    });
   });
 
   group('the body riding the sky', () {

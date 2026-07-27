@@ -1,25 +1,28 @@
 import 'package:aura_design/aura_design.dart';
+import 'package:aura_feature_home/src/widgets/home_page_dots.dart';
 import 'package:aura_l10n/aura_l10n.dart';
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/widgets.dart';
 
-/// The floating navigation, and the dots saying which place is showing.
+/// The navigation at the foot of the page, drawn the way the pen draws it.
 ///
-/// The pen draws navigation twice: the brand and settings at the top, and
-/// search, the saved list and a row of page dots at the foot of a page that
-/// runs to about 1500 points. An earlier pass merged both into one top bar,
-/// which put the buttons exactly where the sky is brightest and where the sun
-/// now sits.
+/// The pen's `Bottom Bar` is three loose pieces on the sky, with no panel
+/// behind them: search on one side, the saved list on the other, and a
+/// `Pages` group in the middle carrying a location arrow for the device's own
+/// page and a dot for every saved place. The scrim underneath is what keeps
+/// them legible; wrapping them in glass put a stroked pill across the sky
+/// that the design never drew.
 ///
-/// This is the pen's own second bar, restored and floated. The content runs
-/// underneath it rather than stopping short, and a scrim fades the cards out
-/// as they pass behind so nothing collides with a glyph.
+/// Settings joins the list on the trailing side because the top bar that used
+/// to hold it is gone.
 class HomeBottomBar extends StatelessWidget {
   /// Creates the floating bar.
   const HomeBottomBar({
     required this.isVisible,
     required this.placeCount,
     required this.placeIndex,
+    required this.leadsWithCurrentLocation,
+    required this.isRefreshing,
     required this.onOpenSearch,
     required this.onOpenSavedCities,
     required this.onOpenSettings,
@@ -35,6 +38,13 @@ class HomeBottomBar extends StatelessWidget {
   /// Which of them is showing.
   final int placeIndex;
 
+  /// Whether the first page is the device's own position, which the pen marks
+  /// with an arrow rather than a dot.
+  final bool leadsWithCurrentLocation;
+
+  /// Whether a refresh is in flight, which the mark beside the dots wears.
+  final bool isRefreshing;
+
   /// Opens search.
   final VoidCallback onOpenSearch;
 
@@ -48,7 +58,7 @@ class HomeBottomBar extends StatelessWidget {
   static const double _travel = 120;
 
   /// How tall the scrim under the bar is.
-  static const double scrimHeight = 148;
+  static const double scrimHeight = 168;
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +88,8 @@ class HomeBottomBar extends StatelessWidget {
         child: _Bar(
           placeCount: placeCount,
           placeIndex: placeIndex,
+          leadsWithCurrentLocation: leadsWithCurrentLocation,
+          isRefreshing: isRefreshing,
           onOpenSearch: onOpenSearch,
           onOpenSavedCities: onOpenSavedCities,
           onOpenSettings: onOpenSettings,
@@ -89,9 +101,9 @@ class HomeBottomBar extends StatelessWidget {
 
 /// Fades the content out under the bar, so a card never meets a glyph.
 ///
-/// This is the piece that makes a floating bar work at all. Without it the
-/// cards run under the glass and the two read as one crowded surface, which is
-/// what sent the navigation to the top in the first place.
+/// With no panel behind the buttons, this wash is the only thing keeping them
+/// legible, so it runs deeper than it is tall: a long quiet ramp and a firm
+/// foot rather than a hard band.
 class HomeBottomScrim extends StatelessWidget {
   /// Creates the scrim.
   const HomeBottomScrim({super.key});
@@ -112,10 +124,11 @@ class HomeBottomScrim extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: <Color>[
                   AuraColors.ink2.withValues(alpha: 0),
-                  AuraColors.ink2.withValues(alpha: 0.42),
-                  AuraColors.ink2.withValues(alpha: 0.82),
+                  AuraColors.ink2.withValues(alpha: 0.18),
+                  AuraColors.ink2.withValues(alpha: 0.52),
+                  AuraColors.ink2.withValues(alpha: 0.86),
                 ],
-                stops: const <double>[0, 0.5, 1],
+                stops: const <double>[0, 0.35, 0.68, 1],
               ),
             ),
           ),
@@ -129,6 +142,8 @@ class _Bar extends StatelessWidget {
   const _Bar({
     required this.placeCount,
     required this.placeIndex,
+    required this.leadsWithCurrentLocation,
+    required this.isRefreshing,
     required this.onOpenSearch,
     required this.onOpenSavedCities,
     required this.onOpenSettings,
@@ -136,6 +151,8 @@ class _Bar extends StatelessWidget {
 
   final int placeCount;
   final int placeIndex;
+  final bool leadsWithCurrentLocation;
+  final bool isRefreshing;
   final VoidCallback onOpenSearch;
   final VoidCallback onOpenSavedCities;
   final VoidCallback onOpenSettings;
@@ -143,100 +160,77 @@ class _Bar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    // The pen insets the glyphs 30 points from the screen edge: 16 here plus
+    // the 14 each pressable carries as its touch target.
     return Padding(
       padding: EdgeInsets.only(
-        left: AuraSpacing.xl,
-        right: AuraSpacing.xl,
-        bottom: MediaQuery.paddingOf(context).bottom + AuraSpacing.md,
+        left: AuraSpacing.lg,
+        right: AuraSpacing.lg,
+        bottom: MediaQuery.paddingOf(context).bottom + AuraSpacing.sm,
       ),
-      child: AuraGlass(
-        radius: AuraRadii.pill,
-        level: AuraGlassLevel.elevated,
-        shadow: AuraShadows.panel,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AuraSpacing.lg,
-          vertical: AuraSpacing.md,
-        ),
-        // Search on one side, the two list actions together on the other, and
-        // the dots holding the middle. With one place there are no dots, and
-        // the middle collapses to space rather than leaving a gap where
-        // something used to be.
-        child: Row(
-          children: <Widget>[
-            AuraCircleButton(
-              icon: AuraIcons.search,
-              semanticLabel: l10n.homeSearch,
-              onPressed: onOpenSearch,
-            ),
-            Expanded(
-              child: Center(
-                child: HomePageDots(count: placeCount, index: placeIndex),
+      child: Row(
+        children: <Widget>[
+          _BarButton(
+            icon: AuraIcons.search,
+            semanticLabel: l10n.homeSearch,
+            onPressed: onOpenSearch,
+          ),
+          Expanded(
+            child: Center(
+              child: HomePages(
+                count: placeCount,
+                index: placeIndex,
+                leadsWithCurrentLocation: leadsWithCurrentLocation,
+                isRefreshing: isRefreshing,
               ),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: AuraSpacing.sm,
-              children: <Widget>[
-                AuraCircleButton(
-                  icon: AuraIcons.list,
-                  semanticLabel: l10n.homeSavedCities,
-                  onPressed: onOpenSavedCities,
-                ),
-                AuraCircleButton(
-                  icon: AuraIcons.settings,
-                  semanticLabel: l10n.homeSettings,
-                  onPressed: onOpenSettings,
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              _BarButton(
+                icon: AuraIcons.list,
+                semanticLabel: l10n.homeSavedCities,
+                onPressed: onOpenSavedCities,
+              ),
+              _BarButton(
+                icon: AuraIcons.settings,
+                semanticLabel: l10n.homeSettings,
+                onPressed: onOpenSettings,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-/// One dot per place, with the current one drawn as a pill.
-///
-/// The pen draws these at the foot of the weather page. They are the only
-/// thing on screen that says how many places there are to move between, which
-/// is what makes the swipe discoverable at all.
-class HomePageDots extends StatelessWidget {
-  /// Creates the row of dots.
-  const HomePageDots({required this.count, required this.index, super.key});
+/// A bare glyph with the touch target the pen does not have to draw.
+class _BarButton extends StatelessWidget {
+  const _BarButton({
+    required this.icon,
+    required this.semanticLabel,
+    required this.onPressed,
+  });
 
-  /// How many places there are.
-  final int count;
-
-  /// Which one is showing.
-  final int index;
+  final IconData icon;
+  final String semanticLabel;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    // One place is not a set to page through, so the row says nothing.
-    if (count < 2) return const SizedBox.shrink();
-
-    return Semantics(
-      label: context.l10n.homePlaceOfPlaces(index + 1, count),
-      excludeSemantics: true,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: AuraSpacing.xs,
-        children: <Widget>[
-          for (var i = 0; i < count; i++)
-            AnimatedContainer(
-              duration: AuraMotion.control,
-              curve: AuraMotion.controlCurve,
-              width: i == index ? AuraSizes.pagerCurrent : AuraSizes.pagerDot,
-              height: AuraSizes.pagerDot,
-              decoration: BoxDecoration(
-                color: AuraColors.textPrimary.withValues(
-                  alpha: i == index ? 1 : 0.35,
-                ),
-                borderRadius: BorderRadius.circular(AuraRadii.pill),
-              ),
-            ),
-        ],
+    return AuraPressable.child(
+      onPressed: onPressed,
+      semanticLabel: semanticLabel,
+      haptic: true,
+      child: Padding(
+        padding: const EdgeInsets.all(AuraSpacing.mdPlus),
+        child: Icon(
+          icon,
+          size: AuraSizes.iconBottomBar,
+          color: AuraColors.textSecondary,
+        ),
       ),
     );
   }

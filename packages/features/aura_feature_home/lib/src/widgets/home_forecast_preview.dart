@@ -1,14 +1,13 @@
 import 'package:aura_design/aura_design.dart';
 import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_feature_home/src/widgets/home_sections.dart';
-import 'package:aura_l10n/aura_l10n.dart';
 import 'package:aura_ui/aura_ui.dart';
 import 'package:flutter/widgets.dart';
 
 /// The forecast at a glance, one column a day.
 ///
 /// Three days, because that is what the free tier returns. The card opens the
-/// full forecast.
+/// full forecast; its title lives above it as a pinned section heading.
 class HomeForecastPreview extends StatelessWidget {
   /// Creates the forecast preview.
   const HomeForecastPreview({
@@ -32,10 +31,6 @@ class HomeForecastPreview extends StatelessWidget {
     return HomeCard(
       onTap: onOpen,
       children: <Widget>[
-        HomeSectionHeader(
-          title: context.l10n.sectionForecast.toUpperCase(),
-          onTap: onOpen,
-        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
