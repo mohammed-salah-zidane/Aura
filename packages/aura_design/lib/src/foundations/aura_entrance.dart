@@ -17,12 +17,19 @@ class AuraEntrance extends StatefulWidget {
   const AuraEntrance({
     required this.index,
     required this.child,
+    this.leadIn = Duration.zero,
     super.key,
   });
 
   /// Position in the stagger, from zero. Each step adds
   /// [AuraMotion.entranceStagger] to the delay.
   final int index;
+
+  /// Held before the whole cascade starts, on top of the stagger.
+  ///
+  /// The home screen passes the sun's arrival here, so the cards wait for the
+  /// sky to settle before they follow it.
+  final Duration leadIn;
 
   /// The section arriving.
   final Widget child;
@@ -59,8 +66,9 @@ class _AuraEntranceState extends State<AuraEntrance>
   }
 
   Future<void> _play() async {
-    if (widget.index > 0) {
-      await Future<void>.delayed(AuraMotion.entranceStagger * widget.index);
+    final delay = widget.leadIn + AuraMotion.entranceStagger * widget.index;
+    if (delay > Duration.zero) {
+      await Future<void>.delayed(delay);
       if (!mounted) return;
     }
     await _controller.forward();

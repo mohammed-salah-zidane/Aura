@@ -91,24 +91,27 @@ abstract final class AuraCelestialPainter {
     }
   }
 
-  /// Where the body sits, as fractions of the frame.
+  /// Where the body sits, in points.
   ///
   /// Public because the sky's bloom is painted from it too: the haze around
   /// the sun has to be centred on the sun, not on the point the pen fixed it
   /// at for a still.
-  static Offset centreFraction(double position) {
+  ///
+  /// The height of the arc rides on the frame's shortest side rather than its
+  /// height, so the body holds its band below the status bar whether the
+  /// frame is a phone screen or the full unscrolled page a golden renders.
+  static Offset centreOf(Size size, double position) {
     final t = position.clamp(0.0, 1.0);
+    final band = size.shortestSide;
     return Offset(
-      _inset + t * (1 - 2 * _inset),
-      _topFraction + (1 - sin(t * pi)) * _arcHeight,
+      (_inset + t * (1 - 2 * _inset)) * size.width,
+      (_topFraction + (1 - sin(t * pi)) * _arcHeight) * band,
     );
   }
 
   /// Where the body sits, on an arc that peaks at the middle of its crossing.
-  static Offset _centreOf(Size size, double position) {
-    final fraction = centreFraction(position);
-    return Offset(fraction.dx * size.width, fraction.dy * size.height);
-  }
+  static Offset _centreOf(Size size, double position) =>
+      centreOf(size, position);
 
   // ---- the sun -----------------------------------------------------------
 
@@ -326,15 +329,17 @@ abstract final class AuraCelestialPainter {
 
   /// Where the arc begins and ends, and how high it reaches.
   ///
-  /// The body stays in the top third and well inside the edges, so it reads as
-  /// sky behind the content rather than as an element of it.
-  /// The arc is deliberately shallow. A tall one drops the body onto the alert
-  /// banner and the city name near sunrise and sunset, and a bright disc
-  /// behind text is worse than a flatter path. The horizontal travel is what
-  /// says the time of day; the height only has to keep it out of the content.
+  /// The vertical values are fractions of the frame's shortest side, per
+  /// [centreOf]. The body rides below the status bar and the island cut-out
+  /// and above the first line of content, so it reads as sky behind the page
+  /// rather than as an ornament on the clock. The arc is deliberately
+  /// shallow. A tall one drops the body onto the city name near sunrise and
+  /// sunset, and a bright disc behind text is worse than a flatter path. The
+  /// horizontal travel is what says the time of day; the height only has to
+  /// keep it out of the content.
   static const double _inset = 0.17;
-  static const double _topFraction = 0.045;
-  static const double _arcHeight = 0.03;
+  static const double _topFraction = 0.215;
+  static const double _arcHeight = 0.048;
 
   /// How dim the body is at the horizon, against its height at noon.
   static const double _horizonDim = 0.4;

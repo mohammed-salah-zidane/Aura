@@ -50,6 +50,15 @@ abstract final class AuraMotion {
   /// as animated.
   static const Duration breath = Duration(milliseconds: 5200);
 
+  /// The sun or the moon sweeping its arc to now, on the first reading.
+  ///
+  /// Long enough to read as the day retraced rather than as a slide, and short
+  /// enough that the content waiting on it never feels held back.
+  static const Duration celestialArrival = Duration(milliseconds: 1400);
+
+  /// The body easing to a new spot when the reading changes.
+  static const Duration celestialShift = Duration(milliseconds: 600);
+
   /// One star's full fade cycle.
   static const Duration twinkle = Duration(milliseconds: 3400);
 
@@ -66,11 +75,11 @@ abstract final class AuraMotion {
   /// How far the splash wordmark travels as it resolves.
   static const double splashRise = 14;
 
-  /// Fraction of the scroll offset the hero moves against.
+  /// Points of scroll over which the hero condenses into the top bar.
   ///
-  /// Below 1, so the hero lags the content it sits in and the sky reads as
-  /// further away than the cards.
-  static const double heroParallax = 0.45;
+  /// Slightly less than the hero's own height, so the choreography completes
+  /// before the first card reaches the pinned bar.
+  static const double heroCondenseRange = 200;
 
   /// Curve for the sky transition and for content settling.
   static const Curve skyCurve = Curves.easeOutCubic;

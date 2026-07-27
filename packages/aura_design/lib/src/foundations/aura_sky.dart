@@ -159,9 +159,33 @@ class _AuraSkyState extends State<AuraSky> with TickerProviderStateMixin {
     curve: AuraMotion.skyCurve,
   );
 
+  /// The sun or the moon travelling between readings.
+  ///
+  /// Its first arrival retraces the arc from the horizon to now, which is the
+  /// one theatrical moment the app allows itself. Every later change is a
+  /// short settle: a refreshed reading moves the body a few points, a swap at
+  /// dusk crossfades the sun for the moon.
+  late final AnimationController _bodyController = AnimationController(
+    vsync: this,
+    duration: AuraMotion.celestialArrival,
+    value: 1,
+  );
+
+  late final Animation<double> _bodyProgress = CurvedAnimation(
+    parent: _bodyController,
+    curve: AuraMotion.skyCurve,
+  );
+
+  /// The body being left behind by the current transition, if any.
+  AuraCelestial? _bodyFrom;
+
+  /// The body the transition is heading to. Mirrors `widget.celestial`.
+  AuraCelestial? _bodyTo;
+
   @override
   void initState() {
     super.initState();
+    _bodyTo = widget.celestial;
     // Once a crossfade into a still sky finishes, the outgoing layer is gone
     // and there is nothing left to tick for.
     _controller.addStatusListener(_onTransitionStatus);
@@ -197,7 +221,18 @@ class _AuraSkyState extends State<AuraSky> with TickerProviderStateMixin {
     super.didChangeDependencies();
     _animate = !context.prefersReducedMotion;
     _syncTicker();
+    // A screen that opens straight onto a reading still gets the arrival: the
+    // check lives here rather than in initState because only now is the
+    // reduced-motion preference known.
+    if (_animate && _bodyTo != null && !_arrivalPlayed) {
+      _arrivalPlayed = true;
+      unawaited(_bodyController.forward(from: 0));
+    }
+    if (!_animate) _bodyController.value = 1;
   }
+
+  /// Whether the first arrival has already been swept.
+  bool _arrivalPlayed = false;
 
   void _syncTicker() {
     final shouldRun = _animate && _hasMotion;
@@ -216,6 +251,7 @@ class _AuraSkyState extends State<AuraSky> with TickerProviderStateMixin {
   @override
   void didUpdateWidget(AuraSky oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _retargetBody();
     if (widget.kind == _to) return;
     _from = _to;
     _to = widget.kind;
@@ -230,9 +266,89 @@ class _AuraSkyState extends State<AuraSky> with TickerProviderStateMixin {
     unawaited(_controller.forward(from: 0));
   }
 
+  /// Points the body transition at the widget's current celestial.
+  void _retargetBody() {
+    final target = widget.celestial;
+    if (target == _bodyTo) return;
+
+    final arriving = _bodyTo == null && _bodyFrom == null && target != null;
+    // A change mid-flight leaves from wherever the body is drawn now, so a
+    // fast pair of readings cannot make it jump back and start over.
+    _bodyFrom = _drawnBody(_bodyProgress.value);
+    _bodyTo = target;
+    _arrivalPlayed = true;
+    _bodyController.duration = arriving
+        ? AuraMotion.celestialArrival
+        : AuraMotion.celestialShift;
+
+    if (!_animate) {
+      _bodyController.value = 1;
+      return;
+    }
+    unawaited(_bodyController.forward(from: 0));
+  }
+
+  /// The body as it should be painted at [t] through the current transition.
+  ///
+  /// On its first arrival the body sweeps the arc from the horizon to now; a
+  /// later change travels from wherever it was. A swap between the sun and the
+  /// moon does not travel at all, because the two never share a path: the
+  /// leaving body fades where it is and the arriving one fades in at its own
+  /// place, which [_drawnOutgoing] carries.
+  AuraCelestial? _drawnBody(double t) {
+    final to = _bodyTo;
+    final from = _bodyFrom;
+    if (to == null) return null;
+    if (from == null) {
+      return AuraCelestial(
+        body: to.body,
+        position: to.position * t,
+        illumination: to.illumination,
+        isWaxing: to.isWaxing,
+      );
+    }
+    if (from.body != to.body) return to;
+    return AuraCelestial(
+      body: to.body,
+      position: from.position + (to.position - from.position) * t,
+      illumination:
+          from.illumination + (to.illumination - from.illumination) * t,
+      isWaxing: to.isWaxing,
+    );
+  }
+
+  /// How strongly the arriving body is lit at [t].
+  ///
+  /// An arrival fades in over the first stretch of its sweep so the sun does
+  /// not pop onto the horizon; a swap crossfades over the whole transition.
+  double _drawnBlend(double t) {
+    final to = _bodyTo;
+    if (to == null) return 0;
+    final from = _bodyFrom;
+    if (from == null) {
+      return (t / _arrivalFadeIn).clamp(0.0, 1.0);
+    }
+    if (from.body != to.body) return t;
+    return 1;
+  }
+
+  /// The body on its way out, painted only while a swap or a clearing sky is
+  /// mid-transition.
+  AuraCelestial? _drawnOutgoing(double t) {
+    final from = _bodyFrom;
+    final to = _bodyTo;
+    if (from == null || t >= 1) return null;
+    if (to != null && to.body == from.body) return null;
+    return from;
+  }
+
+  /// Fraction of the arrival over which the body fades in.
+  static const double _arrivalFadeIn = 0.3;
+
   @override
   void dispose() {
     _ambient.dispose();
+    _bodyController.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -247,18 +363,23 @@ class _AuraSkyState extends State<AuraSky> with TickerProviderStateMixin {
       // both platforms, and the bars come back dark on a dark sky.
       value: _lightSystemBars,
       child: AnimatedBuilder(
-        animation: _progress,
+        animation: Listenable.merge(<Listenable>[_progress, _bodyProgress]),
         builder: (context, child) => CustomPaint(
           painter: _SkyPainter(
             from: _from,
             to: _to,
             progress: _progress.value,
-            celestial: widget.celestial,
+            // The bloom is the atmosphere around the body, so it follows the
+            // drawn position rather than the target and travels with the
+            // arrival sweep.
+            celestial: _drawnBody(_bodyProgress.value),
           ),
           child: child,
         ),
         child: AnimatedBuilder(
-          animation: Listenable.merge(<Listenable>[_progress, _ambient]),
+          animation: Listenable.merge(
+            <Listenable>[_progress, _ambient, _bodyProgress],
+          ),
           builder: (context, child) => CustomPaint(
             painter: _AmbientPainter(
               from: _from,
@@ -266,7 +387,10 @@ class _AuraSkyState extends State<AuraSky> with TickerProviderStateMixin {
               progress: _progress.value,
               phase: _ambient.value,
               animate: _animate,
-              celestial: widget.celestial,
+              celestial: _drawnBody(_bodyProgress.value),
+              celestialBlend: _drawnBlend(_bodyProgress.value),
+              celestialOut: _drawnOutgoing(_bodyProgress.value),
+              celestialOutBlend: 1 - _bodyProgress.value,
             ),
             child: child,
           ),
@@ -360,28 +484,26 @@ class _SkyPainter extends CustomPainter {
       Rect.fromCircle(center: Offset.zero, radius: 1),
     );
 
+    final centre = _bloomCentre(a, b, t, rect);
     canvas
       ..save()
-      ..translate(
-        rect.left + _bloomCentre(a, b, t).dx * rect.width,
-        rect.top + _bloomCentre(a, b, t).dy * rect.height,
-      )
+      ..translate(rect.left + centre.dx, rect.top + centre.dy)
       ..scale(radiusX, radiusY)
       ..drawCircle(Offset.zero, 1, Paint()..shader = shader)
       ..restore();
   }
 
-  /// Where the bloom sits: under the body when there is one, and where the pen
-  /// puts it when the sky is empty.
-  Offset _bloomCentre(AuraBloom a, AuraBloom b, double t) {
+  /// Where the bloom sits, in points: under the body when there is one, and
+  /// where the pen puts it when the sky is empty.
+  Offset _bloomCentre(AuraBloom a, AuraBloom b, double t, Rect rect) {
     final body = celestial;
     if (body == null) {
       return Offset(
-        _lerp(a.centerX, b.centerX, t),
-        _lerp(a.centerY, b.centerY, t),
+        _lerp(a.centerX, b.centerX, t) * rect.width,
+        _lerp(a.centerY, b.centerY, t) * rect.height,
       );
     }
-    return AuraCelestialPainter.centreFraction(body.position);
+    return AuraCelestialPainter.centreOf(rect.size, body.position);
   }
 
   /// One bloom stop, with the fill layer's own opacity folded into its alpha.
@@ -420,6 +542,9 @@ class _AmbientPainter extends CustomPainter {
     required this.phase,
     required this.animate,
     required this.celestial,
+    required this.celestialBlend,
+    required this.celestialOut,
+    required this.celestialOutBlend,
   });
 
   final AuraSkyKind from;
@@ -433,16 +558,35 @@ class _AmbientPainter extends CustomPainter {
   /// The sun or the moon riding this sky, when one is up.
   final AuraCelestial? celestial;
 
+  /// How strongly [celestial] is lit, below 1 only mid-transition.
+  final double celestialBlend;
+
+  /// The body a swap is fading out, painted at [celestialOutBlend].
+  final AuraCelestial? celestialOut;
+
+  /// How much of [celestialOut] is left.
+  final double celestialOutBlend;
+
   @override
   void paint(Canvas canvas, Size size) {
-    // The body goes under the weather: rain falls in front of the sun.
+    // The bodies go under the weather: rain falls in front of the sun.
+    final leaving = celestialOut;
+    if (leaving != null && celestialOutBlend > 0) {
+      AuraCelestialPainter.paint(
+        canvas,
+        size,
+        leaving,
+        blend: celestialOutBlend,
+        phase: animate ? phase : 0,
+      );
+    }
     final body = celestial;
-    if (body != null) {
+    if (body != null && celestialBlend > 0) {
       AuraCelestialPainter.paint(
         canvas,
         size,
         body,
-        blend: 1,
+        blend: celestialBlend,
         phase: animate ? phase : 0,
       );
     }
@@ -701,7 +845,10 @@ class _AmbientPainter extends CustomPainter {
       oldDelegate.progress != progress ||
       oldDelegate.phase != phase ||
       oldDelegate.animate != animate ||
-      oldDelegate.celestial != celestial;
+      oldDelegate.celestial != celestial ||
+      oldDelegate.celestialBlend != celestialBlend ||
+      oldDelegate.celestialOut != celestialOut ||
+      oldDelegate.celestialOutBlend != celestialOutBlend;
 }
 
 /// One star of the clear-night field.
