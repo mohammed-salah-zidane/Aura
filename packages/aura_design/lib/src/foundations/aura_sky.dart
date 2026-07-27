@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' show cos, pi;
 
+import 'package:aura_design/src/foundations/aura_celestial.dart';
 import 'package:aura_design/src/foundations/aura_sky_ambient.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_gradients.dart';
@@ -123,10 +124,18 @@ enum AuraSkyKind {
 /// re-run the shaders sixty times a second to move a few streaks.
 class AuraSky extends StatefulWidget {
   /// Creates a sky background.
-  const AuraSky({required this.kind, this.child, super.key});
+  const AuraSky({required this.kind, this.celestial, this.child, super.key});
 
   /// Which sky to paint.
   final AuraSkyKind kind;
+
+  /// The sun or the moon riding the sky, when one is up.
+  ///
+  /// Absent on every screen that is not showing a live reading, and absent at
+  /// night before the moon has risen. Passed in rather than derived here,
+  /// because where the sun is comes from the domain and this package may not
+  /// know what a sunrise is.
+  final AuraCelestial? celestial;
 
   /// Content drawn on top of the sky.
   final Widget? child;
@@ -240,7 +249,12 @@ class _AuraSkyState extends State<AuraSky> with TickerProviderStateMixin {
       child: AnimatedBuilder(
         animation: _progress,
         builder: (context, child) => CustomPaint(
-          painter: _SkyPainter(from: _from, to: _to, progress: _progress.value),
+          painter: _SkyPainter(
+            from: _from,
+            to: _to,
+            progress: _progress.value,
+            celestial: widget.celestial,
+          ),
           child: child,
         ),
         child: AnimatedBuilder(
@@ -252,6 +266,7 @@ class _AuraSkyState extends State<AuraSky> with TickerProviderStateMixin {
               progress: _progress.value,
               phase: _ambient.value,
               animate: _animate,
+              celestial: widget.celestial,
             ),
             child: child,
           ),
@@ -276,11 +291,20 @@ class _SkyPainter extends CustomPainter {
     required this.from,
     required this.to,
     required this.progress,
+    required this.celestial,
   });
 
   final AuraSkyKind from;
   final AuraSkyKind to;
   final double progress;
+
+  /// Where the light on this sky is coming from, when anything is up.
+  ///
+  /// The pen fixes the bloom at one point on every frame, which is right for a
+  /// still. On a screen that also draws the sun it is wrong: two bright places
+  /// on one sky read as a smear beside a star. The bloom follows the body
+  /// instead, so there is one light source and it moves with the day.
+  final AuraCelestial? celestial;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -339,12 +363,25 @@ class _SkyPainter extends CustomPainter {
     canvas
       ..save()
       ..translate(
-        rect.left + _lerp(a.centerX, b.centerX, t) * rect.width,
-        rect.top + _lerp(a.centerY, b.centerY, t) * rect.height,
+        rect.left + _bloomCentre(a, b, t).dx * rect.width,
+        rect.top + _bloomCentre(a, b, t).dy * rect.height,
       )
       ..scale(radiusX, radiusY)
       ..drawCircle(Offset.zero, 1, Paint()..shader = shader)
       ..restore();
+  }
+
+  /// Where the bloom sits: under the body when there is one, and where the pen
+  /// puts it when the sky is empty.
+  Offset _bloomCentre(AuraBloom a, AuraBloom b, double t) {
+    final body = celestial;
+    if (body == null) {
+      return Offset(
+        _lerp(a.centerX, b.centerX, t),
+        _lerp(a.centerY, b.centerY, t),
+      );
+    }
+    return AuraCelestialPainter.centreFraction(body.position);
   }
 
   /// One bloom stop, with the fill layer's own opacity folded into its alpha.
@@ -362,7 +399,8 @@ class _SkyPainter extends CustomPainter {
   bool shouldRepaint(_SkyPainter oldDelegate) =>
       oldDelegate.from != from ||
       oldDelegate.to != to ||
-      oldDelegate.progress != progress;
+      oldDelegate.progress != progress ||
+      oldDelegate.celestial != celestial;
 }
 
 /// Paints the moving layer over a sky, and the starfield that twinkles in it.
@@ -381,6 +419,7 @@ class _AmbientPainter extends CustomPainter {
     required this.progress,
     required this.phase,
     required this.animate,
+    required this.celestial,
   });
 
   final AuraSkyKind from;
@@ -391,8 +430,22 @@ class _AmbientPainter extends CustomPainter {
   /// False when the platform has asked for reduced motion.
   final bool animate;
 
+  /// The sun or the moon riding this sky, when one is up.
+  final AuraCelestial? celestial;
+
   @override
   void paint(Canvas canvas, Size size) {
+    // The body goes under the weather: rain falls in front of the sun.
+    final body = celestial;
+    if (body != null) {
+      AuraCelestialPainter.paint(
+        canvas,
+        size,
+        body,
+        blend: 1,
+        phase: animate ? phase : 0,
+      );
+    }
     if (from == to) {
       _paintLayer(canvas, size, to, 1);
       return;
@@ -647,7 +700,8 @@ class _AmbientPainter extends CustomPainter {
       oldDelegate.to != to ||
       oldDelegate.progress != progress ||
       oldDelegate.phase != phase ||
-      oldDelegate.animate != animate;
+      oldDelegate.animate != animate ||
+      oldDelegate.celestial != celestial;
 }
 
 /// One star of the clear-night field.

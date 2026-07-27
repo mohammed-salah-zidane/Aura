@@ -21,6 +21,7 @@ export 'src/components/aura_skeleton.dart';
 export 'src/components/aura_state_screen.dart';
 export 'src/components/aura_sun_path.dart';
 export 'src/components/aura_toggle.dart';
+export 'src/foundations/aura_celestial.dart';
 export 'src/foundations/aura_entrance.dart';
 export 'src/foundations/aura_glass.dart';
 export 'src/foundations/aura_pressable.dart';
