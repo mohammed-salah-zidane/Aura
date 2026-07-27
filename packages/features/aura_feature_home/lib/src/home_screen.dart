@@ -3,11 +3,11 @@ import 'package:aura_feature_home/src/home_ui_state.dart';
 import 'package:aura_feature_home/src/home_view_model.dart';
 import 'package:aura_feature_home/src/widgets/home_content.dart';
 import 'package:aura_feature_home/src/widgets/home_loading.dart';
+import 'package:aura_feature_home/src/widgets/home_refresh.dart';
 import 'package:aura_feature_home/src/widgets/home_state_screens.dart';
 import 'package:aura_l10n/aura_l10n.dart';
 import 'package:aura_providers/aura_providers.dart';
 import 'package:aura_ui/aura_ui.dart';
-import 'package:flutter/material.dart' show RefreshIndicator;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -71,10 +71,8 @@ class HomeScreen extends ConsumerWidget {
           onTryAgain: () => _refresh(ref),
         ),
         HomeStale() => _Offline(state: state, ref: ref),
-        HomeReady() => RefreshIndicator(
+        HomeReady() => HomeRefresh(
           onRefresh: () => _refresh(ref),
-          color: AuraColors.onAccent,
-          backgroundColor: AuraColors.accent,
           child: HomeContent(
             state: state,
             isCurrentLocation: location.isCurrentLocation,
