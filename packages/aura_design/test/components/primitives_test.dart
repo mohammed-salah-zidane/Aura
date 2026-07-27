@@ -21,9 +21,17 @@ Widget _host(Widget child) => Directionality(
 /// The boundary is what lets the sky tests rasterise a frame. The surface
 /// itself is pinned to the design canvas by [_useDesignCanvas], so one sampled
 /// pixel is one design point and the starfield lands where the pen put it.
-Widget _skyHost(Widget child) => Directionality(
+/// These tests sample the two fills the pen authors, so they render the sky at
+/// rest: reduced motion drops the ambient layer and leaves exactly the frame.
+///
+/// The crossfade test is the exception and passes `animate: true`, because the
+/// thing it measures is the transition itself, which reduced motion cuts.
+Widget _skyHost(Widget child, {bool animate = false}) => Directionality(
   textDirection: TextDirection.ltr,
-  child: RepaintBoundary(key: _skyBoundary, child: child),
+  child: MediaQuery(
+    data: MediaQueryData(disableAnimations: !animate),
+    child: RepaintBoundary(key: _skyBoundary, child: child),
+  ),
 );
 
 /// Resizes the test surface to the 393 by 852 design canvas at a pixel ratio of
@@ -196,35 +204,80 @@ void main() {
     });
 
     testWidgets('crossfades rather than cutting between skies', (tester) async {
+      // Between two skies that carry no ambient layer, so what is sampled is
+      // the fills blending and nothing painted over them. Both ends are
+      // compared against the sky rendered on its own rather than against a
+      // gradient token, because at this height the bloom is in play too.
+      const y = 700;
+      final before = (await _renderSky(tester, AuraSkyKind.systemBrand)).at(
+        196,
+        y,
+      );
+      final after = (await _renderSky(tester, AuraSkyKind.instrument)).at(
+        196,
+        y,
+      );
+
       _useDesignCanvas(tester);
       await tester.pumpWidget(
-        _skyHost(const AuraSky(kind: AuraSkyKind.clearDay, child: SizedBox())),
+        _skyHost(
+          const AuraSky(kind: AuraSkyKind.systemBrand, child: SizedBox()),
+          animate: true,
+        ),
       );
       await tester.pumpWidget(
-        _skyHost(const AuraSky(kind: AuraSkyKind.rain, child: SizedBox())),
+        _skyHost(
+          const AuraSky(kind: AuraSkyKind.instrument, child: SizedBox()),
+          animate: true,
+        ),
       );
       await tester.pump(AuraMotion.sky ~/ 2);
 
-      // Sampled below both blooms, so only the gradient is in play.
-      const y = 700;
       final mid = (await _capture(tester)).at(196, y);
       expect(
         mid,
-        isNot(_closeToColor(_gradientAt(AuraSkies.clearDay, y / 852))),
-        reason: 'the sky never left the old gradient',
+        isNot(_closeToColor(before)),
+        reason: 'the sky never left the old one',
       );
       expect(
         mid,
-        isNot(_closeToColor(_gradientAt(AuraSkies.rain, y / 852))),
-        reason: 'the sky cut straight to the new gradient',
+        isNot(_closeToColor(after)),
+        reason: 'the sky cut straight to the new one',
       );
 
       await tester.pumpAndSettle();
       expect(
         (await _capture(tester)).at(196, y),
-        _closeToColor(_gradientAt(AuraSkies.rain, y / 852)),
-        reason: 'the sky did not finish on the new gradient',
+        _closeToColor(after),
+        reason: 'the sky did not finish on the new one',
       );
+    });
+
+    testWidgets('reduced motion cuts to the new sky instead of fading', (
+      tester,
+    ) async {
+      // The sky is the whole screen, so its crossfade is the largest movement
+      // in the app and the one this setting most needs to stop.
+      const y = 700;
+      final after = (await _renderSky(tester, AuraSkyKind.instrument)).at(
+        196,
+        y,
+      );
+
+      _useDesignCanvas(tester);
+      await tester.pumpWidget(
+        _skyHost(
+          const AuraSky(kind: AuraSkyKind.systemBrand, child: SizedBox()),
+        ),
+      );
+      await tester.pumpWidget(
+        _skyHost(
+          const AuraSky(kind: AuraSkyKind.instrument, child: SizedBox()),
+        ),
+      );
+      await tester.pump();
+
+      expect((await _capture(tester)).at(196, y), _closeToColor(after));
     });
 
     test('every bloom has two stops, transparent at the outer one', () {
