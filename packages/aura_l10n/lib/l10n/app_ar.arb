@@ -53,6 +53,8 @@
 
   "homeSavedCities": "المدن المحفوظة",
 
+  "homePlaceOfPlaces": "المكان {index} من {count}",
+
   "homeLoadingStatus": "جارٍ جلب أحدث الأحوال…",
 
   "metricFeelsLike": "الإحساس الفعلي",

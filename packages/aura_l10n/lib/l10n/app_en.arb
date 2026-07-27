@@ -141,6 +141,15 @@
     "description": "Spoken label for the saved cities button in the bottom bar, which carries an icon and no text."
   },
 
+  "homePlaceOfPlaces": "Place {index} of {count}",
+  "@homePlaceOfPlaces": {
+    "description": "Spoken in place of the row of page dots in the bottom bar, which says which of the saved places is showing.",
+    "placeholders": {
+      "index": { "type": "int" },
+      "count": { "type": "int" }
+    }
+  },
+
   "homeLoadingStatus": "Fetching latest conditions…",
   "@homeLoadingStatus": {
     "description": "Under the city name while the first reading is on its way."

@@ -1,3 +1,4 @@
+import 'package:aura_core/aura_core.dart';
 import 'package:aura_design/aura_design.dart';
 import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_feature_home/aura_feature_home.dart';
@@ -121,49 +122,29 @@ void main() {
     });
   });
 
-  group('the condensed bar', () {
-    testWidgets('is absent until the page scrolls', (tester) async {
+  group('the floating bar', () {
+    testWidgets('is up when the page opens', (tester) async {
       final harness = HomeHarness(snapshot: weatherFixture());
       await pumpScreen(tester, harness.screen());
       await tester.pumpAndSettle();
 
+      expect(find.byType(HomeBottomBar), findsOneWidget);
       expect(
-        find.byType(HomeCondensedBar),
-        findsOneWidget,
-        reason: 'the listener itself should always be mounted',
-      );
-      expect(
-        find.descendant(
-          of: find.byType(HomeCondensedBar),
-          matching: find.byType(AuraGlass),
-        ),
-        findsNothing,
-        reason: 'the bar drew itself before anything had scrolled',
-      );
-    });
-
-    testWidgets('appears once the hero has gone, carrying the place', (
-      tester,
-    ) async {
-      final harness = HomeHarness(snapshot: weatherFixture());
-      await pumpScreen(tester, harness.screen());
-      await tester.pumpAndSettle();
-
-      await _scrollTo(tester, 400);
-
-      final bar = find.byType(HomeCondensedBar);
-      expect(
-        find.descendant(of: bar, matching: find.byType(AuraGlass)),
-        findsWidgets,
-      );
-      expect(
-        find.descendant(of: bar, matching: find.text('Cairo')),
-        findsOneWidget,
-        reason: 'the bar does not say which place is showing',
+        tester
+            .widget<AnimatedOpacity>(
+              find
+                  .descendant(
+                    of: find.byType(HomeBottomBar),
+                    matching: find.byType(AnimatedOpacity),
+                  )
+                  .first,
+            )
+            .opacity,
+        1,
       );
     });
 
-    testWidgets('keeps every destination the top bar had', (tester) async {
+    testWidgets('carries every destination the page needs', (tester) async {
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
       var search = 0;
       var saved = 0;
@@ -179,9 +160,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await _scrollTo(tester, 400);
 
-      final bar = find.byType(HomeCondensedBar);
+      final bar = find.byType(HomeBottomBar);
       for (final label in <String>[
         l10n.homeSearch,
         l10n.homeSavedCities,
@@ -194,6 +174,83 @@ void main() {
       }
 
       expect(<int>[search, saved, settings], <int>[1, 1, 1]);
+    });
+
+    testWidgets('gets out of the way going down and returns coming up', (
+      tester,
+    ) async {
+      final harness = HomeHarness(snapshot: weatherFixture());
+      await pumpScreen(tester, harness.screen());
+      await tester.pumpAndSettle();
+
+      double opacity() => tester
+          .widget<AnimatedOpacity>(
+            find
+                .descendant(
+                  of: find.byType(HomeBottomBar),
+                  matching: find.byType(AnimatedOpacity),
+                )
+                .first,
+          )
+          .opacity;
+
+      await _scrollTo(tester, 400);
+      expect(opacity(), 0, reason: 'the bar stayed over the content');
+
+      await _scrollTo(tester, 300);
+      expect(opacity(), 1, reason: 'the bar did not come back');
+    });
+
+    testWidgets('the content clears the bar rather than ending under it', (
+      tester,
+    ) async {
+      // The page runs beneath the glass on purpose, so only the last card has
+      // to be given room.
+      expect(
+        HomeContent.padding.bottom,
+        greaterThanOrEqualTo(HomeBottomBar.scrimHeight),
+      );
+    });
+
+    testWidgets('one place shows no dots to page through', (tester) async {
+      final harness = HomeHarness(snapshot: weatherFixture());
+      await pumpScreen(tester, harness.screen());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HomePageDots), findsOneWidget);
+      expect(
+        tester.widget<HomePageDots>(find.byType(HomePageDots)).count,
+        1,
+        reason: 'the device position is the only place saved',
+      );
+    });
+
+    testWidgets('a dot for every saved place, plus the device position', (
+      tester,
+    ) async {
+      final harness = HomeHarness(
+        snapshot: weatherFixture(),
+        saved: <SavedCity>[
+          SavedCity(
+            location: const LocationRef(query: 'Giza'),
+            name: 'Giza',
+            country: 'Egypt',
+            addedAt: fixtureNow,
+          ),
+          SavedCity(
+            location: const LocationRef(query: 'Luxor'),
+            name: 'Luxor',
+            country: 'Egypt',
+            addedAt: fixtureNow,
+          ),
+        ],
+      );
+      await pumpScreen(tester, harness.screen());
+      await tester.pumpAndSettle();
+
+      final dots = tester.widget<HomePageDots>(find.byType(HomePageDots));
+      expect(dots.count, 3);
+      expect(dots.index, 0, reason: 'the device position leads the set');
     });
   });
 
@@ -252,5 +309,61 @@ void main() {
       moreOrLessEquals(60 * (1 - AuraMotion.heroParallax), epsilon: 0.5),
     );
     await tester.pumpAndSettle();
+  });
+
+  group('the body riding the sky', () {
+    AuraCelestial? bodyOf(WidgetTester tester) =>
+        tester.widget<AuraSky>(find.byType(AuraSky)).celestial;
+
+    testWidgets('the sun rides the sky in the middle of the day', (
+      tester,
+    ) async {
+      // The fixture's clock reads 14:34, between its sunrise and its sunset.
+      final harness = HomeHarness(snapshot: weatherFixture());
+      await pumpScreen(tester, harness.screen());
+      await tester.pumpAndSettle();
+
+      final body = bodyOf(tester);
+      expect(body?.body, AuraCelestialBody.sun);
+      expect(body!.position, inInclusiveRange(0, 1));
+    });
+
+    testWidgets('the moon takes over once the sun is down', (tester) async {
+      final harness = HomeHarness(
+        snapshot: weatherFixture(
+          condition: AuraCondition.clearNight,
+          localTime: DateTime(2026, 7, 26, 21, 30),
+        ),
+      );
+      await pumpScreen(tester, harness.screen());
+      await tester.pumpAndSettle();
+
+      final body = bodyOf(tester);
+      expect(body?.body, AuraCelestialBody.moon);
+      expect(body!.illumination, inInclusiveRange(0, 1));
+    });
+
+    testWidgets('a day with no sun times falls through to the moon', (
+      tester,
+    ) async {
+      // WeatherAPI answers `No sunrise` at high latitudes, which is a real
+      // reading rather than a parse failure. The moon still has times, so the
+      // honest answer is the moon rather than an empty sky.
+      final harness = HomeHarness(snapshot: weatherFixture(hasSunTimes: false));
+      await pumpScreen(tester, harness.screen());
+      await tester.pumpAndSettle();
+
+      expect(bodyOf(tester)?.body, AuraCelestialBody.moon);
+    });
+
+    testWidgets('no screen without a reading claims to know where the sun is', (
+      tester,
+    ) async {
+      final harness = HomeHarness(failure: const NoConnection());
+      await pumpScreen(tester, harness.screen());
+      await tester.pumpAndSettle();
+
+      expect(bodyOf(tester), isNull);
+    });
   });
 }

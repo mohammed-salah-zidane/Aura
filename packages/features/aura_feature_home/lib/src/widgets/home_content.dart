@@ -2,13 +2,12 @@ import 'package:aura_design/aura_design.dart';
 import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_feature_home/src/home_ui_state.dart';
 import 'package:aura_feature_home/src/widgets/home_air_quality_card.dart';
-import 'package:aura_feature_home/src/widgets/home_condensed_bar.dart';
+import 'package:aura_feature_home/src/widgets/home_bottom_bar.dart';
 import 'package:aura_feature_home/src/widgets/home_forecast_preview.dart';
 import 'package:aura_feature_home/src/widgets/home_hero.dart';
 import 'package:aura_feature_home/src/widgets/home_hourly_strip.dart';
 import 'package:aura_feature_home/src/widgets/home_metric_grid.dart';
 import 'package:aura_feature_home/src/widgets/home_sun_and_moon_card.dart';
-import 'package:aura_feature_home/src/widgets/home_top_bar.dart';
 import 'package:aura_l10n/aura_l10n.dart';
 import 'package:aura_ui/aura_ui.dart';
 import 'package:flutter/foundation.dart' show ValueListenable;
@@ -30,6 +29,8 @@ class HomeContent extends StatefulWidget {
   const HomeContent({
     required this.state,
     required this.isCurrentLocation,
+    required this.placeCount,
+    required this.placeIndex,
     required this.onOpenSettings,
     required this.onOpenSearch,
     required this.onOpenSavedCities,
@@ -45,6 +46,12 @@ class HomeContent extends StatefulWidget {
 
   /// Whether the place is wherever the device is.
   final bool isCurrentLocation;
+
+  /// How many places can be paged through.
+  final int placeCount;
+
+  /// Which of them this one is.
+  final int placeIndex;
 
   /// Opens settings.
   final VoidCallback onOpenSettings;
@@ -67,13 +74,24 @@ class HomeContent extends StatefulWidget {
   /// Opens the sun and moon detail.
   final VoidCallback onOpenSunAndMoon;
 
-  /// The pen's `Content` padding on every weather frame.
+  /// The pen's `Content` padding, reworked for a page with no bar at the top.
+  ///
+  /// The top inset is the band the sky keeps for itself. Moving navigation to
+  /// the foot freed the space the old top bar held, and the sun now crosses
+  /// exactly there, so the content starts below it rather than under it.
+  ///
+  /// At the foot the page runs *under* the floating bar rather than stopping
+  /// above it, so the sky reaches the bottom edge. Only the last card needs to
+  /// be given room to clear the glass.
   static const EdgeInsets padding = EdgeInsets.fromLTRB(
     AuraSpacing.xl,
-    AuraSpacing.sm,
+    skyBand,
     AuraSpacing.xl,
-    AuraSpacing.xxl,
+    HomeBottomBar.scrimHeight,
   );
+
+  /// How much sky is kept clear above the first card, for the sun to cross.
+  static const double skyBand = 76;
 
   @override
   State<HomeContent> createState() => _HomeContentState();
@@ -88,6 +106,15 @@ class _HomeContentState extends State<HomeContent> {
   /// condensed bar without rebuilding the seven sections underneath them.
   final ValueNotifier<double> _offset = ValueNotifier<double>(0);
 
+  /// Whether the floating bar is on screen.
+  ///
+  /// Scrolling down hides it so the page is uninterrupted; any scroll back up
+  /// brings it straight back, which is the behaviour that keeps it from
+  /// feeling lost. Near the top it is always shown.
+  final ValueNotifier<bool> _navVisible = ValueNotifier<bool>(true);
+
+  double _lastOffset = 0;
+
   @override
   void initState() {
     super.initState();
@@ -97,7 +124,18 @@ class _HomeContentState extends State<HomeContent> {
   void _onScroll() {
     final offset = _scroll.offset;
     _offset.value = offset < 0 ? 0 : offset;
+
+    final delta = offset - _lastOffset;
+    if (delta.abs() < _scrollNoise) return;
+    _lastOffset = offset;
+    _navVisible.value = delta < 0 || offset < _alwaysShownAbove;
   }
+
+  /// A drag smaller than this is a finger resting, not a decision.
+  static const double _scrollNoise = 6;
+
+  /// Near the top the bar is always up, so the screen never opens without it.
+  static const double _alwaysShownAbove = 80;
 
   @override
   void dispose() {
@@ -105,6 +143,7 @@ class _HomeContentState extends State<HomeContent> {
       ..removeListener(_onScroll)
       ..dispose();
     _offset.dispose();
+    _navVisible.dispose();
     super.dispose();
   }
 
@@ -118,11 +157,6 @@ class _HomeContentState extends State<HomeContent> {
     final expires = alert?.expires;
 
     final sections = <Widget>[
-      HomeTopBar(
-        onOpenSearch: widget.onOpenSearch,
-        onOpenSavedCities: widget.onOpenSavedCities,
-        onOpenSettings: widget.onOpenSettings,
-      ),
       if (alert != null)
         AuraAlertBanner(
           title: alert.event,
@@ -180,10 +214,11 @@ class _HomeContentState extends State<HomeContent> {
             ),
           ),
         ),
-        HomeCondensedBar(
-          offset: _offset,
-          placeName: snapshot.placeName,
-          temperature: format.temperature(snapshot.current.temperature),
+        const HomeBottomScrim(),
+        HomeBottomBar(
+          isVisible: _navVisible,
+          placeCount: widget.placeCount,
+          placeIndex: widget.placeIndex,
           onOpenSearch: widget.onOpenSearch,
           onOpenSavedCities: widget.onOpenSavedCities,
           onOpenSettings: widget.onOpenSettings,
