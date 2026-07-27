@@ -57,6 +57,10 @@
 
   "homeLoadingStatus": "جارٍ جلب أحدث الأحوال…",
 
+  "homeCondensedSummary": "{temp} · {condition}",
+
+  "homeUpdating": "جارٍ التحديث",
+
   "metricFeelsLike": "الإحساس الفعلي",
 
   "metricWind": "الرياح",

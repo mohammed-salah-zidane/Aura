@@ -155,6 +155,20 @@
     "description": "Under the city name while the first reading is on its way."
   },
 
+  "homeCondensedSummary": "{temp} · {condition}",
+  "@homeCondensedSummary": {
+    "description": "The reading beside the condition in the condensed bar the hero collapses into on scroll.",
+    "placeholders": {
+      "temp": { "type": "String", "example": "35°" },
+      "condition": { "type": "String", "example": "Sunny" }
+    }
+  },
+
+  "homeUpdating": "Updating",
+  "@homeUpdating": {
+    "description": "Spoken label for the small mark that breathes in the bottom bar while a refresh is in flight."
+  },
+
   "metricFeelsLike": "Feels like",
   "@metricFeelsLike": {
     "description": "Label on the apparent temperature card. Set in small caps by the view."
