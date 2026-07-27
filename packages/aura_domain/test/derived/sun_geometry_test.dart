@@ -4,6 +4,12 @@ import 'package:test/test.dart';
 final _sunrise = DateTime.utc(2026, 7, 26, 5, 14);
 final _sunset = DateTime.utc(2026, 7, 26, 19, 2);
 
+// Cairo's own answer on the day the fixtures were captured: the moon rises in
+// the evening and sets after midnight, so the set reads as earlier than the
+// rise by the clock.
+final _moonrise = DateTime.utc(2026, 7, 26, 18, 8);
+final _moonset = DateTime.utc(2026, 7, 26, 3, 13);
+
 void main() {
   group('daylightSpan', () {
     // The design shows 13h 48m for a 05:14 sunrise and a 19:02 sunset.
@@ -117,6 +123,65 @@ void main() {
     test('sunArcPosition is null when sunset precedes sunrise', () {
       expect(
         sunArcPosition(now: _sunrise, sunrise: _sunset, sunset: _sunrise),
+        isNull,
+      );
+    });
+  });
+
+  group('moonArcPosition', () {
+    test('moonArcPosition is zero at moonrise', () {
+      expect(
+        moonArcPosition(
+          now: _moonrise,
+          moonrise: _moonrise,
+          moonset: _moonset,
+        ),
+        0,
+      );
+    });
+
+    test('moonArcPosition carries a crossing over midnight', () {
+      // 18:08 to 03:13 is nine hours and five minutes. Half way is 22:40.
+      expect(
+        moonArcPosition(
+          now: DateTime.utc(2026, 7, 26, 22, 40),
+          moonrise: _moonrise,
+          moonset: _moonset,
+        ),
+        closeTo(0.5, 0.001),
+      );
+    });
+
+    test('moonArcPosition reads the small hours as the night before', () {
+      // 01:00 is not before this evening's rise on the clock, but it belongs
+      // to the crossing that began yesterday and has not set yet.
+      final position = moonArcPosition(
+        now: DateTime.utc(2026, 7, 26, 1),
+        moonrise: _moonrise,
+        moonset: _moonset,
+      );
+      expect(position, isNotNull);
+      expect(position, greaterThan(0.7));
+    });
+
+    test('moonArcPosition is null while the moon is down', () {
+      expect(
+        moonArcPosition(
+          now: DateTime.utc(2026, 7, 26, 12),
+          moonrise: _moonrise,
+          moonset: _moonset,
+        ),
+        isNull,
+      );
+    });
+
+    test('moonArcPosition is null when a boundary is missing', () {
+      expect(
+        moonArcPosition(now: _moonrise, moonset: _moonset),
+        isNull,
+      );
+      expect(
+        moonArcPosition(now: _moonrise, moonrise: _moonrise),
         isNull,
       );
     });
