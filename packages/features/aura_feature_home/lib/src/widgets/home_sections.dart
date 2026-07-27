@@ -89,9 +89,6 @@ class HomeCard extends StatelessWidget {
       ),
     );
     if (onTap == null) return card;
-    return Semantics(
-      button: true,
-      child: GestureDetector(onTap: onTap, child: card),
-    );
+    return AuraPressable.child(onPressed: onTap, haptic: true, child: card);
   }
 }

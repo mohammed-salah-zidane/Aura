@@ -36,60 +36,74 @@ class HomeHero extends StatelessWidget {
   Widget build(BuildContext context) {
     final current = snapshot.current;
     final today = snapshot.today;
+    final place = isCurrentLocation
+        ? context.l10n.homeCurrentLocation
+        : snapshot.country;
+
     return Padding(
       padding: _padding,
-      child: Column(
-        spacing: AuraSpacing.hairline,
-        children: <Widget>[
-          _Kicker(
-            label: isCurrentLocation
-                ? context.l10n.homeCurrentLocation
-                : snapshot.country,
-          ),
-          Text(
-            snapshot.placeName,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AuraText.titleCity.copyWith(color: AuraColors.textPrimary),
-          ),
-          Text(
-            format.temperature(current.temperature),
-            maxLines: 1,
-            style: AuraText.display.copyWith(color: AuraColors.textPrimary),
-          ),
-          Text(
-            current.conditionText,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AuraText.condition.copyWith(
-              color: AuraColors.textSecondary,
+      // Five separate nodes made a screen reader announce the place, then a
+      // bare number, then a phrase, then two more bare numbers. Merged, it
+      // reads as the sentence the layout already says visually.
+      child: MergeSemantics(
+        child: Column(
+          spacing: AuraSpacing.hairline,
+          children: <Widget>[
+            _Kicker(label: place),
+            Text(
+              snapshot.placeName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AuraText.titleCity.copyWith(color: AuraColors.textPrimary),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: AuraSpacing.xs),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: AuraSpacing.mdPlus,
-              children: <Widget>[
-                Text(
-                  format.high(today.high),
-                  style: AuraText.valueCompact.copyWith(
-                    color: AuraColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  format.low(today.low),
-                  style: AuraText.valueCompact.copyWith(
-                    color: AuraColors.textTertiary,
-                  ),
-                ),
-              ],
+            // The display is set at 98 points. At the largest accessibility
+            // text scale it would otherwise push the condition and the range
+            // off the first screen, so it is allowed to grow only so far.
+            MediaQuery.withClampedTextScaling(
+              maxScaleFactor: _displayMaxScale,
+              child: Text(
+                format.temperature(current.temperature),
+                maxLines: 1,
+                style: AuraText.display.copyWith(color: AuraColors.textPrimary),
+              ),
             ),
-          ),
-        ],
+            Text(
+              current.conditionText,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AuraText.condition.copyWith(
+                color: AuraColors.textSecondary,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: AuraSpacing.xs),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: AuraSpacing.mdPlus,
+                children: <Widget>[
+                  Text(
+                    format.high(today.high),
+                    style: AuraText.valueCompact.copyWith(
+                      color: AuraColors.textPrimary,
+                    ),
+                  ),
+                  Text(
+                    format.low(today.low),
+                    style: AuraText.valueCompact.copyWith(
+                      color: AuraColors.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  /// How far the hero temperature may grow with the system text size.
+  static const double _displayMaxScale = 1.3;
 }
 
 /// The pin and the tracked label above the city name.
