@@ -1,4 +1,5 @@
 import 'package:aura_design/src/foundations/aura_glass.dart';
+import 'package:aura_design/src/foundations/aura_pressable.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
 import 'package:flutter/widgets.dart';
@@ -49,22 +50,22 @@ class AuraCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: semanticLabel,
-      child: GestureDetector(
-        onTap: onPressed,
-        child: AuraGlass(
-          width: size.diameter,
-          height: size.diameter,
-          radius: AuraRadii.pill,
-          shadow: const <BoxShadow>[],
-          child: Center(
-            child: Icon(
-              icon,
-              size: size.iconSize,
-              color: AuraColors.textSecondary,
-            ),
+    return AuraPressable.child(
+      onPressed: onPressed,
+      semanticLabel: semanticLabel,
+      // Every one of these goes somewhere else in the app, so the tick lands
+      // on a screen change rather than on a value the user can already see.
+      haptic: true,
+      child: AuraGlass(
+        width: size.diameter,
+        height: size.diameter,
+        radius: AuraRadii.pill,
+        shadow: const <BoxShadow>[],
+        child: Center(
+          child: Icon(
+            icon,
+            size: size.iconSize,
+            color: AuraColors.textSecondary,
           ),
         ),
       ),

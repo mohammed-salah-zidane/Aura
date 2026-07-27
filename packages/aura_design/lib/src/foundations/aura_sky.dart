@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math' show cos, pi;
 
+import 'package:aura_design/src/foundations/aura_sky_ambient.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_gradients.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
@@ -18,45 +20,79 @@ import 'package:flutter/widgets.dart';
 /// [gradient] and the [bloom] above it.
 enum AuraSkyKind {
   /// Clear day. Warms towards the horizon.
-  clearDay(AuraSkies.clearDay, AuraBlooms.clearDay),
+  clearDay(AuraSkies.clearDay, AuraBlooms.clearDay, AuraAmbients.clearDay),
 
   /// Partly cloudy.
-  partlyCloudy(AuraSkies.partlyCloudy, AuraBlooms.partlyCloudy),
+  partlyCloudy(
+    AuraSkies.partlyCloudy,
+    AuraBlooms.partlyCloudy,
+    AuraAmbients.partlyCloudy,
+  ),
 
   /// Overcast.
-  overcast(AuraSkies.overcast, AuraBlooms.overcast),
+  overcast(AuraSkies.overcast, AuraBlooms.overcast, AuraAmbients.overcast),
 
   /// Rain.
-  rain(AuraSkies.rain, AuraBlooms.rain),
+  rain(AuraSkies.rain, AuraBlooms.rain, AuraAmbients.rain),
 
   /// Thunderstorm.
-  thunderstorm(AuraSkies.thunderstorm, AuraBlooms.thunderstorm),
+  thunderstorm(
+    AuraSkies.thunderstorm,
+    AuraBlooms.thunderstorm,
+    AuraAmbients.thunderstorm,
+  ),
 
   /// Snow.
-  snow(AuraSkies.snow, AuraBlooms.snow),
+  snow(AuraSkies.snow, AuraBlooms.snow, AuraAmbients.snow),
 
   /// Clear night. The only sky that carries a starfield.
-  clearNight(AuraSkies.clearNight, AuraBlooms.clearNight, hasStars: true),
+  clearNight(
+    AuraSkies.clearNight,
+    AuraBlooms.clearNight,
+    AuraAmbients.clearNight,
+    hasStars: true,
+  ),
 
   /// Fog.
-  fog(AuraSkies.fog, AuraBlooms.fog),
+  fog(AuraSkies.fog, AuraBlooms.fog, AuraAmbients.fog),
 
   /// Brand sky, for screens no single condition owns.
-  systemBrand(AuraSkies.systemBrand, AuraBlooms.systemBrand),
+  systemBrand(
+    AuraSkies.systemBrand,
+    AuraBlooms.systemBrand,
+    AuraAmbient.still,
+  ),
 
   /// Dark instrument dashboard.
-  instrument(AuraSkies.instrument, AuraBlooms.instrument),
+  instrument(
+    AuraSkies.instrument,
+    AuraBlooms.instrument,
+    AuraAmbient.still,
+  ),
 
   /// Splash.
-  splash(AuraSkies.splash, AuraBlooms.splash),
+  splash(AuraSkies.splash, AuraBlooms.splash, AuraAmbient.still),
 
   /// Weather alert detail.
-  weatherAlert(AuraSkies.weatherAlert, AuraBlooms.weatherAlert),
+  weatherAlert(
+    AuraSkies.weatherAlert,
+    AuraBlooms.weatherAlert,
+    AuraAmbient.still,
+  ),
 
   /// Sun and moon detail.
-  sunAndMoon(AuraSkies.sunAndMoon, AuraBlooms.sunAndMoon);
+  sunAndMoon(
+    AuraSkies.sunAndMoon,
+    AuraBlooms.sunAndMoon,
+    AuraAmbient.still,
+  );
 
-  const AuraSkyKind(this.gradient, this.bloom, {this.hasStars = false});
+  const AuraSkyKind(
+    this.gradient,
+    this.bloom,
+    this.ambient, {
+    this.hasStars = false,
+  });
 
   /// The vertical gradient this sky paints. The frame's first fill.
   final AuraGradient gradient;
@@ -64,15 +100,27 @@ enum AuraSkyKind {
   /// The radial wash painted over [gradient]. The frame's second fill.
   final AuraBloom bloom;
 
+  /// What moves over the two fills.
+  ///
+  /// The pen authors no motion, so this is the one part of a sky that is not
+  /// read from a frame. It is constrained instead by colour: every ambient
+  /// layer reuses a token the pen already declares.
+  final AuraAmbient ambient;
+
   /// Whether the sky carries a starfield above its fills.
   final bool hasStars;
 }
 
 /// Paints a condition sky behind its child, crossfading when the sky changes.
 ///
-/// Use this as the root of every screen. Both fills and the starfield are drawn
-/// by one painter driven by one animation, so the layers cannot drift out of
-/// step with each other mid-transition.
+/// Use this as the root of every screen. Both fills are drawn by one painter
+/// driven by one animation, so the layers cannot drift out of step with each
+/// other mid-transition.
+///
+/// The moving layer is a **second** painter above the first. That split is
+/// deliberate: the fills are two full-screen shaders and only change during a
+/// transition, while rain has to redraw every frame. One painter for both would
+/// re-run the shaders sixty times a second to move a few streaks.
 class AuraSky extends StatefulWidget {
   /// Creates a sky background.
   const AuraSky({required this.kind, this.child, super.key});
@@ -87,7 +135,7 @@ class AuraSky extends StatefulWidget {
   State<AuraSky> createState() => _AuraSkyState();
 }
 
-class _AuraSkyState extends State<AuraSky> with SingleTickerProviderStateMixin {
+class _AuraSkyState extends State<AuraSky> with TickerProviderStateMixin {
   late AuraSkyKind _from = widget.kind;
   late AuraSkyKind _to = widget.kind;
 
@@ -103,16 +151,79 @@ class _AuraSkyState extends State<AuraSky> with SingleTickerProviderStateMixin {
   );
 
   @override
+  void initState() {
+    super.initState();
+    // Once a crossfade into a still sky finishes, the outgoing layer is gone
+    // and there is nothing left to tick for.
+    _controller.addStatusListener(_onTransitionStatus);
+  }
+
+  void _onTransitionStatus(AnimationStatus status) {
+    if (status.isCompleted) _syncTicker();
+  }
+
+  /// The clock every ambient layer reads its phase off.
+  ///
+  /// One controller for all of them, with each layer scaling it by its own
+  /// speed, so a sky cannot end up with two layers ticking against each other.
+  late final AnimationController _ambient = AnimationController(
+    vsync: this,
+    duration: AuraMotion.breath,
+  );
+
+  bool _animate = true;
+
+  /// Whether either side of the current transition has anything that moves.
+  ///
+  /// Most skies in the app do not: the splash, the brand sky and all three
+  /// detail skies are still. Running a ticker for them would burn a frame
+  /// callback to draw nothing, and it would also mean `pumpAndSettle` never
+  /// returned on any screen in the app.
+  bool get _hasMotion =>
+      (_controller.isAnimating && _from.ambient.kind != AuraAmbientKind.none) ||
+      _to.ambient.kind != AuraAmbientKind.none;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _animate = !context.prefersReducedMotion;
+    _syncTicker();
+  }
+
+  void _syncTicker() {
+    final shouldRun = _animate && _hasMotion;
+    if (shouldRun == _ambient.isAnimating) return;
+    if (shouldRun) {
+      unawaited(_ambient.repeat());
+    } else {
+      // Held at zero rather than stopped wherever it happened to be, so the
+      // resting frame is the same one every time.
+      _ambient
+        ..stop()
+        ..value = 0;
+    }
+  }
+
+  @override
   void didUpdateWidget(AuraSky oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.kind == _to) return;
     _from = _to;
     _to = widget.kind;
+    // The sky is the whole screen, so its crossfade is the largest single
+    // movement in the app. Reduced motion cuts to the new sky instead.
+    if (!_animate) {
+      _controller.value = 1;
+      _syncTicker();
+      return;
+    }
+    _syncTicker();
     unawaited(_controller.forward(from: 0));
   }
 
   @override
   void dispose() {
+    _ambient.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -132,7 +243,20 @@ class _AuraSkyState extends State<AuraSky> with SingleTickerProviderStateMixin {
           painter: _SkyPainter(from: _from, to: _to, progress: _progress.value),
           child: child,
         ),
-        child: widget.child,
+        child: AnimatedBuilder(
+          animation: Listenable.merge(<Listenable>[_progress, _ambient]),
+          builder: (context, child) => CustomPaint(
+            painter: _AmbientPainter(
+              from: _from,
+              to: _to,
+              progress: _progress.value,
+              phase: _ambient.value,
+              animate: _animate,
+            ),
+            child: child,
+          ),
+          child: widget.child,
+        ),
       ),
     );
   }
@@ -146,7 +270,7 @@ class _AuraSkyState extends State<AuraSky> with SingleTickerProviderStateMixin {
   );
 }
 
-/// Paints both of a sky's fills, and the starfield when one side has it.
+/// Paints both of a sky's fills.
 class _SkyPainter extends CustomPainter {
   const _SkyPainter({
     required this.from,
@@ -163,7 +287,6 @@ class _SkyPainter extends CustomPainter {
     final rect = Offset.zero & size;
     _paintGradient(canvas, rect);
     _paintBloom(canvas, rect);
-    _paintStars(canvas, size);
   }
 
   /// The vertical fill. Stop counts differ between skies — clear day has five,
@@ -233,20 +356,135 @@ class _SkyPainter extends CustomPainter {
     return blended.withValues(alpha: blended.a * opacity);
   }
 
-  /// Stars belong to the clear-night sky alone, so their alpha follows the side
-  /// of the transition that carries them.
-  void _paintStars(Canvas canvas, Size size) {
-    final alpha =
-        (from.hasStars ? 1 - progress : 0.0) + (to.hasStars ? progress : 0.0);
+  static double _lerp(double a, double b, double t) => a + (b - a) * t;
+
+  @override
+  bool shouldRepaint(_SkyPainter oldDelegate) =>
+      oldDelegate.from != from ||
+      oldDelegate.to != to ||
+      oldDelegate.progress != progress;
+}
+
+/// Paints the moving layer over a sky, and the starfield that twinkles in it.
+///
+/// Both sides of a transition are drawn, each at its own share of the
+/// crossfade, so rain thins out as clear sky arrives rather than being cut.
+///
+/// Under reduced motion this paints **exactly what the pen draws** and nothing
+/// else, which is what lets the goldens stand as the regression test for the
+/// whole layer: if a golden moves, an animation has changed a frame rather than
+/// how that frame is reached.
+class _AmbientPainter extends CustomPainter {
+  const _AmbientPainter({
+    required this.from,
+    required this.to,
+    required this.progress,
+    required this.phase,
+    required this.animate,
+  });
+
+  final AuraSkyKind from;
+  final AuraSkyKind to;
+  final double progress;
+  final double phase;
+
+  /// False when the platform has asked for reduced motion.
+  final bool animate;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (from == to) {
+      _paintLayer(canvas, size, to, 1);
+      return;
+    }
+    _paintLayer(canvas, size, from, 1 - progress);
+    _paintLayer(canvas, size, to, progress);
+  }
+
+  void _paintLayer(Canvas canvas, Size size, AuraSkyKind sky, double blend) {
+    if (blend <= 0) return;
+    final ambient = sky.ambient;
+    final beat = animate ? phase * ambient.speed : 0.0;
+
+    // Reduced motion drops the layer rather than freezing it. Every mark here
+    // is decorative and says nothing the gradient, the glyph and the condition
+    // text do not already say, so a still rain field would be an artefact
+    // nobody designed rather than information anybody would miss. The starfield
+    // is the exception, because the pen draws it: it stays, unmodulated.
+    if (!animate && ambient.kind != AuraAmbientKind.twinkle) return;
+
+    switch (ambient.kind) {
+      case AuraAmbientKind.none:
+        return;
+      case AuraAmbientKind.breath:
+        _paintBreath(canvas, size, ambient, blend, beat);
+      case AuraAmbientKind.twinkle:
+        _paintStars(canvas, size, ambient, blend, beat);
+      case AuraAmbientKind.drift:
+        _paintDrift(canvas, size, ambient, blend, beat);
+      case AuraAmbientKind.rain:
+        _paintRain(canvas, size, ambient, blend, beat);
+      case AuraAmbientKind.snow:
+        _paintSnow(canvas, size, ambient, blend, beat);
+    }
+    if (ambient.flash > 0) _paintFlash(canvas, size, ambient, blend, beat);
+  }
+
+  /// A pulse of extra light low on the sky, rising from nothing and returning.
+  ///
+  /// Zero at [phase] zero, so a clear-day screen at rest is the pen's frame
+  /// exactly and its golden does not move.
+  void _paintBreath(
+    Canvas canvas,
+    Size size,
+    AuraAmbient ambient,
+    double blend,
+    double beat,
+  ) {
+    final swell = (1 - cos(beat * 2 * pi)) / 2;
+    final alpha = ambient.opacity * swell * blend;
     if (alpha <= 0) return;
 
+    final centre = Offset(size.width / 2, size.height * _breathCentreY);
+    final radius = size.width * _breathRadius;
+    final rect = Rect.fromCircle(center: centre, radius: radius);
+    canvas.drawCircle(
+      centre,
+      radius,
+      Paint()
+        ..shader = RadialGradient(
+          colors: <Color>[
+            ambient.color.withValues(alpha: alpha),
+            ambient.color.withValues(alpha: 0),
+          ],
+          stops: const <double>[0, 1],
+        ).createShader(rect),
+    );
+  }
+
+  /// The eleven stars the pen draws, each breathing on its own offset.
+  ///
+  /// The modulation is a dimming, never a brightening, and it is zero at
+  /// [phase] zero. A star therefore rests at exactly the opacity the frame
+  /// authors and only ever goes darker than it.
+  void _paintStars(
+    Canvas canvas,
+    Size size,
+    AuraAmbient ambient,
+    double blend,
+    double beat,
+  ) {
     final scaleX = size.width / AuraSizes.referenceWidth;
     final scaleY = size.height / AuraSizes.referenceHeight;
     final paint = Paint();
-    for (final star in _Star.field) {
-      paint.color = AuraColors.starfield.withValues(
-        alpha: star.opacity * alpha,
-      );
+
+    for (var i = 0; i < _Star.field.length; i++) {
+      final star = _Star.field[i];
+      final swell = animate
+          ? (1 - cos(AuraAmbientField.progress(i, beat, salt: 11) * 2 * pi)) / 2
+          : 0.0;
+      final dimmed = star.opacity * (1 - ambient.opacity * swell);
+      paint.color = ambient.color.withValues(alpha: dimmed * blend);
       final radius = star.diameter / 2;
       canvas.drawCircle(
         Offset((star.x + radius) * scaleX, (star.y + radius) * scaleY),
@@ -256,13 +494,160 @@ class _SkyPainter extends CustomPainter {
     }
   }
 
-  static double _lerp(double a, double b, double t) => a + (b - a) * t;
+  /// Wide soft bands crossing the sky.
+  void _paintDrift(
+    Canvas canvas,
+    Size size,
+    AuraAmbient ambient,
+    double blend,
+    double beat,
+  ) {
+    final bandHeight = size.height * ambient.length;
+    final bandWidth = size.width * _driftWidth;
+
+    for (var i = 0; i < ambient.count; i++) {
+      final travel = AuraAmbientField.progress(i, beat, salt: 23);
+      final centreX = travel * (size.width + bandWidth * 2) - bandWidth;
+      final centreY =
+          (_driftTop + AuraAmbientField.scatter(i, 31) * _driftSpread) *
+          size.height;
+      final alpha = ambient.opacity * blend;
+
+      final shader = RadialGradient(
+        colors: <Color>[
+          ambient.color.withValues(alpha: alpha),
+          ambient.color.withValues(alpha: 0),
+        ],
+        stops: const <double>[0, 1],
+      ).createShader(Rect.fromCircle(center: Offset.zero, radius: 1));
+
+      canvas
+        ..save()
+        ..translate(centreX, centreY)
+        ..scale(bandWidth, bandHeight)
+        ..drawCircle(Offset.zero, 1, Paint()..shader = shader)
+        ..restore();
+    }
+  }
+
+  /// Slanted streaks falling past the screen.
+  void _paintRain(
+    Canvas canvas,
+    Size size,
+    AuraAmbient ambient,
+    double blend,
+    double beat,
+  ) {
+    final length = size.height * ambient.length;
+    final slant = size.width * ambient.slant;
+    final paint = Paint()
+      ..strokeWidth = ambient.thickness
+      ..strokeCap = StrokeCap.round;
+
+    for (var i = 0; i < ambient.count; i++) {
+      final fall = AuraAmbientField.progress(i, beat, salt: 7);
+      final x = AuraAmbientField.scatter(i, 13) * (size.width + slant) - slant;
+      final y = fall * (size.height + length) - length;
+      // Depth: a nearer streak is darker, so the field does not read as a
+      // single flat plane of identical marks.
+      final depth = _depthFloor + AuraAmbientField.scatter(i, 29) * _depthRange;
+      paint.color = ambient.color.withValues(
+        alpha: ambient.opacity * depth * blend,
+      );
+      canvas.drawLine(Offset(x, y), Offset(x + slant, y + length), paint);
+    }
+  }
+
+  /// Flakes descending, swaying so they do not fall in columns.
+  void _paintSnow(
+    Canvas canvas,
+    Size size,
+    AuraAmbient ambient,
+    double blend,
+    double beat,
+  ) {
+    final radius = ambient.thickness / 2;
+    final sway = size.width * ambient.sway;
+    final paint = Paint();
+
+    for (var i = 0; i < ambient.count; i++) {
+      final fall = AuraAmbientField.progress(i, beat, salt: 3);
+      final drift = AuraAmbientField.wave(i, beat * _swayRate, salt: 5);
+      final x = AuraAmbientField.scatter(i, 17) * size.width + drift * sway;
+      final y = fall * (size.height + ambient.thickness) - ambient.thickness;
+      final depth = _depthFloor + AuraAmbientField.scatter(i, 19) * _depthRange;
+      paint.color = ambient.color.withValues(
+        alpha: ambient.opacity * depth * blend,
+      );
+      canvas.drawCircle(Offset(x, y), radius * depth, paint);
+    }
+  }
+
+  /// The storm's flash: two short strikes at irregular points in the cycle.
+  ///
+  /// Irregular on purpose. Lightning on a fixed beat reads as a blinking light
+  /// rather than as weather.
+  void _paintFlash(
+    Canvas canvas,
+    Size size,
+    AuraAmbient ambient,
+    double blend,
+    double beat,
+  ) {
+    final strike = _strikeAt(beat);
+    if (strike <= 0) return;
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()
+        ..color = AuraAmbients.flashColor.withValues(
+          alpha: ambient.flash * strike * blend,
+        ),
+    );
+  }
+
+  /// A short spike at each of two points, and zero everywhere else.
+  static double _strikeAt(double beat) {
+    final cycle = beat - beat.floorToDouble();
+    final first = _spike(cycle, _firstStrike, _strikeWidth);
+    final second = _spike(cycle, _secondStrike, _strikeWidth / 2) * _afterglow;
+    return first > second ? first : second;
+  }
+
+  static double _spike(double cycle, double at, double width) {
+    final distance = (cycle - at).abs();
+    return distance < width ? 1 - distance / width : 0;
+  }
+
+  /// Where the breath's extra light sits, and how far it reaches.
+  static const double _breathCentreY = 0.2;
+  static const double _breathRadius = 0.85;
+
+  /// Band geometry for a drifting sky.
+  static const double _driftWidth = 0.55;
+  static const double _driftTop = 0.12;
+  static const double _driftSpread = 0.45;
+
+  /// How much a mark's alpha and size vary with its depth in the field.
+  static const double _depthFloor = 0.55;
+  static const double _depthRange = 0.45;
+
+  /// Snow sways faster than it falls, or it reads as sliding rather than
+  /// drifting.
+  static const double _swayRate = 2.4;
+
+  /// Where in a cycle the two strikes land, and how long each lasts.
+  static const double _firstStrike = 0.23;
+  static const double _secondStrike = 0.29;
+  static const double _strikeWidth = 0.018;
+  static const double _afterglow = 0.65;
 
   @override
-  bool shouldRepaint(_SkyPainter oldDelegate) =>
+  bool shouldRepaint(_AmbientPainter oldDelegate) =>
       oldDelegate.from != from ||
       oldDelegate.to != to ||
-      oldDelegate.progress != progress;
+      oldDelegate.progress != progress ||
+      oldDelegate.phase != phase ||
+      oldDelegate.animate != animate;
 }
 
 /// One star of the clear-night field.

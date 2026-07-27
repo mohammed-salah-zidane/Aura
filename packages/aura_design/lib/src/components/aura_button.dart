@@ -1,7 +1,7 @@
 import 'package:aura_design/src/foundations/aura_glass.dart';
+import 'package:aura_design/src/foundations/aura_pressable.dart';
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_metrics.dart';
-import 'package:aura_design/src/tokens/aura_motion.dart';
 import 'package:aura_design/src/tokens/aura_typography.dart';
 import 'package:flutter/widgets.dart';
 
@@ -35,7 +35,7 @@ class AuraButtonPrimary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Pressable(
+    return AuraPressable(
       onPressed: onPressed,
       builder: ({required pressed}) => DecoratedBox(
         decoration: BoxDecoration(
@@ -83,7 +83,7 @@ class AuraButtonSecondary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Pressable(
+    return AuraPressable(
       onPressed: onPressed,
       builder: ({required pressed}) => Opacity(
         opacity: onPressed == null ? 0.5 : 1,
@@ -127,48 +127,6 @@ class _ButtonContent extends StatelessWidget {
         if (icon != null) Icon(icon, size: AuraSizes.iconUi, color: color),
         Text(label, style: style.copyWith(color: color)),
       ],
-    );
-  }
-}
-
-/// Adds press feedback and the tap target without pulling in Material.
-class _Pressable extends StatefulWidget {
-  const _Pressable({required this.onPressed, required this.builder});
-
-  final VoidCallback? onPressed;
-  final Widget Function({required bool pressed}) builder;
-
-  @override
-  State<_Pressable> createState() => _PressableState();
-}
-
-class _PressableState extends State<_Pressable> {
-  bool _pressed = false;
-
-  void _setPressed(bool value) {
-    if (_pressed != value) {
-      setState(() => _pressed = value);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final enabled = widget.onPressed != null;
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      child: GestureDetector(
-        onTap: widget.onPressed,
-        onTapDown: enabled ? (_) => _setPressed(true) : null,
-        onTapUp: enabled ? (_) => _setPressed(false) : null,
-        onTapCancel: enabled ? () => _setPressed(false) : null,
-        child: AnimatedScale(
-          scale: _pressed ? 0.98 : 1,
-          duration: AuraMotion.control,
-          curve: AuraMotion.controlCurve,
-          child: widget.builder(pressed: _pressed),
-        ),
-      ),
     );
   }
 }

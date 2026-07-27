@@ -1,3 +1,5 @@
+import 'dart:math' show pi;
+
 import 'package:aura_design/src/tokens/aura_colors.dart';
 import 'package:aura_design/src/tokens/aura_gradients.dart';
 import 'package:flutter/widgets.dart';
@@ -37,25 +39,66 @@ enum AuraMarkSize {
 /// holds its proportions at every size the design uses.
 class AuraMark extends StatelessWidget {
   /// Creates the mark at one of the sizes the design specifies.
-  const AuraMark({this.size = AuraMarkSize.reference, super.key});
+  const AuraMark({
+    this.size = AuraMarkSize.reference,
+    this.reveal = 1,
+    this.glow = 1,
+    super.key,
+  });
 
   /// Which of the design's sizes to draw.
   final AuraMarkSize size;
+
+  /// How much of the mark has arrived, from 0 to 1.
+  ///
+  /// At 1 this is the mark exactly as the pen draws it, which is the only
+  /// state any screen rests in. Below 1 the rings are part-swept and the core
+  /// is part-faded, which the splash uses to bring the mark out of the dark.
+  final double reveal;
+
+  /// Multiplier on the glow's radius, for the breath the splash runs.
+  ///
+  /// The glow is the one part of the mark that can move without the mark
+  /// looking like it changed size, because it has no edge.
+  final double glow;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox.square(
       dimension: size.diameter,
-      child: CustomPaint(painter: _AuraMarkPainter(size.ringStroke)),
+      child: CustomPaint(
+        painter: _AuraMarkPainter(
+          ringStroke: size.ringStroke,
+          reveal: reveal,
+          glow: glow,
+        ),
+      ),
     );
   }
 }
 
 class _AuraMarkPainter extends CustomPainter {
-  const _AuraMarkPainter(this.ringStroke);
+  const _AuraMarkPainter({
+    required this.ringStroke,
+    required this.reveal,
+    required this.glow,
+  });
 
   /// Ring stroke in points, authored per size rather than scaled.
   final double ringStroke;
+
+  /// How much of the mark has arrived.
+  final double reveal;
+
+  /// Multiplier on the glow radius.
+  final double glow;
+
+  /// The outer ring finishes sweeping before the inner one starts.
+  static const double _outerRingEnd = 0.7;
+  static const double _midRingStart = 0.45;
+
+  /// The core fades in over the back half, behind both rings.
+  static const double _coreStart = 0.5;
 
   // Fractions of the 64-point reference, read from the Mark component.
   static const double _outerInset = 5.3 / 64;
@@ -75,6 +118,7 @@ class _AuraMarkPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final unit = size.shortestSide;
+    final core = _phase(_coreStart, 1);
 
     _paintGlow(canvas, unit);
     _paintRing(
@@ -83,6 +127,7 @@ class _AuraMarkPainter extends CustomPainter {
       inset: _outerInset,
       diameter: _outerDiameter,
       opacity: 0.6,
+      sweep: _phase(0, _outerRingEnd),
     );
     _paintRing(
       canvas,
@@ -90,48 +135,74 @@ class _AuraMarkPainter extends CustomPainter {
       inset: _midInset,
       diameter: _midDiameter,
       opacity: 0.85,
+      sweep: _phase(_midRingStart, 1),
     );
-    _paintCore(canvas, unit);
-    _paintSpecular(canvas, unit);
+    if (core <= 0) return;
+    _paintCore(canvas, unit, core);
+    _paintSpecular(canvas, unit, core);
   }
 
+  /// Where [reveal] sits inside one leg of the sequence, clamped to 0 to 1.
+  double _phase(double start, double end) =>
+      ((reveal - start) / (end - start)).clamp(0.0, 1.0);
+
   void _paintGlow(Canvas canvas, double unit) {
-    final rect = Rect.fromLTWH(0, 0, unit, unit);
+    final radius = unit / 2 * glow;
+    final centre = Offset(unit / 2, unit / 2);
+    final rect = Rect.fromCircle(center: centre, radius: radius);
     canvas.drawCircle(
-      rect.center,
-      unit / 2,
+      centre,
+      radius,
       Paint()
         ..shader = RadialGradient(
-          colors: AuraGradients.markGlow.colors,
+          colors: <Color>[
+            for (final color in AuraGradients.markGlow.colors)
+              color.withValues(alpha: color.a * reveal),
+          ],
           stops: AuraGradients.markGlow.stops,
         ).createShader(rect),
     );
   }
 
+  /// One ring, drawn as an arc so it can sweep on from the top.
+  ///
+  /// A full circle and a full-turn arc rasterise identically, so the resting
+  /// mark is unchanged by this being an arc rather than a circle.
   void _paintRing(
     Canvas canvas,
     double unit, {
     required double inset,
     required double diameter,
     required double opacity,
+    required double sweep,
   }) {
+    if (sweep <= 0) return;
     // An inner-aligned stroke sits wholly inside the ellipse, so the drawn
     // circle is pulled in by half the stroke width.
     final radius = (diameter * unit - ringStroke) / 2;
-    canvas.drawCircle(
-      Offset(
-        inset * unit + diameter * unit / 2,
-        inset * unit + diameter * unit / 2,
-      ),
-      radius,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = ringStroke
-        ..color = AuraColors.auraRing.withValues(alpha: opacity),
+    final centre = Offset(
+      inset * unit + diameter * unit / 2,
+      inset * unit + diameter * unit / 2,
+    );
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = ringStroke
+      ..color = AuraColors.auraRing.withValues(alpha: opacity);
+
+    if (sweep >= 1) {
+      canvas.drawCircle(centre, radius, paint);
+      return;
+    }
+    canvas.drawArc(
+      Rect.fromCircle(center: centre, radius: radius),
+      -_quarterTurn,
+      _fullTurn * sweep,
+      false,
+      paint,
     );
   }
 
-  void _paintCore(Canvas canvas, double unit) {
+  void _paintCore(Canvas canvas, double unit, double opacity) {
     final rect = Rect.fromLTWH(
       _coreInset * unit,
       _coreInset * unit,
@@ -144,22 +215,33 @@ class _AuraMarkPainter extends CustomPainter {
       Paint()
         ..shader = RadialGradient(
           center: _coreFocal,
-          colors: AuraGradients.markCore.colors,
+          colors: <Color>[
+            for (final color in AuraGradients.markCore.colors)
+              color.withValues(alpha: color.a * opacity),
+          ],
           stops: AuraGradients.markCore.stops,
         ).createShader(rect),
     );
   }
 
-  void _paintSpecular(Canvas canvas, double unit) {
+  void _paintSpecular(Canvas canvas, double unit, double opacity) {
     final diameter = _specDiameter * unit;
     canvas.drawCircle(
       Offset(_specX * unit + diameter / 2, _specY * unit + diameter / 2),
       diameter / 2,
-      Paint()..color = AuraColors.auraSpecular,
+      Paint()
+        ..color = AuraColors.auraSpecular.withValues(
+          alpha: AuraColors.auraSpecular.a * opacity,
+        ),
     );
   }
 
+  static const double _fullTurn = 2 * pi;
+  static const double _quarterTurn = pi / 2;
+
   @override
   bool shouldRepaint(_AuraMarkPainter oldDelegate) =>
-      oldDelegate.ringStroke != ringStroke;
+      oldDelegate.ringStroke != ringStroke ||
+      oldDelegate.reveal != reveal ||
+      oldDelegate.glow != glow;
 }
