@@ -1,3 +1,4 @@
+import 'package:aura_design/aura_design.dart';
 import 'package:aura_feature_details/aura_feature_details.dart';
 import 'package:aura_feature_home/aura_feature_home.dart';
 import 'package:aura_feature_onboarding/aura_feature_onboarding.dart';
@@ -44,6 +45,39 @@ abstract final class AuraRoutes {
   static const String sunAndMoon = '/weather/sun-and-moon';
 }
 
+/// Crossfades a root screen in, rather than sliding it over the one behind.
+///
+/// The three screens this is used on are the ones reached by replacing the
+/// stack: splash, permission and home. All three are a full-bleed sky, and a
+/// slide between two full-bleed gradients reads as a curtain being drawn rather
+/// than as one sky becoming another.
+///
+/// A push onto a detail screen keeps the platform transition, because that is a
+/// move down a hierarchy and it should look like one.
+CustomTransitionPage<void> _crossfade(
+  BuildContext context,
+  GoRouterState state,
+  Widget child,
+) {
+  final duration = context.prefersReducedMotion
+      ? Duration.zero
+      : AuraMotion.content;
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    transitionDuration: duration,
+    reverseTransitionDuration: duration,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+        FadeTransition(
+          opacity: CurvedAnimation(
+            parent: animation,
+            curve: AuraMotion.skyCurve,
+          ),
+          child: child,
+        ),
+  );
+}
+
 /// Builds the router.
 ///
 /// [version] is the build the About row reports, read from the package at the
@@ -57,32 +91,44 @@ GoRouter auraRouter({required String version}) {
     routes: <RouteBase>[
       GoRoute(
         path: AuraRoutes.splash,
-        builder: (context, state) => SplashScreen(
-          onReady: (destination) => context.go(
-            switch (destination) {
-              SplashDestination.weather => AuraRoutes.home,
-              SplashDestination.permission => AuraRoutes.permission,
-            },
+        pageBuilder: (context, state) => _crossfade(
+          context,
+          state,
+          SplashScreen(
+            onReady: (destination) => context.go(
+              switch (destination) {
+                SplashDestination.weather => AuraRoutes.home,
+                SplashDestination.permission => AuraRoutes.permission,
+              },
+            ),
           ),
         ),
       ),
       GoRoute(
         path: AuraRoutes.permission,
-        builder: (context, state) => PermissionScreen(
-          onDone: () => context.go(AuraRoutes.home),
-          onEnterManually: () => context.go(AuraRoutes.search),
+        pageBuilder: (context, state) => _crossfade(
+          context,
+          state,
+          PermissionScreen(
+            onDone: () => context.go(AuraRoutes.home),
+            onEnterManually: () => context.go(AuraRoutes.search),
+          ),
         ),
       ),
       GoRoute(
         path: AuraRoutes.home,
-        builder: (context, state) => HomeScreen(
-          onOpenSettings: () => context.push(AuraRoutes.settings),
-          onOpenSearch: () => context.push(AuraRoutes.search),
-          onOpenSavedCities: () => context.push(AuraRoutes.savedCities),
-          onOpenForecast: () => context.push(AuraRoutes.forecast),
-          onOpenAirQuality: () => context.push(AuraRoutes.airQuality),
-          onOpenAlert: () => context.push(AuraRoutes.alert),
-          onOpenSunAndMoon: () => context.push(AuraRoutes.sunAndMoon),
+        pageBuilder: (context, state) => _crossfade(
+          context,
+          state,
+          HomeScreen(
+            onOpenSettings: () => context.push(AuraRoutes.settings),
+            onOpenSearch: () => context.push(AuraRoutes.search),
+            onOpenSavedCities: () => context.push(AuraRoutes.savedCities),
+            onOpenForecast: () => context.push(AuraRoutes.forecast),
+            onOpenAirQuality: () => context.push(AuraRoutes.airQuality),
+            onOpenAlert: () => context.push(AuraRoutes.alert),
+            onOpenSunAndMoon: () => context.push(AuraRoutes.sunAndMoon),
+          ),
         ),
         routes: <RouteBase>[
           GoRoute(
