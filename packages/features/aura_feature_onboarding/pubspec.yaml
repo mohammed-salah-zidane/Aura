@@ -23,7 +23,7 @@ dependencies:
     path: ../../aura_ui
   flutter:
     sdk: flutter
-  flutter_riverpod: ^3.3.2
+  flutter_riverpod: ^3.4.1
   # Matches the SDK's own pin exactly; see docs/ARCHITECTURE.md section 10.
   meta: ^1.18.0
 

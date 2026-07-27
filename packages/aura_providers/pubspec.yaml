@@ -16,7 +16,7 @@ dependencies:
     path: ../aura_domain
   # Matches the SDK's own pin exactly; see docs/ARCHITECTURE.md section 10.
   meta: ^1.18.0
-  riverpod: ^3.3.2
+  riverpod: ^3.4.1
 
 dev_dependencies:
   test: ^1.25.0

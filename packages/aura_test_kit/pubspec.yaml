@@ -23,7 +23,7 @@ dependencies:
     path: ../aura_providers
   flutter:
     sdk: flutter
-  flutter_riverpod: ^3.3.2
+  flutter_riverpod: ^3.4.1
   flutter_test:
     sdk: flutter
 
