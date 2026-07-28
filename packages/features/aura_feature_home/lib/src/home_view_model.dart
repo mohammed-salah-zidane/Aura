@@ -33,9 +33,13 @@ final class HomeViewModel extends AsyncNotifier<HomeUiState> {
   }
 
   /// Asks the service again, from the top.
+  ///
+  /// The invalidation names the active place's own feed: the shared provider
+  /// only mirrors it, and invalidating the mirror alone would hand back the
+  /// same held reading.
   Future<void> refresh() async {
     _acceptedStoredReading = false;
-    ref.invalidate(weatherFeedProvider);
+    ref.invalidate(placeFeedProvider(ref.read(activeLocationProvider)));
     await ref.read(weatherFeedProvider.future);
   }
 

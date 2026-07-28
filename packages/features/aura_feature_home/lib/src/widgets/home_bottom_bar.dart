@@ -60,6 +60,11 @@ class HomeBottomBar extends StatelessWidget {
   /// How tall the scrim under the bar is.
   static const double scrimHeight = 168;
 
+  /// The band the bar's row occupies above the safe area, which a screen
+  /// pinning its own actions at the foot has to stay clear of.
+  static const double clearance =
+      AuraSizes.iconBottomBar + 2 * AuraSpacing.mdPlus + AuraSpacing.sm;
+
   @override
   Widget build(BuildContext context) {
     // Positioned rather than Align: a non-positioned Stack child is given

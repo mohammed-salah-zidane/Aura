@@ -76,6 +76,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// the first reading only; a swipe to another place must not replay them.
   bool _skyArrived = false;
 
+  /// Whether the opening page's neighbours have been warmed yet.
+  bool _warmed = false;
+
   /// Whether the floating bar is up.
   ///
   /// Owned here rather than by a page, so the bar rides above the pager and
@@ -107,6 +110,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() => _index = page);
     _navVisible.value = true;
     ref.read(activeLocationProvider.notifier).location = places[page];
+    _warmNeighbours(places, page);
+  }
+
+  /// Starts the fetches for the pages either side of [page].
+  ///
+  /// The feeds are held per place, so by the time a swipe lands the reading
+  /// is usually already there and the page never shows its loading face.
+  void _warmNeighbours(List<LocationRef> places, int page) {
+    for (final neighbour in <int>[page - 1, page + 1]) {
+      if (neighbour < 0 || neighbour >= places.length) continue;
+      ref.read(placeFeedProvider(places[neighbour]));
+    }
   }
 
   @override
@@ -122,6 +137,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final index = places.indexOf(active).clamp(0, places.length - 1);
     if (index != _index) _index = index;
     _pages ??= PageController(initialPage: index);
+
+    // The first frame warms the pages beside the opening one, so the very
+    // first swipe is as ready as every later one.
+    if (!_warmed && places.length > 1) {
+      _warmed = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _warmNeighbours(places, index);
+      });
+    }
 
     // A reading fetched for the page just left must not dress the page just
     // arrived at, so a state whose feed names another place is withheld and
@@ -202,15 +226,26 @@ class _Page extends StatelessWidget {
   final HomeScreen screen;
   final WidgetRef ref;
 
+  /// Keeps a full-screen state's pinned actions above the floating bar.
+  Widget _clearOfBar(BuildContext context, Widget child) => Padding(
+    padding: EdgeInsets.only(
+      bottom: MediaQuery.paddingOf(context).bottom + HomeBottomBar.clearance,
+    ),
+    child: child,
+  );
+
   @override
   Widget build(BuildContext context) {
     return switch (state) {
       null => HomeLoading(placeName: place.displayName ?? ''),
-      HomeUnavailable(:final failure) => HomeFailure(
-        failure: failure,
-        onTryAgain: () => _refresh(ref),
+      HomeUnavailable(:final failure) => _clearOfBar(
+        context,
+        HomeFailure(failure: failure, onTryAgain: () => _refresh(ref)),
       ),
-      final HomeStale stale => _Offline(state: stale, ref: ref),
+      final HomeStale stale => _clearOfBar(
+        context,
+        _Offline(state: stale, ref: ref),
+      ),
       final HomeReady ready => HomeRefresh(
         onRefresh: () => _refresh(ref),
         child: HomeContent(
