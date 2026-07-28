@@ -101,16 +101,22 @@ final class SearchViewModel extends Notifier<SearchUiState> {
   }
 
   /// Keeps [suggestion] in the saved list.
-  Future<void> save(CitySuggestion suggestion) => ref
-      .read(savedCitiesProvider.notifier)
-      .add(
-        SavedCity(
-          location: suggestion.location,
-          name: suggestion.name,
-          country: suggestion.country,
-          addedAt: ref.read(clockProvider).now(),
-        ),
-      );
+  ///
+  /// Its feed starts warming here, while the user is still on this screen, so
+  /// the page waiting for them at home already has its reading.
+  Future<void> save(CitySuggestion suggestion) {
+    ref.read(placeFeedProvider(suggestion.location));
+    return ref
+        .read(savedCitiesProvider.notifier)
+        .add(
+          SavedCity(
+            location: suggestion.location,
+            name: suggestion.name,
+            country: suggestion.country,
+            addedAt: ref.read(clockProvider).now(),
+          ),
+        );
+  }
 
   /// Switches to wherever the device is.
   ///
