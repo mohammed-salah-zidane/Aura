@@ -63,7 +63,7 @@ class HomeBottomBar extends StatelessWidget {
   /// The band the bar's row occupies above the safe area, which a screen
   /// pinning its own actions at the foot has to stay clear of.
   static const double clearance =
-      AuraSizes.iconBottomBar + 2 * AuraSpacing.mdPlus + AuraSpacing.sm;
+      AuraSizes.iconBottomBar + 2 * AuraSpacing.md + AuraSpacing.sm;
 
   @override
   Widget build(BuildContext context) {
@@ -165,8 +165,8 @@ class _Bar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    // The pen insets the glyphs 30 points from the screen edge: 16 here plus
-    // the 14 each pressable carries as its touch target.
+    // Sixteen here plus the twelve each pressable carries as its touch
+    // target puts a glyph 28 points off the screen edge.
     return Padding(
       padding: EdgeInsets.only(
         left: AuraSpacing.lg,
@@ -230,7 +230,7 @@ class _BarButton extends StatelessWidget {
       semanticLabel: semanticLabel,
       haptic: true,
       child: Padding(
-        padding: const EdgeInsets.all(AuraSpacing.mdPlus),
+        padding: const EdgeInsets.all(AuraSpacing.md),
         child: Icon(
           icon,
           size: AuraSizes.iconBottomBar,
