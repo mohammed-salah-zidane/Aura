@@ -62,11 +62,28 @@ final class DeviceLocation implements LocationPort {
     }
   }
 
+  /// How old a cached fix may be and still stand in for a fresh one.
+  ///
+  /// The forecast is for a place, not a street corner, and a place does not
+  /// change in a quarter of an hour of not moving. A cached fix answers in
+  /// milliseconds where a cold one can take many seconds indoors.
+  static const Duration _lastKnownMaxAge = Duration(minutes: 15);
+
   @override
   Future<Result<LocationRef, AppFailure>> currentPosition() async {
     try {
       if (!await geo.Geolocator.isLocationServiceEnabled()) {
         return const Err<LocationRef, AppFailure>(Unknown());
+      }
+      final cached = await geo.Geolocator.getLastKnownPosition();
+      if (cached != null &&
+          DateTime.now().difference(cached.timestamp) < _lastKnownMaxAge) {
+        return Ok<LocationRef, AppFailure>(
+          LocationRef.coordinates(
+            latitude: cached.latitude,
+            longitude: cached.longitude,
+          ),
+        );
       }
       final position = await geo.Geolocator.getCurrentPosition(
         locationSettings: const geo.LocationSettings(
