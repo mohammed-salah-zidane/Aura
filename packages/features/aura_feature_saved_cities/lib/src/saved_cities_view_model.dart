@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_providers/aura_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +25,16 @@ final class SavedCityRow {
   /// Whether this is the device's own position rather than a kept place.
   final bool isCurrentLocation;
 
-  /// Its reading, or null when the request for it failed.
+  /// Its reading, or null while it is on its way or after it failed.
   final WeatherSnapshot? snapshot;
+
+  /// The same row, dressed with its reading.
+  SavedCityRow withSnapshot(WeatherSnapshot snapshot) => SavedCityRow(
+    location: location,
+    name: name,
+    isCurrentLocation: isCurrentLocation,
+    snapshot: snapshot,
+  );
 }
 
 /// The saved cities screen's state.
@@ -36,35 +46,51 @@ final savedCitiesViewModelProvider =
 
 /// Reads every kept place, with the device's own position at the top.
 ///
-/// One request per row, all in flight at once. A row whose request fails keeps
-/// its name and loses its reading, because a list that drops a city the user
-/// saved is worse than one that admits it could not reach the service.
+/// The rows appear at once, named, with each reading filling in as its own
+/// request lands: a list that waits for the slowest answer holds every city
+/// hostage to it, and a row whose request fails keeps its name, because a
+/// list that drops a city the user saved is worse than one that admits it
+/// could not reach the service.
+///
+/// The readings come through the per-place feed the home pager reads, so a
+/// city the user has already looked at costs nothing here, and opening this
+/// list warms the pages the user is about to swipe through.
 final class SavedCitiesViewModel extends AsyncNotifier<List<SavedCityRow>> {
+  /// Which build the in-flight fills belong to.
+  int _run = 0;
+
   @override
   Future<List<SavedCityRow>> build() async {
     final saved = await ref.watch(savedCitiesProvider.future);
-    final language = ref.watch(languageProvider);
-    final repository = ref.watch(weatherRepositoryProvider);
 
     const here = LocationRef.currentByIp();
-    final locations = <LocationRef>[here, ...saved.map((c) => c.location)];
-    final names = <String>['', ...saved.map((c) => c.name)];
-
-    final snapshots = await Future.wait(
-      locations.map(
-        (location) => repository.snapshot(location, lang: language),
-      ),
-    );
-
-    return <SavedCityRow>[
-      for (final (index, location) in locations.indexed)
+    final rows = <SavedCityRow>[
+      const SavedCityRow(location: here, name: '', isCurrentLocation: true),
+      for (final city in saved)
         SavedCityRow(
-          location: location,
-          name: names[index],
-          isCurrentLocation: index == 0,
-          snapshot: snapshots[index].valueOrNull?.value,
+          location: city.location,
+          name: city.name,
+          isCurrentLocation: false,
         ),
     ];
+
+    final run = ++_run;
+    for (final row in rows) {
+      unawaited(_fill(row.location, run));
+    }
+    return rows;
+  }
+
+  Future<void> _fill(LocationRef location, int run) async {
+    final result = await ref.read(placeFeedProvider(location).future);
+    final snapshot = result.valueOrNull?.snapshot;
+    final rows = state.value;
+    if (run != _run || snapshot == null || rows == null) return;
+
+    state = AsyncData<List<SavedCityRow>>(<SavedCityRow>[
+      for (final row in rows)
+        if (row.location == location) row.withSnapshot(snapshot) else row,
+    ]);
   }
 
   /// Forgets a kept place.

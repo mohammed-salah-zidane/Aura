@@ -61,9 +61,9 @@ class _SavedCitiesScreenState extends ConsumerState<SavedCitiesScreen> {
     final units =
         ref.watch(unitPreferencesProvider).value ?? const UnitPreferences();
     final format = AuraFormat(l10n: l10n, units: units);
-    final canEdit =
-        rows?.any((row) => !row.isCurrentLocation && row.snapshot != null) ??
-        false;
+    // Forgetting a place must not wait for its reading: the row whose
+    // request is failing is exactly the one the user may want to remove.
+    final canEdit = rows?.any((row) => !row.isCurrentLocation) ?? false;
     final isEditing = _isEditing && canEdit;
 
     return AuraSky(
@@ -202,10 +202,50 @@ class _Card extends StatelessWidget {
     final l10n = context.l10n;
     final snapshot = row.snapshot;
     if (snapshot == null) {
-      return const AuraSkeleton(
-        width: double.infinity,
-        height: AuraSizes.cityCardHeight,
-        radius: AuraRadii.card,
+      // The name is known before the reading is, so the shimmer wears it,
+      // and while editing the place can be forgotten without ever having
+      // answered.
+      return Stack(
+        children: <Widget>[
+          const AuraSkeleton(
+            width: double.infinity,
+            height: AuraSizes.cityCardHeight,
+            radius: AuraRadii.card,
+          ),
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.all(AuraSpacing.lg),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      row.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AuraText.titleCard.copyWith(
+                        color: AuraColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  if (isEditing)
+                    Semantics(
+                      button: true,
+                      label: l10n.savedCitiesRemove(row.name),
+                      child: GestureDetector(
+                        onTap: onRemove,
+                        child: const Icon(
+                          AuraIcons.close,
+                          size: AuraSizes.iconMedium,
+                          color: AuraColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
       );
     }
 
