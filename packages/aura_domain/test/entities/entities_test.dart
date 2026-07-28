@@ -88,10 +88,12 @@ void main() {
       );
     });
 
-    test('== distinguishes the same query under a different name', () {
+    test('== treats the same query as the same place whatever its label', () {
+      // The same city arrives named from a search suggestion and bare from
+      // the saved list; the pager and the feed cache key off this equality.
       expect(
         const LocationRef(query: 'Cairo'),
-        isNot(const LocationRef(query: 'Cairo', displayName: 'Home')),
+        const LocationRef(query: 'Cairo', displayName: 'Home'),
       );
     });
 

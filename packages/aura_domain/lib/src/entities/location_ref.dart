@@ -34,15 +34,17 @@ final class LocationRef {
   /// Whether this resolves the device's own location.
   bool get isCurrentLocation => query == 'auto:ip';
 
+  /// Identity is the place asked for, never the label it wears.
+  ///
+  /// The same city arrives with a name from a search suggestion and without
+  /// one from the saved list, and treating those as different places split
+  /// the pager and refetched readings it already had.
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is LocationRef &&
-          other.query == query &&
-          other.displayName == displayName);
+      identical(this, other) || (other is LocationRef && other.query == query);
 
   @override
-  int get hashCode => Object.hash(query, displayName);
+  int get hashCode => query.hashCode;
 
   @override
   String toString() => 'LocationRef($query)';
