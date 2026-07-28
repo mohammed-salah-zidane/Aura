@@ -138,11 +138,14 @@ abstract final class AuraAmbients {
   static const AuraAmbient rain = AuraAmbient(
     kind: AuraAmbientKind.rain,
     color: AuraColors.conditionCloudRain,
-    count: 60,
+    // Short fine strokes rather than long lines: a falling drop reads as a
+    // small dash of water, and a screen-length streak reads as scratches.
+    // The density comes from the count, not from the size of any one drop.
+    count: 96,
     opacity: 0.42,
-    length: 0.085,
-    thickness: 1.4,
-    slant: 0.055,
+    length: 0.022,
+    thickness: 1.1,
+    slant: 0.045,
     speed: 1.8,
   );
 
@@ -150,11 +153,11 @@ abstract final class AuraAmbients {
   static const AuraAmbient thunderstorm = AuraAmbient(
     kind: AuraAmbientKind.rain,
     color: AuraColors.conditionCloudRain,
-    count: 84,
+    count: 132,
     opacity: 0.48,
-    length: 0.11,
-    thickness: 1.6,
-    slant: 0.1,
+    length: 0.03,
+    thickness: 1.2,
+    slant: 0.085,
     speed: 2.6,
     flash: 0.22,
   );
