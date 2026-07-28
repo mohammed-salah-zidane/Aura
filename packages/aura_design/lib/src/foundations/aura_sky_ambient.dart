@@ -149,7 +149,7 @@ abstract final class AuraAmbients {
     slant: 0.02,
     // Fast enough not to float, slow enough that a drop is still a thing the
     // eye can follow for a moment.
-    speed: 3.8,
+    speed: 2.8,
   );
 
   /// Thunderstorm. Rain driven harder, plus the flash.
@@ -161,7 +161,7 @@ abstract final class AuraAmbients {
     length: 0.03,
     thickness: 1.2,
     slant: 0.05,
-    speed: 5.5,
+    speed: 4.2,
     flash: 0.22,
   );
 
