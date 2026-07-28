@@ -87,10 +87,10 @@ final class DeviceLocation implements LocationPort {
       }
       final position = await geo.Geolocator.getCurrentPosition(
         locationSettings: const geo.LocationSettings(
-          // The forecast is for a place, not a street corner. Medium accuracy
-          // answers faster and costs less battery, and the service resolves
-          // the reading to a named place either way.
-          accuracy: geo.LocationAccuracy.medium,
+          // High accuracy, because the fix is one-shot and the place it
+          // resolves is what the whole app stands on; the battery cost of a
+          // single reading is nothing.
+          accuracy: geo.LocationAccuracy.high,
           timeLimit: _timeLimit,
         ),
       );
