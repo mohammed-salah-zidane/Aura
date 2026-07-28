@@ -38,30 +38,44 @@ final class WeatherFeed {
   Duration age(Clock clock) => clock.now().difference(fetchedAt);
 }
 
-/// The whole home screen for the active place, shared by every screen showing
-/// it.
+/// One place's feed, held per place.
 ///
-/// Home and all four detail screens read the same place in the same language,
-/// so they read one provider and the app makes one request rather than five.
+/// A family rather than one provider, so a place that has already answered
+/// keeps its reading: swiping back to it is instant, and swiping to a place
+/// the screen warmed up ahead of time never shows a spinner at all. The home
+/// pager reads the instances directly to do that warming.
 ///
 /// Failure is returned rather than thrown. `AppFailure` is a sealed domain
 /// type and not an `Exception`, and a screen that has to render a recovery
 /// action wants to switch over it rather than inspect an `AsyncError`.
-final weatherFeedProvider = FutureProvider<Result<WeatherFeed, AppFailure>>((
-  ref,
-) async {
-  final startedAt = ref.watch(clockProvider).now();
-  final location = ref.watch(activeLocationProvider);
-  final result = await ref
-      .watch(weatherRepositoryProvider)
-      .snapshot(location, lang: ref.watch(languageProvider));
+// The family's own type is not exported by Riverpod 3, so the annotation the
+// lint asks for here cannot be written.
+// ignore: specify_nonobvious_property_types
+final placeFeedProvider =
+    FutureProvider.family<Result<WeatherFeed, AppFailure>, LocationRef>((
+      ref,
+      location,
+    ) async {
+      final startedAt = ref.watch(clockProvider).now();
+      final result = await ref
+          .watch(weatherRepositoryProvider)
+          .snapshot(location, lang: ref.watch(languageProvider));
 
-  return result.map(
-    (stale) => WeatherFeed(
-      location: location,
-      snapshot: stale.value,
-      fetchedAt: stale.fetchedAt,
-      isLive: !stale.fetchedAt.isBefore(startedAt),
-    ),
-  );
-});
+      return result.map(
+        (stale) => WeatherFeed(
+          location: location,
+          snapshot: stale.value,
+          fetchedAt: stale.fetchedAt,
+          isLive: !stale.fetchedAt.isBefore(startedAt),
+        ),
+      );
+    });
+
+/// The active place's feed, shared by every screen showing it.
+///
+/// Home and all four detail screens read the same place in the same language,
+/// so they read one provider and the app makes one request rather than five.
+final weatherFeedProvider = FutureProvider<Result<WeatherFeed, AppFailure>>(
+  (ref) =>
+      ref.watch(placeFeedProvider(ref.watch(activeLocationProvider)).future),
+);
