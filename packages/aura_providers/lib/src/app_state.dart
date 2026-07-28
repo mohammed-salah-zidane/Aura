@@ -24,6 +24,30 @@ final class ActiveLocation extends Notifier<LocationRef> {
   set location(LocationRef location) => state = location;
 }
 
+/// The device's precise position, once a fix has landed.
+///
+/// Held apart from [activeLocationProvider] on purpose. "Current location" is
+/// one identity across the app: the pager's first page, the saved list's
+/// first row and the active place all name the same symbolic reference, and
+/// the fix only changes what that reference resolves to. Making the fix a
+/// different place broke that: pages stopped matching rows the moment the
+/// coordinates arrived.
+final devicePositionProvider = NotifierProvider<DevicePosition, LocationRef?>(
+  DevicePosition.new,
+);
+
+/// Holds the fix the current-location pages resolve to. Null until one lands.
+final class DevicePosition extends Notifier<LocationRef?> {
+  @override
+  LocationRef? build() => null;
+
+  /// The fix, or null while none has landed.
+  LocationRef? get position => state;
+
+  /// Records a fix.
+  set position(LocationRef position) => state = position;
+}
+
 /// The language every request carries as `lang`.
 ///
 /// WeatherAPI returns `condition.text` already translated, so the language is

@@ -122,15 +122,15 @@ void main() {
 
         await harness.viewModel.useCurrentLocation();
 
-        // The screen is let go at once, standing on the approximate position;
-        // the refiner carries the precise fix over in the background.
+        // The screen is let go at once, and "current location" keeps its one
+        // identity; the fix only changes what that identity resolves to.
         expect(
           harness.container.read(activeLocationProvider),
           const LocationRef.currentByIp(),
         );
 
         await Future<void>.delayed(Duration.zero);
-        expect(harness.container.read(activeLocationProvider), position);
+        expect(harness.container.read(devicePositionProvider), position);
       },
     );
 

@@ -57,9 +57,16 @@ final placeFeedProvider =
       location,
     ) async {
       final startedAt = ref.watch(clockProvider).now();
+      // The current-location page asks with the device's precise fix once one
+      // is known, and with the approximate address until then. The feed's
+      // identity stays the symbolic reference either way, so every screen
+      // naming "current location" is talking about the same page.
+      final query = location.isCurrentLocation
+          ? (ref.watch(devicePositionProvider) ?? location)
+          : location;
       final result = await ref
           .watch(weatherRepositoryProvider)
-          .snapshot(location, lang: ref.watch(languageProvider));
+          .snapshot(query, lang: ref.watch(languageProvider));
 
       return result.map(
         (stale) => WeatherFeed(

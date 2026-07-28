@@ -1,4 +1,5 @@
-import 'package:aura_core/aura_core.dart';
+import 'dart:async';
+
 import 'package:aura_design/aura_design.dart';
 import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_providers/aura_providers.dart';
@@ -50,10 +51,10 @@ final class SplashViewModel extends Notifier<SplashDestination?> {
   Future<SplashDestination> _destination() async {
     final port = ref.read(locationPortProvider);
     if (await port.permission() == LocationPermission.granted) {
-      final position = await port.currentPosition();
-      if (position case Ok<LocationRef, AppFailure>(:final value)) {
-        ref.read(activeLocationProvider.notifier).location = value;
-      }
+      // The fix is not waited for. The app opens on the approximate position
+      // at once, and the refiner sharpens what "current location" resolves
+      // to while the first screen is already up.
+      unawaited(ref.read(locationRefinerProvider.notifier).refine());
       return SplashDestination.weather;
     }
 
