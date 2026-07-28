@@ -3,6 +3,7 @@ import 'package:aura_design/aura_design.dart';
 import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_feature_home/aura_feature_home.dart';
 import 'package:aura_l10n/aura_l10n.dart';
+import 'package:aura_providers/aura_providers.dart';
 import 'package:aura_test_kit/aura_test_kit.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -243,6 +244,39 @@ void main() {
         tester.widget<HomePageDots>(find.byType(HomePageDots)).count,
         1,
         reason: 'the device position is the only place saved',
+      );
+    });
+
+    testWidgets('a place picked on another screen moves the pager under it', (
+      tester,
+    ) async {
+      // Picking a search result sets the active place from outside the
+      // pager. The visible page has to follow, or the sky shows the new
+      // city while the page on screen shimmers for a place nobody asked for.
+      const giza = LocationRef(query: 'Giza');
+      final harness = HomeHarness(
+        snapshot: weatherFixture(),
+        saved: <SavedCity>[
+          SavedCity(
+            location: giza,
+            name: 'Giza',
+            country: 'Egypt',
+            addedAt: fixtureNow,
+          ),
+        ],
+      );
+      await pumpScreen(tester, harness.screen());
+      await tester.pumpAndSettle();
+
+      harness.container.read(activeLocationProvider.notifier).location = giza;
+      await tester.pumpAndSettle();
+
+      final dots = tester.widget<HomePageDots>(find.byType(HomePageDots));
+      expect(dots.index, 1, reason: 'the pager stayed on the page left');
+      expect(
+        find.byType(HomeContent),
+        findsOneWidget,
+        reason: 'the picked place did not land on its reading',
       );
     });
 
