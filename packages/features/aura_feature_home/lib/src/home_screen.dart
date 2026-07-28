@@ -135,7 +135,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final places = _places(saved, active);
     final index = places.indexOf(active).clamp(0, places.length - 1);
-    if (index != _index) _index = index;
+    if (index != _index) {
+      // The active place changed somewhere else: a search result was picked,
+      // or a city was chosen from the saved list. The pager has to move
+      // under it, or the screen sits on a page whose reading is never the
+      // one arriving.
+      _index = index;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final pages = _pages;
+        if (!mounted || pages == null || !pages.hasClients) return;
+        if (pages.page?.round() != _index) pages.jumpToPage(_index);
+      });
+    }
     _pages ??= PageController(initialPage: index);
 
     // The first frame warms the pages beside the opening one, so the very
