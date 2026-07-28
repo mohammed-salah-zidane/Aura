@@ -145,8 +145,11 @@ abstract final class AuraAmbients {
     opacity: 0.42,
     length: 0.022,
     thickness: 1.1,
-    slant: 0.045,
-    speed: 1.8,
+    // Nearly vertical: rain leans with the wind, it does not arrive sideways.
+    slant: 0.02,
+    // Fast enough not to float, slow enough that a drop is still a thing the
+    // eye can follow for a moment.
+    speed: 3.8,
   );
 
   /// Thunderstorm. Rain driven harder, plus the flash.
@@ -157,8 +160,8 @@ abstract final class AuraAmbients {
     opacity: 0.48,
     length: 0.03,
     thickness: 1.2,
-    slant: 0.085,
-    speed: 2.6,
+    slant: 0.05,
+    speed: 5.5,
     flash: 0.22,
   );
 

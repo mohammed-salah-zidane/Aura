@@ -727,7 +727,15 @@ class _AmbientPainter extends CustomPainter {
     }
   }
 
-  /// Slanted streaks falling past the screen.
+  /// Falling drops: a bright head trailing a fading blur.
+  ///
+  /// Three things make the field read as rain rather than as scratches.
+  /// Every drop is two strokes, a faint tail under a shorter brighter head,
+  /// which is what a real drop looks like through a shutter. Depth drives
+  /// everything at once: a nearer drop falls faster, stretches longer and
+  /// reads brighter, so the field has parallax instead of being one plane.
+  /// And each drop leans its own way a little, because rain arrives on
+  /// gusts, not on a ruler.
   void _paintRain(
     Canvas canvas,
     Size size,
@@ -735,23 +743,48 @@ class _AmbientPainter extends CustomPainter {
     double blend,
     double beat,
   ) {
-    final length = size.height * ambient.length;
     final slant = size.width * ambient.slant;
-    final paint = Paint()
-      ..strokeWidth = ambient.thickness
-      ..strokeCap = StrokeCap.round;
+    final paint = Paint()..strokeCap = StrokeCap.round;
 
     for (var i = 0; i < ambient.count; i++) {
-      final fall = AuraAmbientField.progress(i, beat, salt: 7);
+      final depth = _depthFloor + AuraAmbientField.scatter(i, 29) * _depthRange;
+      final fall = AuraAmbientField.progress(
+        i,
+        beat * (_rainFarRate + _rainRateSpread * depth),
+        salt: 7,
+      );
+      final length = size.height * ambient.length * (_rainFarStretch + depth);
+      final lean =
+          slant *
+          (1 + (AuraAmbientField.scatter(i, 41) - 0.5) * _rainLeanJitter);
+
       final x = AuraAmbientField.scatter(i, 13) * (size.width + slant) - slant;
       final y = fall * (size.height + length) - length;
-      // Depth: a nearer streak is darker, so the field does not read as a
-      // single flat plane of identical marks.
-      final depth = _depthFloor + AuraAmbientField.scatter(i, 29) * _depthRange;
-      paint.color = ambient.color.withValues(
-        alpha: ambient.opacity * depth * blend,
+      final head = Offset(x + lean, y + length);
+
+      paint
+        ..strokeWidth = ambient.thickness * depth
+        ..color = ambient.color.withValues(
+          alpha: ambient.opacity * depth * _rainTailShare * blend,
+        );
+      canvas.drawLine(Offset(x, y), head, paint);
+
+      paint
+        ..strokeWidth = ambient.thickness * depth * _rainHeadWidth
+        ..color = ambient.color.withValues(
+          alpha: (ambient.opacity * depth * _rainHeadBoost * blend).clamp(
+            0.0,
+            1.0,
+          ),
+        );
+      canvas.drawLine(
+        Offset(
+          x + lean * (1 - _rainHeadLength),
+          y + length * (1 - _rainHeadLength),
+        ),
+        head,
+        paint,
       );
-      canvas.drawLine(Offset(x, y), Offset(x + slant, y + length), paint);
     }
   }
 
@@ -827,6 +860,22 @@ class _AmbientPainter extends CustomPainter {
   /// How much a mark's alpha and size vary with its depth in the field.
   static const double _depthFloor = 0.55;
   static const double _depthRange = 0.45;
+
+  /// How a drop's fall rate and stretch follow its depth: the farthest sheet
+  /// falls at the base rate, the nearest a third faster and a third longer.
+  static const double _rainFarRate = 0.65;
+  static const double _rainRateSpread = 0.65;
+  static const double _rainFarStretch = 0.35;
+
+  /// How far one drop's lean may stray from the wind's own slant.
+  static const double _rainLeanJitter = 0.3;
+
+  /// The drop through a shutter: a faint tail under a shorter, wider and
+  /// brighter head at the falling end.
+  static const double _rainTailShare = 0.5;
+  static const double _rainHeadLength = 0.22;
+  static const double _rainHeadWidth = 1.6;
+  static const double _rainHeadBoost = 1.45;
 
   /// Snow sways faster than it falls, or it reads as sliding rather than
   /// drifting.
