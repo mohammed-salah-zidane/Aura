@@ -42,9 +42,8 @@ class HomeSectionHeader extends StatelessWidget {
 }
 
 /// A card's title as a sliver: pinned, it holds at the top of its section
-/// while the card passes beneath, then gives way to the next section's title,
-/// wearing a wash only while content is actually under it. Unpinned, for
-/// reduced motion, it simply scrolls with the page.
+/// while the card passes beneath, then gives way to the next section's
+/// title. Unpinned, for reduced motion, it simply scrolls with the page.
 class HomeSectionTitle extends StatelessWidget {
   /// Creates the title sliver.
   const HomeSectionTitle({
@@ -108,8 +107,7 @@ class HomeSectionTitle extends StatelessWidget {
   }
 }
 
-/// Pins a section title at its fixed height and backs it with a wash only
-/// while content is actually passing beneath it.
+/// Pins a section title at its fixed height.
 class _TitleDelegate extends SliverPersistentHeaderDelegate {
   const _TitleDelegate({required this.extent, required this.child});
 
@@ -128,48 +126,17 @@ class _TitleDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        AnimatedOpacity(
-          opacity: overlapsContent ? 1 : 0,
-          duration: AuraMotion.control,
-          curve: AuraMotion.controlCurve,
-          child: const _TitleWash(),
-        ),
-        child,
-      ],
+    // The row is laid out by its type and can come up a point short of the
+    // extent, which a pinned sliver treats as an invalid geometry; filling
+    // the box keeps the paint extent honest.
+    return SizedBox.expand(
+      child: Align(alignment: Alignment.topCenter, child: child),
     );
   }
 
   @override
   bool shouldRebuild(_TitleDelegate oldDelegate) =>
       oldDelegate.extent != extent || oldDelegate.child != child;
-}
-
-/// The wash a stuck title wears so the card sliding under stays quiet.
-class _TitleWash extends StatelessWidget {
-  const _TitleWash();
-
-  static const double _strength = 0.45;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: <Color>[
-            AuraColors.ink2.withValues(alpha: _strength),
-            AuraColors.ink2.withValues(alpha: _strength),
-            AuraColors.ink2.withValues(alpha: 0),
-          ],
-          stops: const <double>[0, 0.6, 1],
-        ),
-      ),
-    );
-  }
 }
 
 /// A glass panel, as every section of the home screen is drawn.
