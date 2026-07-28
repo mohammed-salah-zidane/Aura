@@ -1,4 +1,5 @@
-import 'package:aura_core/aura_core.dart';
+import 'dart:async';
+
 import 'package:aura_domain/aura_domain.dart';
 import 'package:aura_providers/aura_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,20 +21,20 @@ final class PermissionViewModel extends Notifier<bool> {
   @override
   bool build() => false;
 
-  /// Asks, and puts the device's own position on screen if the answer is yes.
+  /// Asks, and returns the moment the prompt is answered.
   ///
-  /// Returns whichever way it went, so the caller can move on either way.
-  /// Refusing is not an error here: WeatherAPI resolves an approximate
-  /// position from the request itself, so the weather still arrives.
+  /// The precise fix is not waited for: it can take many seconds indoors, and
+  /// the app is already standing on the approximate position the service
+  /// resolves without any permission. The refiner carries the fix in the
+  /// background and moves the app onto it once its reading is in hand, so
+  /// the caller leaves for the weather immediately either way. Refusing is
+  /// not an error here, for the same reason.
   Future<void> request() async {
     if (state) return;
     state = true;
     final port = ref.read(locationPortProvider);
     if (await port.request() == LocationPermission.granted) {
-      final position = await port.currentPosition();
-      if (position case Ok<LocationRef, AppFailure>(:final value)) {
-        ref.read(activeLocationProvider.notifier).location = value;
-      }
+      unawaited(ref.read(locationRefinerProvider.notifier).refine());
     }
     state = false;
   }
