@@ -87,7 +87,11 @@ melos:
         Tests with coverage. Named `coverage` rather than `test:coverage`
         because melos matches a script name by prefix, and `melos run test`
         would otherwise stop to ask which of the two was meant.
-      run: flutter test --coverage
+
+        Goldens are excluded: this is the script CI's Linux job runs, and a
+        Linux renderer antialiases differently enough to fail every file.
+        They run in their own job, on the platform that generated them.
+      run: flutter test --coverage --exclude-tags golden
       exec:
         concurrency: 4
       packageFilters:
