@@ -120,9 +120,11 @@ final class SearchViewModel extends Notifier<SearchUiState> {
 
   /// Switches to wherever the device is.
   ///
-  /// Asks for permission if it has never been answered, and falls back to the
-  /// approximate position the service resolves from the request itself. That
-  /// path needs no permission at all, so refusing is never a dead end.
+  /// Asks for permission if it has never been answered, then moves to the
+  /// approximate position at once rather than holding the screen for a fix:
+  /// the service resolves `auto:ip` with no permission at all, so refusing is
+  /// never a dead end, and when the answer was yes the refiner carries the
+  /// precise fix over in the background.
   Future<void> useCurrentLocation() async {
     final port = ref.read(locationPortProvider);
     var permission = await port.permission();
@@ -130,14 +132,10 @@ final class SearchViewModel extends Notifier<SearchUiState> {
       permission = await port.request();
     }
 
-    if (permission == LocationPermission.granted) {
-      final position = await port.currentPosition();
-      if (position case Ok<LocationRef, AppFailure>(:final value)) {
-        ref.read(activeLocationProvider.notifier).location = value;
-        return;
-      }
-    }
     ref.read(activeLocationProvider.notifier).location =
         const LocationRef.currentByIp();
+    if (permission == LocationPermission.granted) {
+      unawaited(ref.read(locationRefinerProvider.notifier).refine());
+    }
   }
 }

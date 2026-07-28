@@ -122,6 +122,14 @@ void main() {
 
         await harness.viewModel.useCurrentLocation();
 
+        // The screen is let go at once, standing on the approximate position;
+        // the refiner carries the precise fix over in the background.
+        expect(
+          harness.container.read(activeLocationProvider),
+          const LocationRef.currentByIp(),
+        );
+
+        await Future<void>.delayed(Duration.zero);
         expect(harness.container.read(activeLocationProvider), position);
       },
     );
