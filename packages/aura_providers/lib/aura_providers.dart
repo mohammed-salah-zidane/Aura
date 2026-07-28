@@ -9,5 +9,6 @@
 library;
 
 export 'src/app_state.dart';
+export 'src/location_refiner.dart';
 export 'src/ports.dart';
 export 'src/weather_feed.dart';
